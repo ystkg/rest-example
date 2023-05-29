@@ -5,14 +5,15 @@
 - Go言語によるREST APIのサンプルコード
 - 題材は商品の価格推移を記録するWebアプリケーション
 - 実用性ではなくフレームワークの特徴を把握するのが目的
-
-| Webフレームワーク | Echo |
-| ORMライブラリ | GORM |
-| テストフレームワーク | Testify |
-| データベース | PostgreSQL |
-
 - 認証は `JWT`
 - テーブルはアプリケーションの起動時に `GORM` のAuto Migrationで生成
+
+<table>
+    <tr><td> Webフレームワーク </td><td> Echo </td></tr>
+    <tr><td> ORMライブラリ </td><td> GORM </td></tr>
+    <tr><td> テストフレームワーク </td><td> Testify </td></tr>
+    <tr><td> データベース </td><td> PostgreSQL </td></tr>
+</table>
 
 # API
 
@@ -238,6 +239,6 @@ docker run --rm --network=rest-develop -p 1323:1323 -e DBURL=postgres://postgres
 
 | 環境変数名 | 必須 | 説明 |
 | ---- | :----: | ---- |
-| DBURL | 〇 | PostgreSQLの接続文字列<br>例） `postgres://postgres:develop@localhost:5432/?sslmode=disable` <br> _※テスト用は固定で変更不可_ |
-| JWTKEY |  | 固定したい場合などに任意の文字列を指定。省略した場合、アプリケーションの起動時にランダム生成し、停止すると発行したトークンは有効期限前に **無効** になる |
+| DBURL | 〇 | PostgreSQLの接続文字列<br>例）<br> `postgres://postgres:develop@localhost:5432/?sslmode=disable` <br> _※テスト用は固定で変更不可_ |
+| JWTKEY |  | 固定したい場合などに任意の文字列を指定。<br>省略した場合、アプリケーションの起動時にランダム生成し、<br>停止すると発行したトークンは有効期限前に **無効** になる |
 | ECHOADDRESS |  | 省略時は `:1323` |
