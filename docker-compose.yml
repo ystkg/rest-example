@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres-develop
+    restart: always
+    networks:
+      - rest-develop
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: develop
+      POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
+      TZ: Asia/Tokyo
+  postgres-test:
+    image: postgres
+    container_name: postgres-test
+    restart: always
+    ports:
+      - 15432:5432
+    shm_size: 1gb
+    environment:
+      POSTGRES_PASSWORD: test
+      PGDATA: /dev/shm/pgdata
+      POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
+      TZ: Asia/Tokyo
+networks:
+  rest-develop:
+    name: rest-develop
