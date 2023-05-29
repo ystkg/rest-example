@@ -121,7 +121,7 @@ curl -X POST -d 'password=pw123' http://localhost:1323/user/user1/token
 ### シェル変数にトークンを設定
 
 ```Shell
-TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUxNzc2NTQsIlVzZXJJZCI6MX0.ypaxze8P9rIylG03y01E98n3YdED77P4x5xZo--TeIw
+TOKEN=`curl -s -X POST -d 'password=pw123' http://localhost:1323/user/user1/token | jq -r '.Token'`
 ```
 
 ### 価格を登録
