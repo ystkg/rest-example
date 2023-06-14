@@ -7,12 +7,18 @@ import (
 	"time"
 
 	"github.com/ystkg/rest-example/handler"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
 	dburl := os.Getenv("DBURL")
 	if dburl == "" {
 		log.Fatal("DBURL is empty")
+	}
+	db, err := gorm.Open(postgres.Open(dburl), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	jwtkeyStr := os.Getenv("JWTKEY")
@@ -32,12 +38,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	h := handler.NewHandler(dburl, jwtkey, location)
-
-	e, err := handler.NewEcho(h)
-	if err != nil {
+	h := handler.NewHandler(db, jwtkey, location)
+	if err := h.InitDB(); err != nil {
 		log.Fatal(err)
 	}
+
+	e := handler.NewEcho(h)
 
 	address := os.Getenv("ECHOADDRESS")
 	if address == "" {

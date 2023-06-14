@@ -66,12 +66,9 @@ func (h *Handler) CreatePrice(c echo.Context) error {
 func (h *Handler) FindPrices(c echo.Context) error {
 	claims := c.Get("user").(*jwt.Token).Claims.(*JwtCustomClaims)
 
-	db, err := h.openDB()
-	if err != nil {
-		return err
-	}
 	var entities []entity.Price
-	if db = db.Where("user_id = ?", claims.UserId).Find(&entities); db.Error != nil {
+	db := h.db.Where("user_id = ?", claims.UserId).Find(&entities)
+	if db.Error != nil {
 		return db.Error
 	}
 
@@ -97,11 +94,7 @@ func (h *Handler) FindPrice(c echo.Context) error {
 		},
 	}
 
-	db, err := h.openDB()
-	if err != nil {
-		return err
-	}
-	if db = db.Where("user_id = ?", claims.UserId).First(price); db.Error != nil {
+	if db := h.db.Where("user_id = ?", claims.UserId).First(price); db.Error != nil {
 		if errors.Is(db.Error, gorm.ErrRecordNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
 		}

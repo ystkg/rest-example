@@ -14,6 +14,8 @@ import (
 
 	"github.com/ystkg/rest-example/entity"
 	"github.com/ystkg/rest-example/handler"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
@@ -94,12 +96,16 @@ func setupTest(testname string) (*echo.Echo, pgx.Tx, []byte, error) {
 		return nil, nil, nil, err
 	}
 
-	h := handler.NewHandler(dburl, jwtkey, location)
-
-	e, err := handler.NewEcho(h)
+	db, err := gorm.Open(postgres.Open(dburl), &gorm.Config{})
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	h := handler.NewHandler(db, jwtkey, location)
+	if err := h.InitDB(); err != nil {
+		return nil, nil, nil, err
+	}
+
+	e := handler.NewEcho(h)
 
 	conn, err := connectDB(dbname)
 	if err != nil {

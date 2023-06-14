@@ -28,6 +28,7 @@ func (h *Handler) AddUser(c echo.Context) error {
 	if req.ID != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, ErrorIDCannotRequest.Error())
 	}
+
 	user := &entity.User{
 		Name:     req.Name,
 		Password: encodePassword(req.Name, req.Password),
@@ -62,12 +63,8 @@ func (h *Handler) GenToken(c echo.Context) error {
 	}
 	password := encodePassword(name, c.FormValue("password"))
 
-	db, err := h.openDB()
-	if err != nil {
-		return err
-	}
 	user := &entity.User{}
-	if db = db.Select("id").Where("name = ? AND password = ?", name, password).First(user); db.Error != nil {
+	if db := h.db.Select("id").Where("name = ? AND password = ?", name, password).First(user); db.Error != nil {
 		if errors.Is(db.Error, gorm.ErrRecordNotFound) {
 			return echo.NewHTTPError(http.StatusForbidden, ErrorAuthenticationFailed.Error())
 		}
