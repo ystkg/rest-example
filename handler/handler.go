@@ -6,22 +6,21 @@ import (
 	"github.com/ystkg/rest-example/entity"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/labstack/echo-jwt/v4"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 type Handler struct {
-	dburl    string
+	db       *gorm.DB
 	jwtkey   []byte
 	location *time.Location
 	layout   string
 }
 
-func NewHandler(dburl string, jwtkey []byte, location *time.Location) *Handler {
+func NewHandler(db *gorm.DB, jwtkey []byte, location *time.Location) *Handler {
 	return &Handler{
-		dburl,
+		db,
 		jwtkey,
 		location,
 		time.DateTime,
@@ -29,29 +28,15 @@ func NewHandler(dburl string, jwtkey []byte, location *time.Location) *Handler {
 }
 
 func (h *Handler) InitDB() error {
-	db, err := h.openDB()
-	if err != nil {
-		return err
-	}
-	return db.AutoMigrate(
+	return h.db.AutoMigrate(
 		&entity.User{},
 		&entity.Price{},
 	)
 }
 
-func (h *Handler) openDB() (*gorm.DB, error) {
-	return gorm.Open(postgres.Open(h.dburl), &gorm.Config{})
-}
-
 func (h *Handler) beginTX() (*gorm.DB, error) {
-	db, err := h.openDB()
-	if err != nil {
-		return nil, err
-	}
-	tx := db.Begin()
-	if tx.Error != nil {
-		err := tx.Error
-		tx.Rollback()
+	tx := h.db.Begin()
+	if err := tx.Error; err != nil {
 		return nil, err
 	}
 	return tx, nil

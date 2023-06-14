@@ -1,17 +1,14 @@
 package handler
 
 import (
-	"github.com/labstack/echo-jwt/v4"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewEcho(h *Handler) (*echo.Echo, error) {
-	if err := h.InitDB(); err != nil {
-		return nil, err
-	}
-
+func NewEcho(h *Handler) *echo.Echo {
 	e := echo.New()
+
 	e.Validator = NewCustomValidator()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -28,5 +25,5 @@ func NewEcho(h *Handler) (*echo.Echo, error) {
 	g.PUT("/price/:id", h.UpdatePrice)
 	g.DELETE("/price/:id", h.DeletePrice)
 
-	return e, nil
+	return e
 }
