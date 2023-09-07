@@ -4,6 +4,6 @@ COPY . .
 RUN go mod download
 RUN CGO_ENABLED=0 go build -o app
 
-FROM gcr.io/distroless/static-debian11:latest
+FROM gcr.io/distroless/static-debian12:latest
 COPY --from=build /build/app /
 CMD [ "/app" ]
