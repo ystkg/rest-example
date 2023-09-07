@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"testing"
@@ -33,13 +32,13 @@ func TestAddUser(t *testing.T) {
 
 	e, tx, _, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	name, password := "testuser01", "testpassword"
@@ -55,14 +54,14 @@ func TestAddUser(t *testing.T) {
 
 	rec, diff, _, err := execHandlerTest(e, tx, req)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Equal(t, 201, rec.Code)
 
 	res := &api.User{}
 	if err := json.Unmarshal(rec.Body.Bytes(), res); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Equal(t, name, res.Name)
@@ -86,15 +85,15 @@ func TestAddUserValidation(t *testing.T) {
 
 	e, tx, _, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	if err := tx.Commit(context.Background()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
-	patterns := []struct {
+	cases := []struct {
 		body string
 		code int
 		err  error
@@ -107,7 +106,7 @@ func TestAddUserValidation(t *testing.T) {
 		{"name=_testuser01&password=testpassword", 400, nil},
 	}
 
-	for _, v := range patterns {
+	for _, v := range cases {
 		req := newRequest(
 			http.MethodPost,
 			"/user",
@@ -118,7 +117,7 @@ func TestAddUserValidation(t *testing.T) {
 
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 
 		assert.Equal(t, v.code, code)
@@ -133,19 +132,19 @@ func TestGenToken(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	name, password := "testuser01", "testpassword"
 	id, err := insertUser(tx, &now, &now, nil, name, encodePassword(name, password))
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	body := "password=" + password
@@ -160,14 +159,14 @@ func TestGenToken(t *testing.T) {
 
 	rec, diff, _, err := execHandlerTest(e, tx, req)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Equal(t, 201, rec.Code)
 
 	res := &api.UserToken{}
 	if err := json.Unmarshal(rec.Body.Bytes(), res); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	token := strings.Split(res.Token, ".")
@@ -175,7 +174,7 @@ func TestGenToken(t *testing.T) {
 	payload := token[1]
 	header, claims, signature, err := decodeJwt(payload, jwtkey)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	assert.Equal(t, header+"."+payload+"."+signature, res.Token)
 	assert.Equal(t, id, claims.UserId)
@@ -188,21 +187,21 @@ func TestGenTokenValidation(t *testing.T) {
 
 	e, tx, _, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	name, password := "testuser01", "testpassword"
 	now := time.Now()
 	if _, err := insertUser(tx, &now, &now, nil, name, encodePassword(name, password)); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	if err := tx.Commit(context.Background()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
-	patterns := []struct {
+	cases := []struct {
 		name string
 		body string
 		code int
@@ -214,7 +213,7 @@ func TestGenTokenValidation(t *testing.T) {
 		{name + "a", "password=" + password, 403, handler.ErrorAuthenticationFailed},
 	}
 
-	for _, v := range patterns {
+	for _, v := range cases {
 		req := newRequest(
 			http.MethodPost,
 			"/user/"+v.name+"/token",
@@ -225,7 +224,7 @@ func TestGenTokenValidation(t *testing.T) {
 
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 
 		assert.Equal(t, v.code, code)

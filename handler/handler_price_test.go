@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"testing"
@@ -31,13 +30,13 @@ func TestCreatePrice(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	userId := uint(1)
@@ -54,14 +53,14 @@ func TestCreatePrice(t *testing.T) {
 
 	rec, diff, _, err := execHandlerTest(e, tx, req)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Equal(t, 201, rec.Code)
 
 	res := &api.Price{}
 	if err := json.Unmarshal(rec.Body.Bytes(), res); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	bodyAppendID := fmt.Sprintf(`{"ID":%d, %s`, *res.ID, body[1:])
@@ -90,17 +89,17 @@ func TestCreatePriceValidation(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	if err := tx.Commit(context.Background()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	userId := uint(1)
 	jwt := genToken(userId, jwtkey)
-	patterns := []struct {
+	cases := []struct {
 		jwt  *string
 		body string
 		code int
@@ -120,7 +119,7 @@ func TestCreatePriceValidation(t *testing.T) {
 		{jwt, `{"ID":1, "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 400, handler.ErrorIDCannotRequest},
 	}
 
-	for _, v := range patterns {
+	for _, v := range cases {
 		req := newRequest(
 			http.MethodPost,
 			"/v1/price",
@@ -131,7 +130,7 @@ func TestCreatePriceValidation(t *testing.T) {
 
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 
 		assert.Equal(t, v.code, code)
@@ -146,13 +145,13 @@ func TestFindPrices(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	userId := uint(1)
@@ -167,14 +166,14 @@ func TestFindPrices(t *testing.T) {
 
 	rec, diff, before, err := execHandlerTest(e, tx, req)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Equal(t, 200, rec.Code)
 
 	res := &[]api.Price{}
 	if err := json.Unmarshal(rec.Body.Bytes(), res); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Nil(t, diff)
@@ -205,22 +204,22 @@ func TestFindPricesValidation(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	userId := uint(1)
 	now := time.Now()
 	if _, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	if err := tx.Commit(context.Background()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	jwt := genToken(userId, jwtkey)
-	patterns := []struct {
+	cases := []struct {
 		jwt  *string
 		code int
 	}{
@@ -228,7 +227,7 @@ func TestFindPricesValidation(t *testing.T) {
 		{jwt, 200},
 	}
 
-	for _, v := range patterns {
+	for _, v := range cases {
 		req := newRequest(
 			http.MethodGet,
 			"/v1/price",
@@ -239,7 +238,7 @@ func TestFindPricesValidation(t *testing.T) {
 
 		code, _, err := execHandlerValidation(e, req)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 
 		assert.Equal(t, v.code, code)
@@ -251,20 +250,20 @@ func TestFindPrice(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	userId := uint(1)
 	store, product, price, inStock := "pcshop", "ssd1T", uint(9500), true
 	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, store, product, price, inStock)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	req := newRequest(
@@ -277,14 +276,14 @@ func TestFindPrice(t *testing.T) {
 
 	rec, diff, before, err := execHandlerTest(e, tx, req)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Equal(t, 200, rec.Code)
 
 	res := &api.Price{}
 	if err := json.Unmarshal(rec.Body.Bytes(), res); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Nil(t, diff)
@@ -304,7 +303,7 @@ func TestFindPriceValidation(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
@@ -312,16 +311,16 @@ func TestFindPriceValidation(t *testing.T) {
 	now := time.Now()
 	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	if err := tx.Commit(context.Background()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	jwt := genToken(userId, jwtkey)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
-	patterns := []struct {
+	cases := []struct {
 		jwt     *string
 		priceId string
 		code    int
@@ -333,7 +332,7 @@ func TestFindPriceValidation(t *testing.T) {
 		{jwt, "a", 404, handler.ErrorNotFound},
 	}
 
-	for _, v := range patterns {
+	for _, v := range cases {
 		req := newRequest(
 			http.MethodGet,
 			fmt.Sprintf("/v1/price/%s", v.priceId),
@@ -344,7 +343,7 @@ func TestFindPriceValidation(t *testing.T) {
 
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 
 		assert.Equal(t, v.code, code)
@@ -359,13 +358,13 @@ func TestUpdatePrice(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	userId := uint(1)
@@ -383,14 +382,14 @@ func TestUpdatePrice(t *testing.T) {
 
 	rec, diff, before, err := execHandlerTest(e, tx, req)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Equal(t, 200, rec.Code)
 
 	res := &api.Price{}
 	if err := json.Unmarshal(rec.Body.Bytes(), res); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.NotNil(t, diff)
@@ -417,7 +416,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
@@ -425,16 +424,16 @@ func TestUpdatePriceValidation(t *testing.T) {
 	now := time.Now()
 	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	if err := tx.Commit(context.Background()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	jwt := genToken(userId, jwtkey)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
-	patterns := []struct {
+	cases := []struct {
 		jwt     *string
 		priceId string
 		body    string
@@ -453,7 +452,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		{jwt, "a", `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 404, handler.ErrorNotFound},
 	}
 
-	for _, v := range patterns {
+	for _, v := range cases {
 		req := newRequest(
 			http.MethodPut,
 			fmt.Sprintf("/v1/price/%s", v.priceId),
@@ -464,7 +463,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 
 		assert.Equal(t, v.code, code)
@@ -479,14 +478,14 @@ func TestDeletePrice(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
 	now := time.Now()
 
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	userId := uint(1)
@@ -502,7 +501,7 @@ func TestDeletePrice(t *testing.T) {
 
 	rec, diff, before, err := execHandlerTest(e, tx, req)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	assert.Equal(t, 204, rec.Code)
@@ -533,7 +532,7 @@ func TestDeletePriceValidation(t *testing.T) {
 
 	e, tx, jwtkey, err := setupTest(testname)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
@@ -541,16 +540,16 @@ func TestDeletePriceValidation(t *testing.T) {
 	now := time.Now()
 	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	if err := tx.Commit(context.Background()); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	jwt := genToken(userId, jwtkey)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
-	patterns := []struct {
+	cases := []struct {
 		jwt     *string
 		priceId string
 		code    int
@@ -563,7 +562,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		{jwt, priceIdStr, 404, handler.ErrorNotFound},
 	}
 
-	for _, v := range patterns {
+	for _, v := range cases {
 		req := newRequest(
 			http.MethodDelete,
 			fmt.Sprintf("/v1/price/%s", v.priceId),
@@ -574,7 +573,7 @@ func TestDeletePriceValidation(t *testing.T) {
 
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 
 		assert.Equal(t, v.code, code)
