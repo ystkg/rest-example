@@ -1,6 +1,6 @@
 module github.com/ystkg/rest-example
 
-go 1.21.1
+go 1.21.3
 
 require (
 	github.com/go-playground/validator v9.31.0+incompatible

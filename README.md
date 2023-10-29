@@ -60,6 +60,15 @@ erDiagram
         bool in_stock
     }
 ```
+## 動作要件
+
+* Go（version 1.21以降）がインストールされていること
+
+例
+```
+$ go version
+go version go1.21.3 linux/amd64
+```
 
 # 使い方
 
