@@ -84,10 +84,10 @@ go mod tidy
 ### PostgreSQLの起動
 
 ```Shell
-docker compose up -d
+docker-compose up -d
 ```
 
-- 上記はDocker Composeのプラグイン版。スタンドアローン版の場合は `docker compose` を `docker-compose` に置換
+- Docker Composeのプラグイン版の場合は `docker compose`
 
 ### 環境変数に接続先のデータベースを設定
 
@@ -216,7 +216,7 @@ curl -X DELETE -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/
 ### PostgreSQLの起動
 
 ```Shell
-docker compose up -d
+docker-compose up -d
 ```
 
 ### テストの実行
@@ -236,7 +236,7 @@ docker build -t rest-example .
 ### PostgreSQLの起動
 
 ```Shell
-docker compose up -d
+docker-compose up -d
 ```
 
 ### アプリケーションの起動
