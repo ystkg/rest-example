@@ -68,7 +68,8 @@ erDiagram
 * Go（version 1.21以降）がインストールされていること
 
 例
-```
+
+```Shell
 $ go version
 go version go1.21.3 linux/amd64
 ```
@@ -108,6 +109,7 @@ go run .
 ```Shell
 curl -X POST -d 'name=user1' -d 'password=pw123' http://localhost:1323/user
 ```
+
 ```JSON
 {
   "ID": 1,
@@ -120,6 +122,7 @@ curl -X POST -d 'name=user1' -d 'password=pw123' http://localhost:1323/user
 ```Shell
 curl -X POST -d 'password=pw123' http://localhost:1323/user/user1/token
 ```
+
 ```JSON
 {
   "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUxNzc2NTQsIlVzZXJJZCI6MX0.ypaxze8P9rIylG03y01E98n3YdED77P4x5xZo--TeIw"
@@ -139,6 +142,7 @@ TOKEN=`curl -s -X POST -d 'password=pw123' http://localhost:1323/user/user1/toke
 ```Shell
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17800, "InStock":true}' http://localhost:1323/v1/price
 ```
+
 ```JSON
 {
   "ID": 1,
@@ -155,6 +159,7 @@ curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/jso
 ```Shell
 curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price
 ```
+
 ```JSON
 [
   {
@@ -173,6 +178,7 @@ curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price
 ```Shell
 curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/1
 ```
+
 ```JSON
 {
   "ID": 1,
@@ -189,6 +195,7 @@ curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/1
 ```Shell
 curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17500, "InStock":true}' http://localhost:1323/v1/price/1
 ```
+
 ```JSON
 {
   "ID": 1,
