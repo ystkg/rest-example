@@ -1,6 +1,6 @@
 # REST APIサンプル
 
-# 概要
+## 概要
 
 - Go言語によるREST APIのサンプルコード
 - 題材は商品の価格推移を記録するWebアプリケーション
@@ -15,16 +15,16 @@
 <tr><td> データベース </td><td> PostgreSQL </td></tr>
 </table>
 
-# API
+## API
 
-## ユーザ
+### ユーザ
 
 | 操作 | METHOD | ENDPOINT | STATUS CODE | REQUEST BODY | RESPONSE BODY |
 | ---- | ---- | ---- | :----: | ---- | ---- |
 | 登録         | POST | /user             | 201 | application/x-www-form-urlencoded | application/json |
 | トークン発行 | POST | /user/:name/token | 201 | application/x-www-form-urlencoded | application/json |
 
-## 価格
+### 価格
 
 | 操作 | METHOD | ENDPOINT | STATUS CODE | REQUEST BODY | RESPONSE BODY |
 | ---- | ---- | ---- | :----: | ---- | ---- |
@@ -34,7 +34,7 @@
 | 更新 | PUT    | /v1/price/:id | 200 | application/json | application/json |
 | 削除 | DELETE | /v1/price/:id | 204 | -                | -                |
 
-# エンティティ
+## エンティティ
 
 ```mermaid
 erDiagram
@@ -61,11 +61,11 @@ erDiagram
     }
 ```
 
-# 使い方
+## 使い方
 
-## 動作要件
+### 動作要件
 
-* Go（version 1.21以降）がインストールされていること
+Go（version 1.21以降）がインストールされていること
 
 例
 
@@ -74,15 +74,15 @@ $ go version
 go version go1.21.4 linux/amd64
 ```
 
-## 起動方法
+### 起動方法
 
-### 依存モジュールの準備
+#### 依存モジュールの準備
 
 ```Shell
 go mod tidy
 ```
 
-### PostgreSQLの起動
+#### PostgreSQLの起動
 
 ```Shell
 docker-compose up -d
@@ -90,21 +90,21 @@ docker-compose up -d
 
 - Docker Composeのプラグイン版の場合は `docker compose`
 
-### 環境変数に接続先のデータベースを設定
+#### 環境変数に接続先のデータベースを設定
 
 ```Shell
 export DBURL=postgres://postgres:develop@localhost:5432/?sslmode=disable
 ```
 
-### アプリケーションの起動
+#### アプリケーションの起動
 
 ```Shell
 go run .
 ```
 
-## 実行例
+### 実行例
 
-### ユーザを登録
+#### ユーザを登録
 
 ```Shell
 curl -X POST -d 'name=user1' -d 'password=pw123' http://localhost:1323/user
@@ -117,7 +117,7 @@ curl -X POST -d 'name=user1' -d 'password=pw123' http://localhost:1323/user
 }
 ```
 
-### トークンの発行
+#### トークンの発行
 
 ```Shell
 curl -X POST -d 'password=pw123' http://localhost:1323/user/user1/token
@@ -131,13 +131,13 @@ curl -X POST -d 'password=pw123' http://localhost:1323/user/user1/token
 
 - 有効期限は2時間
 
-### シェル変数にトークンを設定
+#### シェル変数にトークンを設定
 
 ```Shell
 TOKEN=`curl -s -X POST -d 'password=pw123' http://localhost:1323/user/user1/token | jq -r '.Token'`
 ```
 
-### 価格を登録
+#### 価格を登録
 
 ```Shell
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17800, "InStock":true}' http://localhost:1323/v1/price
@@ -154,7 +154,7 @@ curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/jso
 }
 ```
 
-### 価格の一覧
+#### 価格の一覧
 
 ```Shell
 curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price
@@ -173,7 +173,7 @@ curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price
 ]
 ```
 
-### 価格の取得
+#### 価格の取得
 
 ```Shell
 curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/1
@@ -190,7 +190,7 @@ curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/1
 }
 ```
 
-### 価格の更新
+#### 価格の更新
 
 ```Shell
 curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17500, "InStock":true}' http://localhost:1323/v1/price/1
@@ -207,52 +207,52 @@ curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json
 }
 ```
 
-### 価格の削除
+#### 価格の削除
 
 ```Shell
 curl -X DELETE -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/1
 ```
 
-# 開発関連
+## 開発関連
 
-## テスト
+### テスト
 
 - テスト用に `PostgreSQL` を `15432` ポートで起動させた状態でテスト実行
 - テスト毎に個別のデータベースを作成し、テストが成功したら削除。失敗時は確認用に最後に実行した状態を保持
 
-### PostgreSQLの起動
+#### PostgreSQLの起動
 
 ```Shell
 docker-compose up -d
 ```
 
-### テストの実行
+#### テストの実行
 
 ```Shell
 go test ./handler
 ```
 
-## Docker
+### Docker
 
-### イメージの作成
+#### イメージの作成
 
 ```Shell
 docker build -t rest-example .
 ```
 
-### PostgreSQLの起動
+#### PostgreSQLの起動
 
 ```Shell
 docker-compose up -d
 ```
 
-### アプリケーションの起動
+#### アプリケーションの起動
 
 ```Shell
 docker run --rm --network=rest-develop -p 1323:1323 -e DBURL=postgres://postgres:develop@postgres-develop:5432/?sslmode=disable rest-example
 ```
 
-## 環境変数
+### 環境変数
 
 | 環境変数名 | 必須 | 説明 |
 | ---- | :----: | ---- |
