@@ -45,7 +45,7 @@ func (h *Handler) beginTX() (*gorm.DB, error) {
 func (h *Handler) newJwtConfig() echojwt.Config {
 	return echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(JwtCustomClaims)
+			return JwtCustomClaims{}
 		},
 		SigningKey: h.jwtkey,
 	}

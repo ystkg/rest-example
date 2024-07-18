@@ -89,6 +89,6 @@ func (h *Handler) GenToken(c echo.Context) error {
 }
 
 func encodePassword(user, password string) string {
-	sha256 := sha256.Sum256([]byte(fmt.Sprintf("%s %s", user, password)))
-	return hex.EncodeToString(sha256[:])
+	hash := sha256.Sum256([]byte(fmt.Sprintf("%s %s", user, password)))
+	return hex.EncodeToString(hash[:])
 }
