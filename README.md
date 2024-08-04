@@ -71,7 +71,7 @@ Go（version 1.22以降）がインストールされていること
 
 ```ShellSession
 $ go version
-go version go1.22.4 linux/amd64
+go version go1.22.5 linux/amd64
 ```
 
 ### 起動方法
