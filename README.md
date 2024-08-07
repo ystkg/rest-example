@@ -2,11 +2,10 @@
 
 ## 概要
 
-- Go言語によるREST APIのサンプルコード
-- 題材は商品の価格推移を記録するWebアプリケーション
-- 実用性ではなくフレームワークの特徴を把握するのが目的
+- Go言語によるREST APIのサンプル実装
+- 題材は商品の価格推移を記録していくWebアプリケーション
 - 認証は `JWT`
-- テーブルはアプリケーションの起動時に `GORM` のAuto Migrationで生成
+- テーブルは起動時に `GORM` のAuto Migrationで生成
 
 <table>
 <tr><td> Webフレームワーク </td><td> Echo </td></tr>
@@ -71,7 +70,7 @@ Go（version 1.22以降）がインストールされていること
 
 ```ShellSession
 $ go version
-go version go1.22.5 linux/amd64
+go version go1.22.6 linux/amd64
 ```
 
 ### 起動方法

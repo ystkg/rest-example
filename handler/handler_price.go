@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -10,18 +9,25 @@ import (
 
 	"github.com/ystkg/rest-example/api"
 	"github.com/ystkg/rest-example/entity"
+	"github.com/ystkg/rest-example/service"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
+// 価格の登録
 func (h *Handler) CreatePrice(c echo.Context) error {
-	claims := c.Get("user").(*jwt.Token).Claims.(*JwtCustomClaims)
+	// リクエストの取得
+	userId := h.userId(c)
 	req := &api.Price{}
 	if err := c.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+	inStock := true
+	if req.InStock != nil {
+		inStock = *req.InStock
+	}
+
+	// 入力チェック
 	if err := c.Validate(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -32,173 +38,144 @@ func (h *Handler) CreatePrice(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+
+	// サービスの実行
+	price, err := h.service.CreatePrice(
+		c.Request().Context(),
+		userId,
+		dateTime,
+		req.Store,
+		req.Product,
+		req.Price,
+		inStock,
+	)
+	if err != nil {
+		return err
+	}
+
+	// レスポンスの生成
+	return c.JSONPretty(http.StatusCreated, h.entityToResponse(price), h.indent)
+}
+
+// 価格の一覧
+func (h *Handler) FindPrices(c echo.Context) error {
+	// リクエストの取得
+	userId := h.userId(c)
+
+	// サービスの実行
+	entities, err := h.service.FindPrices(c.Request().Context(), userId)
+	if err != nil {
+		return err
+	}
+
+	// レスポンスの生成
+	sort.SliceStable(entities, func(i, j int) bool { return entities[i].DateTime.Unix() > entities[j].DateTime.Unix() }) // 降順
+	priceList := make([]*api.Price, len(entities))
+	for i, v := range entities {
+		priceList[i] = h.entityToResponse(&v)
+	}
+
+	return c.JSONPretty(http.StatusOK, priceList, h.indent)
+}
+
+// 価格の取得
+func (h *Handler) FindPrice(c echo.Context) error {
+	// リクエストの取得
+	userId := h.userId(c)
+	reqId := c.Param("id")
+
+	// 入力チェック
+	priceId, err := strconv.ParseUint(reqId, 10, 0)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
+	}
+
+	// サービスの実行
+	price, err := h.service.FindPrice(c.Request().Context(), uint(priceId), userId)
+	if err != nil {
+		return err
+	}
+	if price == nil {
+		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
+	}
+
+	// レスポンスの生成
+	return c.JSONPretty(http.StatusOK, h.entityToResponse(price), h.indent)
+}
+
+// 価格の更新
+func (h *Handler) UpdatePrice(c echo.Context) error {
+	// リクエストの取得
+	userId := h.userId(c)
+	reqId := c.Param("id")
+	req := &api.Price{}
+	if err := c.Bind(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
 	inStock := true
 	if req.InStock != nil {
 		inStock = *req.InStock
 	}
 
-	price := &entity.Price{
-		UserID:   claims.UserId,
-		DateTime: dateTime,
-		Store:    req.Store,
-		Product:  req.Product,
-		Price:    req.Price,
-		InStock:  inStock,
-	}
-
-	tx, err := h.beginTX()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	if tx = tx.Create(price); tx.Error != nil {
-		err := tx.Error
-		tx.Rollback()
-		return err
-	}
-	if err := tx.Commit().Error; err != nil {
-		return err
-	}
-
-	return c.JSONPretty(http.StatusCreated, h.entityToResponse(price), "  ")
-}
-
-func (h *Handler) FindPrices(c echo.Context) error {
-	claims := c.Get("user").(*jwt.Token).Claims.(*JwtCustomClaims)
-
-	var entities []entity.Price
-	db := h.db.Where("user_id = ?", claims.UserId).Find(&entities)
-	if db.Error != nil {
-		return db.Error
-	}
-
-	priceList := make([]*api.Price, db.RowsAffected)
-	for i, v := range entities {
-		priceList[i] = h.entityToResponse(&v)
-	}
-	sort.SliceStable(priceList, func(i, j int) bool { return entities[j].DateTime.Unix() < entities[i].DateTime.Unix() }) // desc
-
-	return c.JSONPretty(http.StatusOK, priceList, "  ")
-}
-
-func (h *Handler) FindPrice(c echo.Context) error {
-	claims := c.Get("user").(*jwt.Token).Claims.(*JwtCustomClaims)
-	id, err := strconv.Atoi(c.Param("id"))
+	// 入力チェック
+	priceId, err := strconv.ParseUint(reqId, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
 	}
-
-	price := &entity.Price{
-		Model: gorm.Model{
-			ID: uint(id),
-		},
-	}
-
-	if db := h.db.Where("user_id = ?", claims.UserId).First(price); db.Error != nil {
-		if errors.Is(db.Error, gorm.ErrRecordNotFound) {
-			return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
-		}
-		return db.Error
-	}
-
-	return c.JSONPretty(http.StatusOK, h.entityToResponse(price), "  ")
-}
-
-func (h *Handler) UpdatePrice(c echo.Context) error {
-	claims := c.Get("user").(*jwt.Token).Claims.(*JwtCustomClaims)
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
-	}
-	req := &api.Price{}
-	if err := c.Bind(req); err != nil {
+	if err = c.Validate(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if err := c.Validate(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	if req.ID != nil && *req.ID != uint(id) {
+	if req.ID != nil && *req.ID != uint(priceId) {
 		return echo.NewHTTPError(http.StatusBadRequest, ErrorIDUnchangeable.Error())
 	}
 	dateTime, err := h.parseDateTime(req.DateTime)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	inStock := true
-	if req.InStock != nil {
-		inStock = *req.InStock
-	}
 
-	price := &entity.Price{
-		Model: gorm.Model{
-			ID: uint(id),
-		},
-		UserID:   claims.UserId,
-		DateTime: dateTime,
-		Store:    req.Store,
-		Product:  req.Product,
-		Price:    req.Price,
-		InStock:  inStock,
-	}
-
-	tx, err := h.beginTX()
+	// サービスの実行
+	price, err := h.service.UpdatePrice(
+		c.Request().Context(),
+		uint(priceId),
+		userId,
+		dateTime,
+		req.Store,
+		req.Product,
+		req.Price,
+		inStock,
+	)
 	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	if tx = tx.Where("user_id = ? and deleted_at is null", claims.UserId).Updates(price); tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
-	}
-	rows := tx.RowsAffected
-	if rows != 1 {
-		tx.Rollback()
-		if rows == 0 {
+		if errors.Is(err, service.ErrorNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
 		}
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("RowsAffected:%d", tx.RowsAffected))
-	}
-	if err := tx.Commit().Error; err != nil {
 		return err
 	}
 
-	return c.JSONPretty(http.StatusOK, h.entityToResponse(price), "  ")
+	// レスポンスの生成
+	return c.JSONPretty(http.StatusOK, h.entityToResponse(price), h.indent)
 }
 
+// 価格の削除
 func (h *Handler) DeletePrice(c echo.Context) error {
-	claims := c.Get("user").(*jwt.Token).Claims.(*JwtCustomClaims)
-	id, err := strconv.Atoi(c.Param("id"))
+	// リクエストの取得
+	userId := h.userId(c)
+	reqId := c.Param("id")
+
+	// 入力チェック
+	priceId, err := strconv.ParseUint(reqId, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
 	}
 
-	price := &entity.Price{
-		Model: gorm.Model{
-			ID: uint(id),
-		},
-	}
-
-	tx, err := h.beginTX()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	if tx = tx.Where("user_id = ?", claims.UserId).Delete(price); tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
-	}
-	rows := tx.RowsAffected
-	if rows != 1 {
-		tx.Rollback()
-		if rows == 0 {
+	// サービスの実行
+	if err = h.service.DeletePrice(c.Request().Context(), uint(priceId), userId); err != nil {
+		if errors.Is(err, service.ErrorNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
 		}
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("RowsAffected:%d", tx.RowsAffected))
-	}
-	if err := tx.Commit().Error; err != nil {
 		return err
 	}
 
+	// レスポンスの生成
 	return c.NoContent(http.StatusNoContent)
 }
 
@@ -210,15 +187,13 @@ func (h *Handler) parseDateTime(dateTime *string) (time.Time, error) {
 }
 
 func (h *Handler) entityToResponse(entity *entity.Price) *api.Price {
-	id := entity.ID
 	dateTime := entity.DateTime.Format(h.layout)
-	inStock := entity.InStock
 	return &api.Price{
-		ID:       &id,
+		ID:       &entity.ID,
 		DateTime: &dateTime,
 		Store:    entity.Store,
 		Product:  entity.Product,
 		Price:    entity.Price,
-		InStock:  &inStock,
+		InStock:  &entity.InStock,
 	}
 }

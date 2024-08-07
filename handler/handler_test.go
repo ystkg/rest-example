@@ -14,8 +14,8 @@ import (
 
 	"github.com/ystkg/rest-example/entity"
 	"github.com/ystkg/rest-example/handler"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/ystkg/rest-example/repository"
+	"github.com/ystkg/rest-example/service"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
@@ -82,31 +82,40 @@ func dropDatabaseIfExists(conn *pgx.Conn, dbname string) error {
 }
 
 func setupTest(testname string) (*echo.Echo, pgx.Tx, []byte, error) {
+	// Database
 	dbname := strings.ToLower(testname)
-
 	dburl, err := createTestDatabase(dbname)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	jwtkey := []byte(testname)
+	// Repository
+	r, err := repository.NewRepository(dburl)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if err := r.InitDb(context.Background()); err != nil {
+		return nil, nil, nil, err
+	}
 
+	// Service
+	s := service.NewService(r)
+
+	// Handler
+	jwtkey := []byte(testname)
+	validityMin := 1
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	indent := "  "
+	timeoutSec := 60
+	h := handler.NewHandler(s, jwtkey, validityMin, location, indent, timeoutSec)
 
-	db, err := gorm.Open(postgres.Open(dburl), &gorm.Config{})
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	h := handler.NewHandler(db, jwtkey, location)
-	if err := h.InitDB(); err != nil {
-		return nil, nil, nil, err
-	}
-
+	// Echo
 	e := handler.NewEcho(h)
 
+	// トランザクション
 	conn, err := connectDB(dbname)
 	if err != nil {
 		return nil, nil, nil, err
