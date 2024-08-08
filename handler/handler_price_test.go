@@ -28,7 +28,7 @@ func somePrices() [][6]any {
 func TestCreatePrice(t *testing.T) {
 	testname := "TestCreatePrice"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,7 +48,7 @@ func TestCreatePrice(t *testing.T) {
 		"/v1/price",
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, jwtkey),
+		genToken(userId, jwtkey, validityMin),
 	)
 
 	rec, diff, _, err := execHandlerTest(e, tx, req)
@@ -87,7 +87,7 @@ func TestCreatePrice(t *testing.T) {
 func TestCreatePriceValidation(t *testing.T) {
 	testname := "TestCreatePriceValidation"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func TestCreatePriceValidation(t *testing.T) {
 	}
 
 	userId := uint(1)
-	jwt := genToken(userId, jwtkey)
+	jwt := genToken(userId, jwtkey, validityMin)
 	cases := []struct {
 		jwt  *string
 		body string
@@ -143,7 +143,7 @@ func TestCreatePriceValidation(t *testing.T) {
 func TestFindPrices(t *testing.T) {
 	testname := "TestFindPrices"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +161,7 @@ func TestFindPrices(t *testing.T) {
 		"/v1/price",
 		nil,
 		"",
-		genToken(userId, jwtkey),
+		genToken(userId, jwtkey, validityMin),
 	)
 
 	rec, diff, before, err := execHandlerTest(e, tx, req)
@@ -202,7 +202,7 @@ func TestFindPrices(t *testing.T) {
 func TestFindPricesValidation(t *testing.T) {
 	testname := "TestFindPricesValidation"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -218,7 +218,7 @@ func TestFindPricesValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt := genToken(userId, jwtkey)
+	jwt := genToken(userId, jwtkey, validityMin)
 	cases := []struct {
 		jwt  *string
 		code int
@@ -248,7 +248,7 @@ func TestFindPricesValidation(t *testing.T) {
 func TestFindPrice(t *testing.T) {
 	testname := "TestFindPrice"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -271,7 +271,7 @@ func TestFindPrice(t *testing.T) {
 		fmt.Sprintf("/v1/price/%d", priceId),
 		nil,
 		"",
-		genToken(userId, jwtkey),
+		genToken(userId, jwtkey, validityMin),
 	)
 
 	rec, diff, before, err := execHandlerTest(e, tx, req)
@@ -301,7 +301,7 @@ func TestFindPrice(t *testing.T) {
 func TestFindPriceValidation(t *testing.T) {
 	testname := "TestFindPriceValidation"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -318,7 +318,7 @@ func TestFindPriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt := genToken(userId, jwtkey)
+	jwt := genToken(userId, jwtkey, validityMin)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string
@@ -356,7 +356,7 @@ func TestFindPriceValidation(t *testing.T) {
 func TestUpdatePrice(t *testing.T) {
 	testname := "TestUpdatePrice"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -377,7 +377,7 @@ func TestUpdatePrice(t *testing.T) {
 		fmt.Sprintf("/v1/price/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, jwtkey),
+		genToken(userId, jwtkey, validityMin),
 	)
 
 	rec, diff, before, err := execHandlerTest(e, tx, req)
@@ -414,7 +414,7 @@ func TestUpdatePrice(t *testing.T) {
 func TestUpdatePriceValidation(t *testing.T) {
 	testname := "TestUpdatePriceValidation"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -431,7 +431,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt := genToken(userId, jwtkey)
+	jwt := genToken(userId, jwtkey, validityMin)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string
@@ -476,7 +476,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 func TestDeletePrice(t *testing.T) {
 	testname := "TestDeletePrice"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -496,7 +496,7 @@ func TestDeletePrice(t *testing.T) {
 		fmt.Sprintf("/v1/price/%d", priceId),
 		nil,
 		"",
-		genToken(userId, jwtkey),
+		genToken(userId, jwtkey, validityMin),
 	)
 
 	rec, diff, before, err := execHandlerTest(e, tx, req)
@@ -530,7 +530,7 @@ func TestDeletePrice(t *testing.T) {
 func TestDeletePriceValidation(t *testing.T) {
 	testname := "TestDeletePriceValidation"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -547,7 +547,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt := genToken(userId, jwtkey)
+	jwt := genToken(userId, jwtkey, validityMin)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string

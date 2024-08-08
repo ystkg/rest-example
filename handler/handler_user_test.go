@@ -27,10 +27,10 @@ func someUsers() [][2]any {
 	}
 }
 
-func TestAddUser(t *testing.T) {
-	testname := "TestAddUser"
+func TestCreateUser(t *testing.T) {
+	testname := "TestCreateUser"
 
-	e, tx, _, err := setupTest(testname)
+	e, tx, _, _, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,10 +80,10 @@ func TestAddUser(t *testing.T) {
 	assert.Equal(t, encodePassword(name, password), entity.Password)
 }
 
-func TestAddUserValidation(t *testing.T) {
-	testname := "TestAddUserValidation"
+func TestCreateUserValidation(t *testing.T) {
+	testname := "TestCreateUserValidation"
 
-	e, tx, _, err := setupTest(testname)
+	e, tx, _, _, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func TestAddUserValidation(t *testing.T) {
 func TestGenToken(t *testing.T) {
 	testname := "TestGenToken"
 
-	e, tx, jwtkey, err := setupTest(testname)
+	e, tx, jwtkey, _, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -185,7 +185,7 @@ func TestGenToken(t *testing.T) {
 func TestGenTokenValidation(t *testing.T) {
 	testname := "TestGenTokenValidation"
 
-	e, tx, _, err := setupTest(testname)
+	e, tx, _, _, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}

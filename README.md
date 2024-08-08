@@ -228,7 +228,7 @@ docker-compose up -d
 #### テストの実行
 
 ```Shell
-go test ./handler
+go test -coverpkg=./handler,./service,./repository ./handler
 ```
 
 ### Docker
