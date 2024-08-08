@@ -12,8 +12,9 @@ func NewEcho(h *Handler) *echo.Echo {
 	e.Validator = NewCustomValidator()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(timeout(h.timeoutSec))
 
-	e.POST("/user", h.AddUser)
+	e.POST("/user", h.CreateUser)
 	e.POST("/user/:name/token", h.GenToken)
 
 	g := e.Group("/v1")

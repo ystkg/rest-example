@@ -14,8 +14,8 @@ import (
 
 	"github.com/ystkg/rest-example/entity"
 	"github.com/ystkg/rest-example/handler"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/ystkg/rest-example/repository"
+	"github.com/ystkg/rest-example/service"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
@@ -82,31 +82,40 @@ func dropDatabaseIfExists(conn *pgx.Conn, dbname string) error {
 }
 
 func setupTest(testname string) (*echo.Echo, pgx.Tx, []byte, error) {
+	// Database
 	dbname := strings.ToLower(testname)
-
 	dburl, err := createTestDatabase(dbname)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	jwtkey := []byte(testname)
+	// Repository
+	r, err := repository.NewRepository(dburl)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if err := r.InitDb(context.Background()); err != nil {
+		return nil, nil, nil, err
+	}
 
+	// Service
+	s := service.NewService(r)
+
+	// Handler
+	jwtkey := []byte(testname)
+	validityMin := 1
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	indent := "  "
+	timeoutSec := 60
+	h := handler.NewHandler(s, jwtkey, validityMin, location, indent, timeoutSec)
 
-	db, err := gorm.Open(postgres.Open(dburl), &gorm.Config{})
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	h := handler.NewHandler(db, jwtkey, location)
-	if err := h.InitDB(); err != nil {
-		return nil, nil, nil, err
-	}
-
+	// Echo
 	e := handler.NewEcho(h)
 
+	// トランザクション
 	conn, err := connectDB(dbname)
 	if err != nil {
 		return nil, nil, nil, err
@@ -257,7 +266,8 @@ func (t *Tables) count() (c int) {
 	return
 }
 
-func (t *Tables) findUser(ID uint) *entity.User {
+// X:instead of 'lint:ignore U1000'. remove X if use.
+func (t *Tables) XfindUser(ID uint) *entity.User {
 	entity, ok := t.users[ID]
 	if !ok {
 		return nil
@@ -272,7 +282,8 @@ func (t *Tables) userAny() *entity.User {
 	return nil
 }
 
-func (t *Tables) userList() []*entity.User {
+// X:instead of 'lint:ignore U1000'. remove X if use.
+func (t *Tables) XuserList() []*entity.User {
 	entities := make([]*entity.User, 0, len(t.users))
 	for _, v := range t.users {
 		entities = append(entities, v)
@@ -296,7 +307,8 @@ func (t *Tables) priceAny() *entity.Price {
 	return nil
 }
 
-func (t *Tables) priceList() []*entity.Price {
+// X:instead of 'lint:ignore U1000'. remove X if use.
+func (t *Tables) XpriceList() []*entity.Price {
 	entities := make([]*entity.Price, 0, len(t.prices))
 	for _, v := range t.prices {
 		entities = append(entities, v)
@@ -338,7 +350,7 @@ func loadUsers(tx pgx.Tx) (map[uint]*entity.User, error) {
 
 	users := make(map[uint]*entity.User)
 	for rows.Next() {
-		user := new(entity.User)
+		user := &entity.User{}
 		rows.Scan(
 			&user.ID,
 			&user.CreatedAt,
@@ -363,7 +375,7 @@ func loadPrices(tx pgx.Tx) (map[uint]*entity.Price, error) {
 
 	prices := make(map[uint]*entity.Price)
 	for rows.Next() {
-		price := new(entity.Price)
+		price := &entity.Price{}
 		rows.Scan(
 			&price.ID,
 			&price.CreatedAt,
@@ -471,10 +483,10 @@ func insertUser(tx pgx.Tx, createdAt, updatedAt, deletedAt *time.Time, name, pas
 	return
 }
 
-func insertUsers(tx pgx.Tx, time *time.Time, rows [][2]any) (int64, error) {
+func insertUsers(tx pgx.Tx, t *time.Time, rows [][2]any) (int64, error) {
 	inputRows := make([][]any, len(rows))
 	for i, v := range rows {
-		inputRows[i] = []any{time, time, v[0], v[1]}
+		inputRows[i] = []any{t, t, v[0], v[1]}
 	}
 	return tx.CopyFrom(
 		context.Background(),
@@ -490,10 +502,10 @@ func insertPrice(tx pgx.Tx, createdAt, updatedAt, deletedAt *time.Time, userID u
 	return
 }
 
-func insertPrices(tx pgx.Tx, time *time.Time, rows [][6]any) (int64, error) {
+func insertPrices(tx pgx.Tx, t *time.Time, rows [][6]any) (int64, error) {
 	inputRows := make([][]any, len(rows))
 	for i, v := range rows {
-		inputRows[i] = []any{time, time, v[0], v[1], v[2], v[3], v[4], v[5]}
+		inputRows[i] = []any{t, t, v[0], v[1], v[2], v[3], v[4], v[5]}
 	}
 	return tx.CopyFrom(
 		context.Background(),
