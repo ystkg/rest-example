@@ -24,9 +24,6 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	if err := c.Validate(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if req.ID != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, ErrorIDCannotRequest.Error())
-	}
 
 	// サービスの実行
 	userId, err := h.service.CreateUser(c.Request().Context(), req.Name, req.Password)
