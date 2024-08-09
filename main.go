@@ -4,7 +4,10 @@ import (
 	"context"
 	"crypto/rand"
 	"log"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/ystkg/rest-example/handler"
@@ -55,11 +58,23 @@ func main() {
 	timeoutSec := 60
 	h := handler.NewHandler(s, jwtkey, validityMin, location, indent, timeoutSec)
 
-	// Echo
+	// Echo(Graceful Shutdown)
 	address := os.Getenv("ECHOADDRESS")
 	if address == "" {
 		address = ":1323"
 	}
 	e := handler.NewEcho(h)
-	e.Logger.Fatal(e.Start(address))
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+	go func() {
+		if err := e.Start(address); err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
+		}
+	}()
+	<-ctx.Done()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutSec)*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	}
 }
