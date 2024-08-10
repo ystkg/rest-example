@@ -24,7 +24,7 @@ func TestCreateUserCreateError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.user = newMockUserRepository(h.Service().(*serviceMock))
 	mock.user.(*userRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
@@ -60,7 +60,7 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	// mock
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.beginTxErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
@@ -96,7 +96,7 @@ func TestCreateUserCommitError(t *testing.T) {
 	// mock
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.commitErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
@@ -133,7 +133,7 @@ func TestGenTokenFindError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.user = newMockUserRepository(h.Service().(*serviceMock))
 	mock.user.(*userRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {

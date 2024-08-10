@@ -89,7 +89,7 @@ func setupTest(testname string) (*echo.Echo, pgx.Tx, []byte, int, error) {
 func setupMockTest(testname string) (*echo.Echo, *handler.Handler, pgx.Tx, []byte, int, error) {
 	e, h, _, r, tx, jwtkey, validityMin, err := setupTestMain(testname)
 	if err == nil {
-		h.SetService(newMockService(r))
+		h.SetMockService(newMockService(r))
 	}
 	return e, h, tx, jwtkey, validityMin, err
 }

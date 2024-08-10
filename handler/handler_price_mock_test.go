@@ -24,7 +24,7 @@ func TestCreatePriceCreateError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
 	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -61,7 +61,7 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 	// mock
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.beginTxErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -98,7 +98,7 @@ func TestCreatePriceCommitError(t *testing.T) {
 	// mock
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.commitErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -136,7 +136,7 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
 	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -172,7 +172,7 @@ func TestFindPriceFindError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
 	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -213,7 +213,7 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
 	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -252,7 +252,7 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
 	mock.price.(*priceRepositoryMock).rowsAffected, mock.price.(*priceRepositoryMock).overwirte = 2, true
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -290,7 +290,7 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 	// mock
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.beginTxErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -328,7 +328,7 @@ func TestUpdatePriceCommitError(t *testing.T) {
 	// mock
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.commitErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
@@ -367,7 +367,7 @@ func TestDeletePriceDeleteError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
 	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 
@@ -405,7 +405,7 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
 	mock.price.(*priceRepositoryMock).rowsAffected, mock.price.(*priceRepositoryMock).overwirte = 2, true
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 
@@ -442,7 +442,7 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 	// mock
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.beginTxErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 
@@ -479,7 +479,7 @@ func TestDeletePriceCommitError(t *testing.T) {
 	// mock
 	mock := newMockRepository(h.Service().(*serviceMock))
 	mock.commitErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	h.SetMockService(newMockService(mock))
 
 	now := time.Now()
 
