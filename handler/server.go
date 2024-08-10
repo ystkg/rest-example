@@ -21,7 +21,7 @@ func NewEcho(h *Handler) *echo.Echo {
 	root.POST("user/:name/token", h.GenToken)
 
 	g := root.Group("v1/")
-	g.Use(echojwt.WithConfig(h.newJwtConfig()))
+	g.Use(echojwt.WithConfig(h.jwtConfig))
 
 	g.POST("price", h.CreatePrice)
 	g.GET("price", h.FindPrices)
