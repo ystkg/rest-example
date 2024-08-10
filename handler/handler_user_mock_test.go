@@ -15,17 +15,14 @@ func TestCreateUserCreateError(t *testing.T) {
 	testname := "TestCreateUserCreateError"
 
 	// セットアップ
-	e, h, tx, _, _, err := setupMockTest(testname)
+	e, mock, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.user = newMockUserRepository(h.Service().(*serviceMock))
-	mock.user.(*userRepositoryMock).err = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.user.err = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -48,7 +45,7 @@ func TestCreateUserCreateError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.user.(*userRepositoryMock).err, err)
+	assert.Equal(t, mock.repository.user.err, err)
 	assert.Nil(t, diff)
 }
 
@@ -56,16 +53,14 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	testname := "TestCreateUserBeginTxError"
 
 	// セットアップ
-	e, h, tx, _, _, err := setupMockTest(testname)
+	e, mock, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.beginTxErr = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.beginTxErr = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -88,7 +83,7 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.beginTxErr, err)
+	assert.Equal(t, mock.repository.beginTxErr, err)
 	assert.Nil(t, diff)
 }
 
@@ -96,16 +91,14 @@ func TestCreateUserCommitError(t *testing.T) {
 	testname := "TestCreateUserCommitError"
 
 	// セットアップ
-	e, h, tx, _, _, err := setupMockTest(testname)
+	e, mock, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.commitErr = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.commitErr = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -128,7 +121,7 @@ func TestCreateUserCommitError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.commitErr, err)
+	assert.Equal(t, mock.repository.commitErr, err)
 	assert.Nil(t, diff)
 }
 
@@ -136,17 +129,14 @@ func TestGenTokenFindError(t *testing.T) {
 	testname := "TestGenTokenFindError"
 
 	// セットアップ
-	e, h, tx, _, _, err := setupMockTest(testname)
+	e, mock, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.user = newMockUserRepository(h.Service().(*serviceMock))
-	mock.user.(*userRepositoryMock).err = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.user.err = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -174,6 +164,6 @@ func TestGenTokenFindError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.user.(*userRepositoryMock).err, err)
+	assert.Equal(t, mock.repository.user.err, err)
 	assert.Nil(t, diff)
 }

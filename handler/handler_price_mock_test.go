@@ -15,17 +15,14 @@ func TestCreatePriceCreateError(t *testing.T) {
 	testname := "TestCreatePriceCreateError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -49,7 +46,7 @@ func TestCreatePriceCreateError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
@@ -57,16 +54,14 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 	testname := "TestCreatePriceBeginTxError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.beginTxErr = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.beginTxErr = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -90,7 +85,7 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.beginTxErr, err)
+	assert.Equal(t, mock.repository.beginTxErr, err)
 	assert.Nil(t, diff)
 }
 
@@ -98,16 +93,14 @@ func TestCreatePriceCommitError(t *testing.T) {
 	testname := "TestCreatePriceCommitError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.commitErr = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.commitErr = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -131,7 +124,7 @@ func TestCreatePriceCommitError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.commitErr, err)
+	assert.Equal(t, mock.repository.commitErr, err)
 	assert.Nil(t, diff)
 }
 
@@ -139,17 +132,14 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 	testname := "TestFindPricesFindByUserIdError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -171,7 +161,7 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
@@ -179,17 +169,14 @@ func TestFindPriceFindError(t *testing.T) {
 	testname := "TestFindPriceFindError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -216,7 +203,7 @@ func TestFindPriceFindError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
@@ -224,17 +211,14 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 	testname := "TestUpdatePriceUpdateError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -259,7 +243,7 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
@@ -267,17 +251,14 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	testname := "TestUpdatePriceRowsAffectedError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).rowsAffected, mock.price.(*priceRepositoryMock).overwirte = 2, true
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.rowsAffected, mock.repository.price.overwirte = 2, true
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -302,7 +283,7 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.price.(*priceRepositoryMock).rowsAffected), err)
+	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.repository.price.rowsAffected), err)
 	assert.Nil(t, diff)
 }
 
@@ -310,16 +291,14 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 	testname := "TestUpdatePriceBeginTxError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.beginTxErr = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.beginTxErr = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -344,7 +323,7 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.beginTxErr, err)
+	assert.Equal(t, mock.repository.beginTxErr, err)
 	assert.Nil(t, diff)
 }
 
@@ -352,16 +331,14 @@ func TestUpdatePriceCommitError(t *testing.T) {
 	testname := "TestUpdatePriceCommitError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.commitErr = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.commitErr = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -386,7 +363,7 @@ func TestUpdatePriceCommitError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.commitErr, err)
+	assert.Equal(t, mock.repository.commitErr, err)
 	assert.Nil(t, diff)
 }
 
@@ -394,17 +371,14 @@ func TestDeletePriceDeleteError(t *testing.T) {
 	testname := "TestDeletePriceDeleteError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -427,7 +401,7 @@ func TestDeletePriceDeleteError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
@@ -435,17 +409,14 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 	testname := "TestDeletePriceRowsAffectedError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).rowsAffected, mock.price.(*priceRepositoryMock).overwirte = 2, true
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.rowsAffected, mock.repository.price.overwirte = 2, true
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -468,7 +439,7 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.price.(*priceRepositoryMock).rowsAffected), err)
+	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.repository.price.rowsAffected), err)
 	assert.Nil(t, diff)
 }
 
@@ -476,16 +447,14 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 	testname := "TestDeletePriceBeginTxError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.beginTxErr = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.beginTxErr = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -508,7 +477,7 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.beginTxErr, err)
+	assert.Equal(t, mock.repository.beginTxErr, err)
 	assert.Nil(t, diff)
 }
 
@@ -516,16 +485,14 @@ func TestDeletePriceCommitError(t *testing.T) {
 	testname := "TestDeletePriceCommitError"
 
 	// セットアップ
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.commitErr = errors.New(testname)
-	h.SetMockService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.commitErr = errors.New(testname)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -548,6 +515,6 @@ func TestDeletePriceCommitError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, mock.commitErr, err)
+	assert.Equal(t, mock.repository.commitErr, err)
 	assert.Nil(t, diff)
 }

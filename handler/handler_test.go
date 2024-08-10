@@ -82,33 +82,35 @@ func dropDatabaseIfExists(conn *pgx.Conn, dbname string) error {
 }
 
 func setupTest(testname string) (*echo.Echo, pgx.Tx, []byte, int, error) {
-	e, _, _, _, tx, jwtkey, validityMin, err := setupTestMain(testname)
+	e, _, _, tx, jwtkey, validityMin, err := setupTestMain(testname)
 	return e, tx, jwtkey, validityMin, err
 }
 
-func setupMockTest(testname string) (*echo.Echo, *handler.Handler, pgx.Tx, []byte, int, error) {
-	e, h, _, r, tx, jwtkey, validityMin, err := setupTestMain(testname)
+func setupMockTest(testname string) (*echo.Echo, *serviceMock, pgx.Tx, []byte, int, error) {
+	e, h, r, tx, jwtkey, validityMin, err := setupTestMain(testname)
+	var mock *serviceMock
 	if err == nil {
-		h.SetMockService(newMockService(r))
+		mock = newMockService(newMockRepository(r))
+		h.SetMockService(mock)
 	}
-	return e, h, tx, jwtkey, validityMin, err
+	return e, mock, tx, jwtkey, validityMin, err
 }
 
-func setupTestMain(testname string) (*echo.Echo, *handler.Handler, service.Service, repository.Repository, pgx.Tx, []byte, int, error) {
+func setupTestMain(testname string) (*echo.Echo, *handler.Handler, repository.Repository, pgx.Tx, []byte, int, error) {
 	// Database
 	dbname := strings.ToLower(testname)
 	dburl, err := createTestDatabase(dbname)
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, 0, err
 	}
 
 	// Repository
 	r, err := repository.NewRepository(dburl)
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, 0, err
 	}
 	if err := r.InitDb(context.Background()); err != nil {
-		return nil, nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, 0, err
 	}
 
 	// Service
@@ -119,7 +121,7 @@ func setupTestMain(testname string) (*echo.Echo, *handler.Handler, service.Servi
 	validityMin := 1
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, 0, err
 	}
 	indent := "  "
 	timeoutSec := 60
@@ -131,14 +133,14 @@ func setupTestMain(testname string) (*echo.Echo, *handler.Handler, service.Servi
 	// トランザクション
 	conn, err := connectDB(dbname)
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, 0, err
 	}
 	tx, err := conn.Begin(context.Background())
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, 0, err
 	}
 
-	return e, h, s, r, tx, jwtkey, validityMin, nil
+	return e, h, r, tx, jwtkey, validityMin, nil
 }
 
 func cleanIfSuccess(testname string, t *testing.T) error {
