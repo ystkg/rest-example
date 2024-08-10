@@ -247,11 +247,13 @@ func newRequest(method, target string, body *string, contentType string, jwt *st
 }
 
 func genToken(userId uint, jwtkey []byte, validityMin int) *string {
+	iat := time.Now()
 	claims := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		&handler.JwtCustomClaims{
 			jwt.RegisteredClaims{
-				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(validityMin) * time.Minute)),
+				ExpiresAt: jwt.NewNumericDate(iat.Add(time.Duration(validityMin) * time.Minute)),
+				IssuedAt:  jwt.NewNumericDate(iat),
 			},
 			userId,
 		},

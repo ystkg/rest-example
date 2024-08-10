@@ -58,20 +58,23 @@ func (h *Handler) GenToken(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, ErrorAuthenticationFailed.Error())
 	}
 
-	// レスポンスの生成
+	// トークンの生成
+	iat := time.Now()
 	token := jwt.NewWithClaims(
-		jwt.SigningMethodHS256,
+		h.signingMethod,
 		&JwtCustomClaims{
 			jwt.RegisteredClaims{
-				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(h.validityMin) * time.Minute)),
+				ExpiresAt: jwt.NewNumericDate(iat.Add(time.Duration(h.validityMin) * time.Minute)),
+				IssuedAt:  jwt.NewNumericDate(iat),
 			},
 			*userId,
 		},
 	)
-	signed, err := token.SignedString(h.jwtkey)
+	signed, err := token.SignedString(h.jwtConfig.SigningKey)
 	if err != nil {
 		return err
 	}
 
+	// レスポンスの生成
 	return c.JSONPretty(http.StatusCreated, &api.UserToken{Token: signed}, h.indent)
 }

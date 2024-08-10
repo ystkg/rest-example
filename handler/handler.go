@@ -14,8 +14,10 @@ type Handler struct {
 	service service.Service
 
 	// JWT
-	jwtkey      []byte
-	validityMin int
+	jwtConfig     echojwt.Config
+	signingMethod jwt.SigningMethod
+	jwtContextKey string
+	validityMin   int
 
 	// 日付
 	layout   string
@@ -28,9 +30,28 @@ type Handler struct {
 }
 
 func NewHandler(s service.Service, jwtkey []byte, validityMin int, location *time.Location, indent string, timeoutSec int) *Handler {
+	jwtConfig := echojwt.Config{
+		SigningKey: jwtkey,
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return &JwtCustomClaims{}
+		},
+	}
+	signingMethod := jwtConfig.SigningMethod
+	if signingMethod == "" {
+		// デフォルトはHS256になる
+		signingMethod = echojwt.AlgorithmHS256
+	}
+	jwtContextKey := jwtConfig.ContextKey
+	if jwtContextKey == "" {
+		// デフォルトは"user"になる
+		jwtContextKey = "user"
+	}
+
 	return &Handler{
 		s,
-		jwtkey,
+		jwtConfig,
+		jwt.GetSigningMethod(signingMethod),
+		jwtContextKey,
 		validityMin,
 		time.DateTime,
 		location,
@@ -39,15 +60,6 @@ func NewHandler(s service.Service, jwtkey []byte, validityMin int, location *tim
 	}
 }
 
-func (h *Handler) newJwtConfig() echojwt.Config {
-	return echojwt.Config{
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return &JwtCustomClaims{}
-		},
-		SigningKey: h.jwtkey,
-	}
-}
-
 func (h *Handler) userId(c echo.Context) uint {
-	return c.Get("user").(*jwt.Token).Claims.(*JwtCustomClaims).UserId
+	return c.Get(h.jwtContextKey).(*jwt.Token).Claims.(*JwtCustomClaims).UserId
 }
