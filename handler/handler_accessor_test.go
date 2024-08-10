@@ -4,10 +4,7 @@ import (
 	"github.com/ystkg/rest-example/service"
 )
 
-func (h *Handler) Service() service.Service {
-	return h.service
-}
-
-func (h *Handler) SetService(s service.Service) {
-	h.service = s
+// mockに差し替える目的で使う
+func (h *Handler) SetMockService(mock service.Service) {
+	h.service = mock
 }

@@ -14,27 +14,26 @@ import (
 func TestCreatePriceCreateError(t *testing.T) {
 	testname := "TestCreatePriceCreateError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPost,
 		"/v1/price",
@@ -43,35 +42,37 @@ func TestCreatePriceCreateError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	// アサーション
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
 func TestCreatePriceBeginTxError(t *testing.T) {
 	testname := "TestCreatePriceBeginTxError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.beginTxErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.beginTxErr = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPost,
 		"/v1/price",
@@ -80,35 +81,37 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.beginTxErr, err)
+	// アサーション
+	assert.Equal(t, mock.repository.beginTxErr, err)
 	assert.Nil(t, diff)
 }
 
 func TestCreatePriceCommitError(t *testing.T) {
 	testname := "TestCreatePriceCommitError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.commitErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.commitErr = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPost,
 		"/v1/price",
@@ -117,34 +120,35 @@ func TestCreatePriceCommitError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.commitErr, err)
+	// アサーション
+	assert.Equal(t, mock.repository.commitErr, err)
 	assert.Nil(t, diff)
 }
 
 func TestFindPricesFindByUserIdError(t *testing.T) {
 	testname := "TestFindPricesFindByUserIdError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
-
 	req := newRequest(
 		http.MethodGet,
 		"/v1/price",
@@ -153,39 +157,40 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	// アサーション
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
 func TestFindPriceFindError(t *testing.T) {
 	testname := "TestFindPriceFindError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	store, product, price, inStock := "pcshop", "ssd1T", uint(9500), true
 	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, store, product, price, inStock)
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	req := newRequest(
 		http.MethodGet,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -194,37 +199,38 @@ func TestFindPriceFindError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	// アサーション
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
 func TestUpdatePriceUpdateError(t *testing.T) {
 	testname := "TestUpdatePriceUpdateError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -233,37 +239,38 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	// アサーション
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
 func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	testname := "TestUpdatePriceRowsAffectedError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).rowsAffected, mock.price.(*priceRepositoryMock).overwirte = 2, true
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.rowsAffected, mock.repository.price.overwirte = 2, true
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -272,36 +279,38 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.price.(*priceRepositoryMock).rowsAffected), err)
+	// アサーション
+	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.repository.price.rowsAffected), err)
 	assert.Nil(t, diff)
 }
 
 func TestUpdatePriceBeginTxError(t *testing.T) {
 	testname := "TestUpdatePriceBeginTxError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.beginTxErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.beginTxErr = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -310,36 +319,38 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.beginTxErr, err)
+	// アサーション
+	assert.Equal(t, mock.repository.beginTxErr, err)
 	assert.Nil(t, diff)
 }
 
 func TestUpdatePriceCommitError(t *testing.T) {
 	testname := "TestUpdatePriceCommitError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.commitErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.commitErr = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -348,36 +359,36 @@ func TestUpdatePriceCommitError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.commitErr, err)
+	// アサーション
+	assert.Equal(t, mock.repository.commitErr, err)
 	assert.Nil(t, diff)
 }
 
 func TestDeletePriceDeleteError(t *testing.T) {
 	testname := "TestDeletePriceDeleteError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).err = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.err = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
-
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-
 	req := newRequest(
 		http.MethodDelete,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -386,36 +397,36 @@ func TestDeletePriceDeleteError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.price.(*priceRepositoryMock).err, err)
+	// アサーション
+	assert.Equal(t, mock.repository.price.err, err)
 	assert.Nil(t, diff)
 }
 
 func TestDeletePriceRowsAffectedError(t *testing.T) {
 	testname := "TestDeletePriceRowsAffectedError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.price = newMockPriceRepository(h.Service().(*serviceMock))
-	mock.price.(*priceRepositoryMock).rowsAffected, mock.price.(*priceRepositoryMock).overwirte = 2, true
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.price.rowsAffected, mock.repository.price.overwirte = 2, true
 
+	// データベースの初期データ生成
 	now := time.Now()
-
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-
 	req := newRequest(
 		http.MethodDelete,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -424,35 +435,36 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.price.(*priceRepositoryMock).rowsAffected), err)
+	// アサーション
+	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.repository.price.rowsAffected), err)
 	assert.Nil(t, diff)
 }
 
 func TestDeletePriceBeginTxError(t *testing.T) {
 	testname := "TestDeletePriceBeginTxError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.beginTxErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.beginTxErr = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
-
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-
 	req := newRequest(
 		http.MethodDelete,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -461,35 +473,36 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.beginTxErr, err)
+	// アサーション
+	assert.Equal(t, mock.repository.beginTxErr, err)
 	assert.Nil(t, diff)
 }
 
 func TestDeletePriceCommitError(t *testing.T) {
 	testname := "TestDeletePriceCommitError"
 
-	e, h, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	// セットアップ
+	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// mock
-	mock := newMockRepository(h.Service().(*serviceMock))
-	mock.commitErr = errors.New(testname)
-	h.SetService(newMockService(mock))
+	// mockの挙動設定
+	mock.repository.commitErr = errors.New(testname)
 
+	// データベースの初期データ生成
 	now := time.Now()
-
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-
 	req := newRequest(
 		http.MethodDelete,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -498,8 +511,10 @@ func TestDeletePriceCommitError(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
-	assert.Equal(t, mock.commitErr, err)
+	// アサーション
+	assert.Equal(t, mock.repository.commitErr, err)
 	assert.Nil(t, diff)
 }

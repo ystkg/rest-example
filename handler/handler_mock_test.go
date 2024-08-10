@@ -10,31 +10,30 @@ import (
 )
 
 type serviceMock struct {
-	service.Service
-	base service.Service
+	service.Service                 // embedded
+	base            service.Service // delegate
 
-	repository repository.Repository
+	repository *repositoryMock
 }
 
-func newMockService(r repository.Repository) *serviceMock {
-	s := service.NewService(r)
-	return &serviceMock{s, s, r}
+func newMockService(mock *repositoryMock) *serviceMock {
+	s := service.NewService(mock)
+	return &serviceMock{s, s, mock}
 }
 
 type repositoryMock struct {
-	repository.Repository
-	base repository.Repository
+	repository.Repository                       // embedded
+	base                  repository.Repository // delegate
 
-	user  repository.UserRepository
-	price repository.PriceRepository
+	user  *userRepositoryMock
+	price *priceRepositoryMock
 
 	beginTxErr error
 	commitErr  error
 }
 
-func newMockRepository(s *serviceMock) *repositoryMock {
-	r := s.repository
-	return &repositoryMock{r, r, r.User(), r.Price(), nil, nil}
+func newMockRepository(r repository.Repository) *repositoryMock {
+	return &repositoryMock{r, r, newMockUserRepository(r.User()), newMockPriceRepository(r.Price()), nil, nil}
 }
 
 func (m *repositoryMock) BeginTx(ctx context.Context) (context.Context, error) {
@@ -60,14 +59,13 @@ func (m *repositoryMock) Price() repository.PriceRepository {
 }
 
 type userRepositoryMock struct {
-	repository.UserRepository
-	base repository.UserRepository
+	repository.UserRepository                           // embedded
+	base                      repository.UserRepository // delegate
 
 	err error
 }
 
-func newMockUserRepository(s *serviceMock) *userRepositoryMock {
-	r := s.repository.User()
+func newMockUserRepository(r repository.UserRepository) *userRepositoryMock {
 	return &userRepositoryMock{r, r, nil}
 }
 
@@ -86,8 +84,8 @@ func (m *userRepositoryMock) Find(ctx context.Context, name, password string) (*
 }
 
 type priceRepositoryMock struct {
-	repository.PriceRepository
-	base repository.PriceRepository
+	repository.PriceRepository                            // embedded
+	base                       repository.PriceRepository // delegate
 
 	rowsAffected int
 	overwirte    bool
@@ -95,8 +93,7 @@ type priceRepositoryMock struct {
 	err error
 }
 
-func newMockPriceRepository(s *serviceMock) *priceRepositoryMock {
-	r := s.repository.Price()
+func newMockPriceRepository(r repository.PriceRepository) *priceRepositoryMock {
 	return &priceRepositoryMock{r, r, 0, false, nil}
 }
 
