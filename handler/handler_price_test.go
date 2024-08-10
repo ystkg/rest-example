@@ -28,21 +28,23 @@ func somePrices() [][6]any {
 func TestCreatePrice(t *testing.T) {
 	testname := "TestCreatePrice"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPost,
 		"/v1/price",
@@ -51,11 +53,13 @@ func TestCreatePrice(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	rec, diff, _, err := execHandlerTest(e, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// アサーション
 	assert.Equal(t, 201, rec.Code)
 
 	res := &api.Price{}
@@ -87,12 +91,14 @@ func TestCreatePrice(t *testing.T) {
 func TestCreatePriceValidation(t *testing.T) {
 	testname := "TestCreatePriceValidation"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// テーブル駆動テストは事前にコミット
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -120,6 +126,7 @@ func TestCreatePriceValidation(t *testing.T) {
 	}
 
 	for _, v := range cases {
+		// リクエストの生成
 		req := newRequest(
 			http.MethodPost,
 			"/v1/price",
@@ -128,11 +135,13 @@ func TestCreatePriceValidation(t *testing.T) {
 			v.jwt,
 		)
 
+		// テストの実行
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
 			assert.Equal(t, v.err.Error(), message)
@@ -143,19 +152,21 @@ func TestCreatePriceValidation(t *testing.T) {
 func TestFindPrices(t *testing.T) {
 	testname := "TestFindPrices"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
-
 	req := newRequest(
 		http.MethodGet,
 		"/v1/price",
@@ -164,11 +175,13 @@ func TestFindPrices(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	rec, diff, before, err := execHandlerTest(e, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// アサーション
 	assert.Equal(t, 200, rec.Code)
 
 	res := &[]api.Price{}
@@ -202,18 +215,21 @@ func TestFindPrices(t *testing.T) {
 func TestFindPricesValidation(t *testing.T) {
 	testname := "TestFindPricesValidation"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	userId := uint(1)
 	now := time.Now()
 	if _, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true); err != nil {
 		t.Fatal(err)
 	}
 
+	// テーブル駆動テストは事前にコミット
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -228,6 +244,7 @@ func TestFindPricesValidation(t *testing.T) {
 	}
 
 	for _, v := range cases {
+		// リクエストの生成
 		req := newRequest(
 			http.MethodGet,
 			"/v1/price",
@@ -236,11 +253,13 @@ func TestFindPricesValidation(t *testing.T) {
 			v.jwt,
 		)
 
+		// テストの実行
 		code, _, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		// アサーション
 		assert.Equal(t, v.code, code)
 	}
 }
@@ -248,12 +267,14 @@ func TestFindPricesValidation(t *testing.T) {
 func TestFindPrice(t *testing.T) {
 	testname := "TestFindPrice"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
@@ -266,6 +287,7 @@ func TestFindPrice(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	req := newRequest(
 		http.MethodGet,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -274,11 +296,13 @@ func TestFindPrice(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	rec, diff, before, err := execHandlerTest(e, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// アサーション
 	assert.Equal(t, 200, rec.Code)
 
 	res := &api.Price{}
@@ -301,12 +325,14 @@ func TestFindPrice(t *testing.T) {
 func TestFindPriceValidation(t *testing.T) {
 	testname := "TestFindPriceValidation"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	userId := uint(1)
 	now := time.Now()
 	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
@@ -314,6 +340,7 @@ func TestFindPriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// テーブル駆動テストは事前にコミット
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -333,6 +360,7 @@ func TestFindPriceValidation(t *testing.T) {
 	}
 
 	for _, v := range cases {
+		// リクエストの生成
 		req := newRequest(
 			http.MethodGet,
 			fmt.Sprintf("/v1/price/%s", v.priceId),
@@ -341,11 +369,13 @@ func TestFindPriceValidation(t *testing.T) {
 			v.jwt,
 		)
 
+		// テストの実行
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
 			assert.Equal(t, v.err.Error(), message)
@@ -356,22 +386,24 @@ func TestFindPriceValidation(t *testing.T) {
 func TestUpdatePrice(t *testing.T) {
 	testname := "TestUpdatePrice"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
 	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
-
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -380,11 +412,13 @@ func TestUpdatePrice(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	rec, diff, before, err := execHandlerTest(e, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// アサーション
 	assert.Equal(t, 200, rec.Code)
 
 	res := &api.Price{}
@@ -414,12 +448,14 @@ func TestUpdatePrice(t *testing.T) {
 func TestUpdatePriceValidation(t *testing.T) {
 	testname := "TestUpdatePriceValidation"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	userId := uint(1)
 	now := time.Now()
 	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
@@ -427,6 +463,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// テーブル駆動テストは事前にコミット
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -453,6 +490,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 	}
 
 	for _, v := range cases {
+		// リクエストの生成
 		req := newRequest(
 			http.MethodPut,
 			fmt.Sprintf("/v1/price/%s", v.priceId),
@@ -461,11 +499,13 @@ func TestUpdatePriceValidation(t *testing.T) {
 			v.jwt,
 		)
 
+		// テストの実行
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
 			assert.Equal(t, v.err.Error(), message)
@@ -476,21 +516,22 @@ func TestUpdatePriceValidation(t *testing.T) {
 func TestDeletePrice(t *testing.T) {
 	testname := "TestDeletePrice"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	now := time.Now()
-
 	if _, err := insertPrices(tx, &now, somePrices()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-
 	req := newRequest(
 		http.MethodDelete,
 		fmt.Sprintf("/v1/price/%d", priceId),
@@ -499,11 +540,13 @@ func TestDeletePrice(t *testing.T) {
 		genToken(userId, jwtkey, validityMin),
 	)
 
+	// テストの実行
 	rec, diff, before, err := execHandlerTest(e, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// アサーション
 	assert.Equal(t, 204, rec.Code)
 
 	assert.NotNil(t, diff)
@@ -530,12 +573,14 @@ func TestDeletePrice(t *testing.T) {
 func TestDeletePriceValidation(t *testing.T) {
 	testname := "TestDeletePriceValidation"
 
+	// セットアップ
 	e, tx, jwtkey, validityMin, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	userId := uint(1)
 	now := time.Now()
 	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
@@ -543,6 +588,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// テーブル駆動テストは事前にコミット
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -563,6 +609,7 @@ func TestDeletePriceValidation(t *testing.T) {
 	}
 
 	for _, v := range cases {
+		// リクエストの生成
 		req := newRequest(
 			http.MethodDelete,
 			fmt.Sprintf("/v1/price/%s", v.priceId),
@@ -571,11 +618,13 @@ func TestDeletePriceValidation(t *testing.T) {
 			v.jwt,
 		)
 
+		// テストの実行
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
 			assert.Equal(t, v.err.Error(), message)

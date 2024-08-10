@@ -14,6 +14,7 @@ import (
 func TestCreateUserCreateError(t *testing.T) {
 	testname := "TestCreateUserCreateError"
 
+	// セットアップ
 	e, h, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
@@ -26,14 +27,15 @@ func TestCreateUserCreateError(t *testing.T) {
 	mock.user.(*userRepositoryMock).err = errors.New(testname)
 	h.SetMockService(newMockService(mock))
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	name, password := "testuser01", "testpassword"
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
-
 	req := newRequest(
 		http.MethodPost,
 		"/user",
@@ -42,8 +44,10 @@ func TestCreateUserCreateError(t *testing.T) {
 		nil,
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
+	// アサーション
 	assert.Equal(t, mock.user.(*userRepositoryMock).err, err)
 	assert.Nil(t, diff)
 }
@@ -51,6 +55,7 @@ func TestCreateUserCreateError(t *testing.T) {
 func TestCreateUserBeginTxError(t *testing.T) {
 	testname := "TestCreateUserBeginTxError"
 
+	// セットアップ
 	e, h, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
@@ -62,14 +67,15 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	mock.beginTxErr = errors.New(testname)
 	h.SetMockService(newMockService(mock))
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	name, password := "testuser01", "testpassword"
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
-
 	req := newRequest(
 		http.MethodPost,
 		"/user",
@@ -78,8 +84,10 @@ func TestCreateUserBeginTxError(t *testing.T) {
 		nil,
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
+	// アサーション
 	assert.Equal(t, mock.beginTxErr, err)
 	assert.Nil(t, diff)
 }
@@ -87,6 +95,7 @@ func TestCreateUserBeginTxError(t *testing.T) {
 func TestCreateUserCommitError(t *testing.T) {
 	testname := "TestCreateUserCommitError"
 
+	// セットアップ
 	e, h, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
@@ -98,14 +107,15 @@ func TestCreateUserCommitError(t *testing.T) {
 	mock.commitErr = errors.New(testname)
 	h.SetMockService(newMockService(mock))
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	name, password := "testuser01", "testpassword"
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
-
 	req := newRequest(
 		http.MethodPost,
 		"/user",
@@ -114,8 +124,10 @@ func TestCreateUserCommitError(t *testing.T) {
 		nil,
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
+	// アサーション
 	assert.Equal(t, mock.commitErr, err)
 	assert.Nil(t, diff)
 }
@@ -123,6 +135,7 @@ func TestCreateUserCommitError(t *testing.T) {
 func TestGenTokenFindError(t *testing.T) {
 	testname := "TestGenTokenFindError"
 
+	// セットアップ
 	e, h, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
@@ -135,6 +148,7 @@ func TestGenTokenFindError(t *testing.T) {
 	mock.user.(*userRepositoryMock).err = errors.New(testname)
 	h.SetMockService(newMockService(mock))
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
 		t.Fatal(err)
@@ -146,8 +160,8 @@ func TestGenTokenFindError(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	body := "password=" + password
-
 	req := newRequest(
 		http.MethodPost,
 		"/user/"+name+"/token",
@@ -156,8 +170,10 @@ func TestGenTokenFindError(t *testing.T) {
 		nil,
 	)
 
+	// テストの実行
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
+	// アサーション
 	assert.Equal(t, mock.user.(*userRepositoryMock).err, err)
 	assert.Nil(t, diff)
 }

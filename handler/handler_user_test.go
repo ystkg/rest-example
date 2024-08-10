@@ -30,20 +30,22 @@ func someUsers() [][2]any {
 func TestCreateUser(t *testing.T) {
 	testname := "TestCreateUser"
 
+	// セットアップ
 	e, tx, _, _, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	name, password := "testuser01", "testpassword"
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
-
 	req := newRequest(
 		http.MethodPost,
 		"/user",
@@ -52,11 +54,13 @@ func TestCreateUser(t *testing.T) {
 		nil,
 	)
 
+	// テストの実行
 	rec, diff, _, err := execHandlerTest(e, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// アサーション
 	assert.Equal(t, 201, rec.Code)
 
 	res := &api.User{}
@@ -83,12 +87,14 @@ func TestCreateUser(t *testing.T) {
 func TestCreateUserValidation(t *testing.T) {
 	testname := "TestCreateUserValidation"
 
+	// セットアップ
 	e, tx, _, _, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// テーブル駆動テストは事前にコミット
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -107,6 +113,7 @@ func TestCreateUserValidation(t *testing.T) {
 	}
 
 	for _, v := range cases {
+		// リクエストの生成
 		req := newRequest(
 			http.MethodPost,
 			"/user",
@@ -115,11 +122,13 @@ func TestCreateUserValidation(t *testing.T) {
 			nil,
 		)
 
+		// テストの実行
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
 			assert.Equal(t, v.err.Error(), message)
@@ -130,12 +139,14 @@ func TestCreateUserValidation(t *testing.T) {
 func TestGenToken(t *testing.T) {
 	testname := "TestGenToken"
 
+	// セットアップ
 	e, tx, jwtkey, _, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	now := time.Now()
 	if _, err := insertUsers(tx, &now, someUsers()); err != nil {
 		t.Fatal(err)
@@ -147,8 +158,8 @@ func TestGenToken(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// リクエストの生成
 	body := "password=" + password
-
 	req := newRequest(
 		http.MethodPost,
 		"/user/"+name+"/token",
@@ -157,11 +168,13 @@ func TestGenToken(t *testing.T) {
 		nil,
 	)
 
+	// テストの実行
 	rec, diff, _, err := execHandlerTest(e, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// アサーション
 	assert.Equal(t, 201, rec.Code)
 
 	res := &api.UserToken{}
@@ -185,18 +198,21 @@ func TestGenToken(t *testing.T) {
 func TestGenTokenValidation(t *testing.T) {
 	testname := "TestGenTokenValidation"
 
+	// セットアップ
 	e, tx, _, _, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanIfSuccess(testname, t)
 
+	// データベースの初期データ生成
 	name, password := "testuser01", "testpassword"
 	now := time.Now()
 	if _, err := insertUser(tx, &now, &now, nil, name, encodePassword(name, password)); err != nil {
 		t.Fatal(err)
 	}
 
+	// テーブル駆動テストは事前にコミット
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -214,6 +230,7 @@ func TestGenTokenValidation(t *testing.T) {
 	}
 
 	for _, v := range cases {
+		// リクエストの生成
 		req := newRequest(
 			http.MethodPost,
 			"/user/"+v.name+"/token",
@@ -222,11 +239,13 @@ func TestGenTokenValidation(t *testing.T) {
 			nil,
 		)
 
+		// テストの実行
 		code, message, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
 			assert.Equal(t, v.err.Error(), message)
