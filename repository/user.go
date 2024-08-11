@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/ystkg/rest-example/entity"
@@ -16,14 +17,19 @@ type UserRepository interface {
 }
 
 type userRepositoryGorm struct {
+	logger *slog.Logger
+
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepositoryGorm{db}
+func NewUserRepository(logger *slog.Logger, db *gorm.DB) UserRepository {
+	return &userRepositoryGorm{logger, db}
 }
 
 func (r *userRepositoryGorm) Create(ctx context.Context, name, password string) (*entity.User, error) {
+	r.logger.DebugContext(ctx, "userRepositoryGorm#Create start")
+	defer r.logger.DebugContext(ctx, "userRepositoryGorm#Create end")
+
 	tx := tx(ctx)
 
 	user := &entity.User{
@@ -43,6 +49,9 @@ func (r *userRepositoryGorm) Create(ctx context.Context, name, password string) 
 }
 
 func (r *userRepositoryGorm) Find(ctx context.Context, name, password string) (*entity.User, error) {
+	r.logger.DebugContext(ctx, "userRepositoryGorm#Find start")
+	defer r.logger.DebugContext(ctx, "userRepositoryGorm#Find end")
+
 	tx := tx(ctx)
 	if tx == nil {
 		tx = r.db.WithContext(ctx)

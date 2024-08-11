@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,7 +16,7 @@ func TestCustomErrorHandler(t *testing.T) {
 	testname := "TestCustomErrorHandler"
 
 	// セットアップ
-	h := NewHandler(nil, nil, 0, nil, "", 0)
+	h := NewHandler(slog.Default(), nil, nil, 0, nil, "", 0)
 	e := NewEcho(h)
 
 	cases := []struct {

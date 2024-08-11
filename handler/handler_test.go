@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"sort"
@@ -97,6 +98,8 @@ func setupMockTest(testname string) (*echo.Echo, *serviceMock, pgx.Tx, []byte, i
 }
 
 func setupTestMain(testname string) (*echo.Echo, *handler.Handler, repository.Repository, pgx.Tx, []byte, int, error) {
+	logger := slog.Default()
+
 	// Database
 	dbname := strings.ToLower(testname)
 	dburl, err := createTestDatabase(dbname)
@@ -105,7 +108,7 @@ func setupTestMain(testname string) (*echo.Echo, *handler.Handler, repository.Re
 	}
 
 	// Repository
-	r, err := repository.NewRepository(dburl)
+	r, err := repository.NewRepository(logger, dburl)
 	if err != nil {
 		return nil, nil, nil, nil, nil, 0, err
 	}
@@ -114,7 +117,7 @@ func setupTestMain(testname string) (*echo.Echo, *handler.Handler, repository.Re
 	}
 
 	// Service
-	s := service.NewService(r)
+	s := service.NewService(logger, r)
 
 	// Handler
 	jwtkey := []byte(testname)
@@ -125,7 +128,7 @@ func setupTestMain(testname string) (*echo.Echo, *handler.Handler, repository.Re
 	}
 	indent := "  "
 	timeoutSec := 60
-	h := handler.NewHandler(s, jwtkey, validityMin, location, indent, timeoutSec)
+	h := handler.NewHandler(logger, s, jwtkey, validityMin, location, indent, timeoutSec)
 
 	// Echo
 	e := handler.NewEcho(h)

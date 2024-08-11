@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/ystkg/rest-example/entity"
 	"gorm.io/driver/postgres"
@@ -26,20 +27,23 @@ type Repository interface {
 }
 
 type repositoryGorm struct {
+	logger *slog.Logger
+
 	db    *gorm.DB
 	user  UserRepository
 	price PriceRepository
 }
 
-func NewRepository(dburl string) (Repository, error) {
+func NewRepository(logger *slog.Logger, dburl string) (Repository, error) {
 	db, err := gorm.Open(postgres.Open(dburl), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 	return &repositoryGorm{
-		db:    db,
-		user:  NewUserRepository(db),
-		price: NewPriceRepository(db),
+		logger: logger,
+		db:     db,
+		user:   NewUserRepository(logger, db),
+		price:  NewPriceRepository(logger, db),
 	}, nil
 }
 

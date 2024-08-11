@@ -14,6 +14,10 @@ import (
 
 // ユーザの登録
 func (h *Handler) CreateUser(c echo.Context) error {
+	ctx := c.Request().Context()
+	h.logger.DebugContext(ctx, "Handler#CreateUser start")
+	defer h.logger.DebugContext(ctx, "Handler#CreateUser end")
+
 	// リクエストの取得
 	req := &api.User{}
 	if err := c.Bind(req); err != nil {
@@ -26,7 +30,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	}
 
 	// サービスの実行
-	userId, err := h.service.CreateUser(c.Request().Context(), req.Name, req.Password)
+	userId, err := h.service.CreateUser(ctx, req.Name, string(req.Password))
 	if err != nil {
 		if errors.Is(err, repository.ErrorDuplicated) {
 			return echo.NewHTTPError(http.StatusBadRequest, ErrorAlreadyRegistered)
@@ -40,6 +44,10 @@ func (h *Handler) CreateUser(c echo.Context) error {
 
 // トークン発行
 func (h *Handler) GenToken(c echo.Context) error {
+	ctx := c.Request().Context()
+	h.logger.DebugContext(ctx, "Handler#GenToken start")
+	defer h.logger.DebugContext(ctx, "Handler#GenToken end")
+
 	// リクエストの取得
 	name := c.Param("name")
 	password := c.FormValue("password")
@@ -50,7 +58,7 @@ func (h *Handler) GenToken(c echo.Context) error {
 	}
 
 	// サービスの実行
-	userId, err := h.service.FindUser(c.Request().Context(), name, password)
+	userId, err := h.service.FindUser(ctx, name, password)
 	if err != nil {
 		return err
 	}
