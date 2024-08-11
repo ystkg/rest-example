@@ -206,18 +206,18 @@ func execHandlerTest(e *echo.Echo, tx pgx.Tx, req *http.Request) (*httptest.Resp
 	return rec, diffTables(before, after), before, nil
 }
 
-func execHandlerValidation(e *echo.Echo, req *http.Request) (int, string, error) {
+func execHandlerValidation(e *echo.Echo, req *http.Request) (int, any, error) {
 	rec, err := execHandler(e, req)
 	if err == nil {
-		return rec.Code, "", nil
+		return rec.Code, nil, nil
 	}
 
 	httpError, ok := err.(*echo.HTTPError)
 	if !ok {
-		return 0, "", err
+		return 0, nil, err
 	}
 
-	return httpError.Code, httpError.Message.(string), nil
+	return httpError.Code, httpError.Message, nil
 }
 
 func execHandler(e *echo.Echo, req *http.Request) (*httptest.ResponseRecorder, error) {
