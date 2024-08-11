@@ -98,7 +98,7 @@ func TestCreatePriceValidation(t *testing.T) {
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// テーブル駆動テストは事前にコミット
+	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func TestCreatePriceValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err.Error(), message)
+			assert.Equal(t, v.err, message.(error))
 		}
 	}
 }
@@ -229,7 +229,7 @@ func TestFindPricesValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// テーブル駆動テストは事前にコミット
+	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -340,7 +340,7 @@ func TestFindPriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// テーブル駆動テストは事前にコミット
+	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -378,7 +378,7 @@ func TestFindPriceValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err.Error(), message)
+			assert.Equal(t, v.err, message.(error))
 		}
 	}
 }
@@ -463,7 +463,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// テーブル駆動テストは事前にコミット
+	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -508,7 +508,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err.Error(), message)
+			assert.Equal(t, v.err, message.(error))
 		}
 	}
 }
@@ -588,7 +588,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// テーブル駆動テストは事前にコミット
+	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -627,7 +627,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err.Error(), message)
+			assert.Equal(t, v.err, message.(error))
 		}
 	}
 }

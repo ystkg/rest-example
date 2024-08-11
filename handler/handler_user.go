@@ -17,19 +17,19 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	// リクエストの取得
 	req := &api.User{}
 	if err := c.Bind(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	// 入力チェック
 	if err := c.Validate(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	// サービスの実行
 	userId, err := h.service.CreateUser(c.Request().Context(), req.Name, req.Password)
 	if err != nil {
 		if errors.Is(err, repository.ErrorDuplicated) {
-			return echo.NewHTTPError(http.StatusBadRequest, ErrorAlreadyRegistered.Error())
+			return echo.NewHTTPError(http.StatusBadRequest, ErrorAlreadyRegistered)
 		}
 		return err
 	}
@@ -46,7 +46,7 @@ func (h *Handler) GenToken(c echo.Context) error {
 
 	// 入力チェック
 	if name == "" {
-		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound.Error())
+		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound)
 	}
 
 	// サービスの実行
@@ -55,7 +55,7 @@ func (h *Handler) GenToken(c echo.Context) error {
 		return err
 	}
 	if userId == nil {
-		return echo.NewHTTPError(http.StatusForbidden, ErrorAuthenticationFailed.Error())
+		return echo.NewHTTPError(http.StatusUnauthorized, ErrorAuthenticationFailed)
 	}
 
 	// トークンの生成

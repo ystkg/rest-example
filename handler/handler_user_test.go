@@ -94,7 +94,7 @@ func TestCreateUserValidation(t *testing.T) {
 	}
 	defer cleanIfSuccess(testname, t)
 
-	// テーブル駆動テストは事前にコミット
+	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -131,7 +131,7 @@ func TestCreateUserValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err.Error(), message)
+			assert.Equal(t, v.err, message.(error))
 		}
 	}
 }
@@ -212,7 +212,7 @@ func TestGenTokenValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// テーブル駆動テストは事前にコミット
+	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -225,8 +225,8 @@ func TestGenTokenValidation(t *testing.T) {
 	}{
 		{name, "password=" + password, 201, nil},
 		{"", "", 404, handler.ErrorNotFound},
-		{name, "password=" + password + "a", 403, handler.ErrorAuthenticationFailed},
-		{name + "a", "password=" + password, 403, handler.ErrorAuthenticationFailed},
+		{name, "password=" + password + "a", 401, handler.ErrorAuthenticationFailed},
+		{name + "a", "password=" + password, 401, handler.ErrorAuthenticationFailed},
 	}
 
 	for _, v := range cases {
@@ -248,7 +248,7 @@ func TestGenTokenValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err.Error(), message)
+			assert.Equal(t, v.err, message.(error))
 		}
 	}
 }
