@@ -124,7 +124,7 @@ curl -X POST -d 'password=pw123' http://localhost:1323/user/user1/token
 
 ```JSON
 {
-  "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUxNzc2NTQsIlVzZXJJZCI6MX0.ypaxze8P9rIylG03y01E98n3YdED77P4x5xZo--TeIw"
+  "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjMzNzI1NjQsImlhdCI6MTcyMzM2NTM2NCwiVXNlcklkIjoxfQ._fIC46X44z8zcNta12IZ1a7l_TozE49bRoE1X7wXGaw"
 }
 ```
 
