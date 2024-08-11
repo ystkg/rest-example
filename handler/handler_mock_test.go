@@ -10,8 +10,8 @@ import (
 )
 
 type serviceMock struct {
-	service.Service                 // embedded
-	base            service.Service // delegate
+	service.Service                 // 暗黙的な委譲
+	base            service.Service // 明示的に委譲
 
 	repository *repositoryMock
 }
@@ -22,8 +22,8 @@ func newMockService(mock *repositoryMock) *serviceMock {
 }
 
 type repositoryMock struct {
-	repository.Repository                       // embedded
-	base                  repository.Repository // delegate
+	repository.Repository                       // 暗黙的な委譲
+	base                  repository.Repository // 明示的に委譲
 
 	user  *userRepositoryMock
 	price *priceRepositoryMock
@@ -59,8 +59,8 @@ func (m *repositoryMock) Price() repository.PriceRepository {
 }
 
 type userRepositoryMock struct {
-	repository.UserRepository                           // embedded
-	base                      repository.UserRepository // delegate
+	repository.UserRepository                           // 暗黙的な委譲
+	base                      repository.UserRepository // 明示的に委譲
 
 	err error
 }
@@ -84,8 +84,8 @@ func (m *userRepositoryMock) Find(ctx context.Context, name, password string) (*
 }
 
 type priceRepositoryMock struct {
-	repository.PriceRepository                            // embedded
-	base                       repository.PriceRepository // delegate
+	repository.PriceRepository                            // 暗黙的な委譲
+	base                       repository.PriceRepository // 明示的に委譲
 
 	rowsAffected int
 	overwirte    bool
