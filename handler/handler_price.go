@@ -16,6 +16,10 @@ import (
 
 // 価格の登録
 func (h *Handler) CreatePrice(c echo.Context) error {
+	ctx := c.Request().Context()
+	h.logger.DebugContext(ctx, "Handler#CreatePrice start")
+	defer h.logger.DebugContext(ctx, "Handler#CreatePrice end")
+
 	// リクエストの取得
 	userId := h.userId(c)
 	req := &api.Price{}
@@ -41,7 +45,7 @@ func (h *Handler) CreatePrice(c echo.Context) error {
 
 	// サービスの実行
 	price, err := h.service.CreatePrice(
-		c.Request().Context(),
+		ctx,
 		userId,
 		dateTime,
 		req.Store,
@@ -59,11 +63,15 @@ func (h *Handler) CreatePrice(c echo.Context) error {
 
 // 価格の一覧
 func (h *Handler) FindPrices(c echo.Context) error {
+	ctx := c.Request().Context()
+	h.logger.DebugContext(ctx, "Handler#FindPrices start")
+	defer h.logger.DebugContext(ctx, "Handler#FindPrices end")
+
 	// リクエストの取得
 	userId := h.userId(c)
 
 	// サービスの実行
-	entities, err := h.service.FindPrices(c.Request().Context(), userId)
+	entities, err := h.service.FindPrices(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -80,6 +88,10 @@ func (h *Handler) FindPrices(c echo.Context) error {
 
 // 価格の取得
 func (h *Handler) FindPrice(c echo.Context) error {
+	ctx := c.Request().Context()
+	h.logger.DebugContext(ctx, "Handler#FindPrice start")
+	defer h.logger.DebugContext(ctx, "Handler#FindPrice end")
+
 	// リクエストの取得
 	userId := h.userId(c)
 	reqId := c.Param("id")
@@ -91,7 +103,7 @@ func (h *Handler) FindPrice(c echo.Context) error {
 	}
 
 	// サービスの実行
-	price, err := h.service.FindPrice(c.Request().Context(), uint(priceId), userId)
+	price, err := h.service.FindPrice(ctx, uint(priceId), userId)
 	if err != nil {
 		return err
 	}
@@ -105,6 +117,10 @@ func (h *Handler) FindPrice(c echo.Context) error {
 
 // 価格の更新
 func (h *Handler) UpdatePrice(c echo.Context) error {
+	ctx := c.Request().Context()
+	h.logger.DebugContext(ctx, "Handler#UpdatePrice start")
+	defer h.logger.DebugContext(ctx, "Handler#UpdatePrice end")
+
 	// リクエストの取得
 	userId := h.userId(c)
 	reqId := c.Param("id")
@@ -135,7 +151,7 @@ func (h *Handler) UpdatePrice(c echo.Context) error {
 
 	// サービスの実行
 	price, err := h.service.UpdatePrice(
-		c.Request().Context(),
+		ctx,
 		uint(priceId),
 		userId,
 		dateTime,
@@ -157,6 +173,10 @@ func (h *Handler) UpdatePrice(c echo.Context) error {
 
 // 価格の削除
 func (h *Handler) DeletePrice(c echo.Context) error {
+	ctx := c.Request().Context()
+	h.logger.DebugContext(ctx, "Handler#DeletePrice start")
+	defer h.logger.DebugContext(ctx, "Handler#DeletePrice end")
+
 	// リクエストの取得
 	userId := h.userId(c)
 	reqId := c.Param("id")
@@ -168,7 +188,7 @@ func (h *Handler) DeletePrice(c echo.Context) error {
 	}
 
 	// サービスの実行
-	if err = h.service.DeletePrice(c.Request().Context(), uint(priceId), userId); err != nil {
+	if err = h.service.DeletePrice(ctx, uint(priceId), userId); err != nil {
 		if errors.Is(err, service.ErrorNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound)
 		}

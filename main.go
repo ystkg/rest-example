@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,6 +17,8 @@ import (
 )
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+
 	// リクエスト処理フロー
 	// Echo -> Handler -> Service -> Repository -> Database
 
@@ -26,7 +29,7 @@ func main() {
 	if dburl == "" {
 		log.Fatal("DBURL is empty")
 	}
-	r, err := repository.NewRepository(dburl)
+	r, err := repository.NewRepository(logger, dburl)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +38,7 @@ func main() {
 	}
 
 	// Service
-	s := service.NewService(r)
+	s := service.NewService(logger, r)
 
 	// Handler
 	jwtkeyStr := os.Getenv("JWTKEY")
@@ -56,7 +59,7 @@ func main() {
 	}
 	indent := "  " // レスポンスのJSONのインデント
 	timeoutSec := 60
-	h := handler.NewHandler(s, jwtkey, validityMin, location, indent, timeoutSec)
+	h := handler.NewHandler(logger, s, jwtkey, validityMin, location, indent, timeoutSec)
 
 	// Echo(Graceful Shutdown)
 	address := os.Getenv("ECHOADDRESS")

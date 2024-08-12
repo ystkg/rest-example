@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/ystkg/rest-example/entity"
@@ -23,11 +24,13 @@ type Service interface {
 }
 
 type serviceImpl struct {
+	logger *slog.Logger
+
 	repository repository.Repository
 }
 
-func NewService(r repository.Repository) Service {
-	return &serviceImpl{r}
+func NewService(logger *slog.Logger, r repository.Repository) Service {
+	return &serviceImpl{logger, r}
 }
 
 func (s *serviceImpl) beginTx(ctx context.Context) (context.Context, error) {
@@ -44,6 +47,9 @@ func (s *serviceImpl) commit(ctx context.Context) error {
 
 // ユーザの登録
 func (s *serviceImpl) CreateUser(ctx context.Context, name, password string) (*uint, error) {
+	s.logger.DebugContext(ctx, "serviceImpl#CreateUser start")
+	defer s.logger.DebugContext(ctx, "serviceImpl#CreateUser end")
+
 	// トランザクション開始
 	ctx, err := s.beginTx(ctx)
 	if err != nil {
@@ -68,6 +74,9 @@ func (s *serviceImpl) CreateUser(ctx context.Context, name, password string) (*u
 
 // ユーザIDの取得
 func (s *serviceImpl) FindUser(ctx context.Context, name, password string) (*uint, error) {
+	s.logger.DebugContext(ctx, "serviceImpl#FindUser start")
+	defer s.logger.DebugContext(ctx, "serviceImpl#FindUser end")
+
 	encPassword := encodePassword(name, password)
 	user, err := s.repository.User().Find(ctx, name, encPassword)
 	if err != nil {
@@ -87,6 +96,9 @@ func encodePassword(user, password string) string {
 
 // 価格の登録
 func (s *serviceImpl) CreatePrice(ctx context.Context, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error) {
+	s.logger.DebugContext(ctx, "serviceImpl#CreatePrice start")
+	defer s.logger.DebugContext(ctx, "serviceImpl#CreatePrice end")
+
 	// トランザクション開始
 	ctx, err := s.beginTx(ctx)
 	if err != nil {
@@ -110,16 +122,25 @@ func (s *serviceImpl) CreatePrice(ctx context.Context, userId uint, dateTime tim
 
 // 価格の一覧
 func (s *serviceImpl) FindPrices(ctx context.Context, userId uint) ([]entity.Price, error) {
+	s.logger.DebugContext(ctx, "serviceImpl#FindPrices start")
+	defer s.logger.DebugContext(ctx, "serviceImpl#FindPrices end")
+
 	return s.repository.Price().FindByUserId(ctx, userId)
 }
 
 // 価格の取得
 func (s *serviceImpl) FindPrice(ctx context.Context, priceId, userId uint) (*entity.Price, error) {
+	s.logger.DebugContext(ctx, "serviceImpl#FindPrice start")
+	defer s.logger.DebugContext(ctx, "serviceImpl#FindPrice end")
+
 	return s.repository.Price().Find(ctx, priceId, userId)
 }
 
 // 価格の更新
 func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error) {
+	s.logger.DebugContext(ctx, "serviceImpl#UpdatePrice start")
+	defer s.logger.DebugContext(ctx, "serviceImpl#UpdatePrice end")
+
 	// トランザクション開始
 	ctx, err := s.beginTx(ctx)
 	if err != nil {
@@ -159,6 +180,9 @@ func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dat
 
 // 価格の削除
 func (s *serviceImpl) DeletePrice(ctx context.Context, priceId, userId uint) error {
+	s.logger.DebugContext(ctx, "serviceImpl#DeletePrice start")
+	defer s.logger.DebugContext(ctx, "serviceImpl#DeletePrice end")
+
 	// トランザクション開始
 	ctx, err := s.beginTx(ctx)
 	if err != nil {

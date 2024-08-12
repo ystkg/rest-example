@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"time"
 
 	"github.com/ystkg/rest-example/entity"
@@ -19,11 +20,13 @@ type PriceRepository interface {
 }
 
 type priceRepositoryGorm struct {
+	logger *slog.Logger
+
 	db *gorm.DB
 }
 
-func NewPriceRepository(db *gorm.DB) PriceRepository {
-	return &priceRepositoryGorm{db}
+func NewPriceRepository(logger *slog.Logger, db *gorm.DB) PriceRepository {
+	return &priceRepositoryGorm{logger, db}
 }
 
 func (r *priceRepositoryGorm) Create(
@@ -54,6 +57,9 @@ func (r *priceRepositoryGorm) Create(
 }
 
 func (r *priceRepositoryGorm) Find(ctx context.Context, id, userId uint) (*entity.Price, error) {
+	r.logger.DebugContext(ctx, "priceRepositoryGorm#Find start")
+	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#Find end")
+
 	tx := tx(ctx)
 	if tx == nil {
 		tx = r.db.WithContext(ctx)
@@ -76,6 +82,9 @@ func (r *priceRepositoryGorm) Find(ctx context.Context, id, userId uint) (*entit
 }
 
 func (r *priceRepositoryGorm) FindByUserId(ctx context.Context, userId uint) ([]entity.Price, error) {
+	r.logger.DebugContext(ctx, "priceRepositoryGorm#FindByUserId start")
+	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#FindByUserId end")
+
 	tx := tx(ctx)
 	if tx == nil {
 		tx = r.db.WithContext(ctx)
@@ -99,6 +108,9 @@ func (r *priceRepositoryGorm) Update(
 	price uint,
 	inStock bool,
 ) (*entity.Price, int64, error) {
+	r.logger.DebugContext(ctx, "priceRepositoryGorm#Update start")
+	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#Update end")
+
 	tx := tx(ctx)
 
 	priceEntity := &entity.Price{
@@ -122,6 +134,9 @@ func (r *priceRepositoryGorm) Update(
 }
 
 func (r *priceRepositoryGorm) Delete(ctx context.Context, id, userId uint) (int64, error) {
+	r.logger.DebugContext(ctx, "priceRepositoryGorm#Delete start")
+	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#Delete end")
+
 	tx := tx(ctx)
 
 	price := &entity.Price{

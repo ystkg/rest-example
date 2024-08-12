@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,7 +17,7 @@ func TestMiddlewareTimeout(t *testing.T) {
 
 	// セットアップ
 	const timeoutSec = 60
-	h := NewHandler(nil, nil, 0, nil, "", timeoutSec)
+	h := NewHandler(slog.Default(), nil, nil, 0, nil, "", timeoutSec)
 	e := NewEcho(h)
 
 	req := httptest.NewRequest(http.MethodPost, "/", nil)
