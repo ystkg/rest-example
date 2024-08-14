@@ -20,18 +20,18 @@
 
 | 操作 | METHOD | ENDPOINT | STATUS CODE | REQUEST BODY | RESPONSE BODY |
 | ---- | ---- | ---- | :----: | ---- | ---- |
-| 登録         | POST | /user             | 201 | application/x-www-form-urlencoded | application/json |
-| トークン発行 | POST | /user/:name/token | 201 | application/x-www-form-urlencoded | application/json |
+| 登録         | POST | /users             | 201 | application/x-www-form-urlencoded | application/json |
+| トークン発行 | POST | /users/:name/token | 201 | application/x-www-form-urlencoded | application/json |
 
 ### 価格
 
 | 操作 | METHOD | ENDPOINT | STATUS CODE | REQUEST BODY | RESPONSE BODY |
 | ---- | ---- | ---- | :----: | ---- | ---- |
-| 登録 | POST   | /v1/price     | 201 | application/json | application/json |
-| 一覧 | GET    | /v1/price     | 200 | -                | application/json |
-| 取得 | GET    | /v1/price/:id | 200 | -                | application/json |
-| 更新 | PUT    | /v1/price/:id | 200 | application/json | application/json |
-| 削除 | DELETE | /v1/price/:id | 204 | -                | -                |
+| 登録 | POST   | /v1/prices     | 201 | application/json | application/json |
+| 一覧 | GET    | /v1/prices     | 200 | -                | application/json |
+| 取得 | GET    | /v1/prices/:id | 200 | -                | application/json |
+| 更新 | PUT    | /v1/prices/:id | 200 | application/json | application/json |
+| 削除 | DELETE | /v1/prices/:id | 204 | -                | -                |
 
 ## エンティティ
 
@@ -106,7 +106,7 @@ go run .
 #### ユーザを登録
 
 ```Shell
-curl -X POST -d 'name=user1' -d 'password=pw123' http://localhost:1323/user
+curl -X POST -d 'name=user1' -d 'password=pw123' http://localhost:1323/users
 ```
 
 ```JSON
@@ -119,7 +119,7 @@ curl -X POST -d 'name=user1' -d 'password=pw123' http://localhost:1323/user
 #### トークンの発行
 
 ```Shell
-curl -X POST -d 'password=pw123' http://localhost:1323/user/user1/token
+curl -X POST -d 'password=pw123' http://localhost:1323/users/user1/token
 ```
 
 ```JSON
@@ -133,13 +133,13 @@ curl -X POST -d 'password=pw123' http://localhost:1323/user/user1/token
 #### シェル変数にトークンを設定
 
 ```Shell
-TOKEN=`curl -s -X POST -d 'password=pw123' http://localhost:1323/user/user1/token | jq -r '.Token'`
+TOKEN=`curl -s -X POST -d 'password=pw123' http://localhost:1323/users/user1/token | jq -r '.Token'`
 ```
 
 #### 価格を登録
 
 ```Shell
-curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17800, "InStock":true}' http://localhost:1323/v1/price
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17800, "InStock":true}' http://localhost:1323/v1/prices
 ```
 
 ```JSON
@@ -156,7 +156,7 @@ curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/jso
 #### 価格の一覧
 
 ```Shell
-curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price
+curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/prices
 ```
 
 ```JSON
@@ -175,7 +175,7 @@ curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price
 #### 価格の取得
 
 ```Shell
-curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/1
+curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/prices/1
 ```
 
 ```JSON
@@ -192,7 +192,7 @@ curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/1
 #### 価格の更新
 
 ```Shell
-curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17500, "InStock":true}' http://localhost:1323/v1/price/1
+curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17500, "InStock":true}' http://localhost:1323/v1/prices/1
 ```
 
 ```JSON
@@ -209,7 +209,7 @@ curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json
 #### 価格の削除
 
 ```Shell
-curl -X DELETE -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/price/1
+curl -X DELETE -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/prices/1
 ```
 
 ## 開発関連

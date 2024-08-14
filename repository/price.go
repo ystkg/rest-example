@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"time"
 
-	pkgerrors "github.com/pkg/errors"
 	"github.com/ystkg/rest-example/entity"
 	"gorm.io/gorm"
 )
@@ -51,7 +50,7 @@ func (r *priceRepositoryGorm) Create(
 	}
 
 	if err := tx.Create(priceEntity).Error; err != nil {
-		return nil, pkgerrors.WithStack(err)
+		return nil, withStack(err)
 	}
 
 	return priceEntity, nil
@@ -76,7 +75,7 @@ func (r *priceRepositoryGorm) Find(ctx context.Context, id, userId uint) (*entit
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		return nil, pkgerrors.WithStack(err)
+		return nil, withStack(err)
 	}
 
 	return price, nil
@@ -93,7 +92,7 @@ func (r *priceRepositoryGorm) FindByUserId(ctx context.Context, userId uint) ([]
 
 	var entities []entity.Price
 	if err := tx.Where("user_id = ?", userId).Find(&entities).Error; err != nil {
-		return nil, pkgerrors.WithStack(err)
+		return nil, withStack(err)
 	}
 
 	return entities, nil
@@ -128,7 +127,7 @@ func (r *priceRepositoryGorm) Update(
 
 	db := tx.Where("user_id = ? and deleted_at is null", userId).Updates(priceEntity)
 	if db.Error != nil {
-		return nil, 0, pkgerrors.WithStack(db.Error)
+		return nil, 0, withStack(db.Error)
 	}
 
 	return priceEntity, db.RowsAffected, nil
@@ -148,7 +147,7 @@ func (r *priceRepositoryGorm) Delete(ctx context.Context, id, userId uint) (int6
 
 	db := tx.Where("user_id = ?", userId).Delete(price)
 	if db.Error != nil {
-		return 0, pkgerrors.WithStack(db.Error)
+		return 0, withStack(db.Error)
 	}
 
 	return db.RowsAffected, nil

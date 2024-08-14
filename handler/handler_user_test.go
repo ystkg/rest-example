@@ -48,7 +48,7 @@ func TestCreateUser(t *testing.T) {
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
 	req := newRequest(
 		http.MethodPost,
-		"/user",
+		"/users",
 		&body,
 		echo.MIMEApplicationForm,
 		nil,
@@ -116,7 +116,7 @@ func TestCreateUserValidation(t *testing.T) {
 		// リクエストの生成
 		req := newRequest(
 			http.MethodPost,
-			"/user",
+			"/users",
 			&v.body,
 			echo.MIMEApplicationForm,
 			nil,
@@ -162,7 +162,7 @@ func TestGenToken(t *testing.T) {
 	body := "password=" + password
 	req := newRequest(
 		http.MethodPost,
-		"/user/"+name+"/token",
+		"/users/"+name+"/token",
 		&body,
 		echo.MIMEApplicationForm,
 		nil,
@@ -233,7 +233,7 @@ func TestGenTokenValidation(t *testing.T) {
 		// リクエストの生成
 		req := newRequest(
 			http.MethodPost,
-			"/user/"+v.name+"/token",
+			"/users/"+v.name+"/token",
 			&v.body,
 			echo.MIMEApplicationForm,
 			nil,

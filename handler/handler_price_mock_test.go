@@ -36,7 +36,7 @@ func TestCreatePriceCreateError(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPost,
-		"/v1/price",
+		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -75,7 +75,7 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPost,
-		"/v1/price",
+		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -114,7 +114,7 @@ func TestCreatePriceCommitError(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPost,
-		"/v1/price",
+		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -151,7 +151,7 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 	userId := uint(1)
 	req := newRequest(
 		http.MethodGet,
-		"/v1/price",
+		"/v1/prices",
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),
@@ -193,7 +193,7 @@ func TestFindPriceFindError(t *testing.T) {
 	}
 	req := newRequest(
 		http.MethodGet,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),
@@ -233,7 +233,7 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPut,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -273,7 +273,7 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPut,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -313,7 +313,7 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPut,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -353,7 +353,7 @@ func TestUpdatePriceCommitError(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPut,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -391,7 +391,7 @@ func TestDeletePriceDeleteError(t *testing.T) {
 	priceId := uint(1)
 	req := newRequest(
 		http.MethodDelete,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),
@@ -429,7 +429,7 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 	priceId := uint(1)
 	req := newRequest(
 		http.MethodDelete,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),
@@ -467,7 +467,7 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 	priceId := uint(1)
 	req := newRequest(
 		http.MethodDelete,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),
@@ -505,7 +505,7 @@ func TestDeletePriceCommitError(t *testing.T) {
 	priceId := uint(1)
 	req := newRequest(
 		http.MethodDelete,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),

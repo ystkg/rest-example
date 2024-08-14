@@ -23,8 +23,8 @@ var (
 	ErrorNotFound = errors.New("not found")
 )
 
-func newHTTPError(code int, cause error) *echo.HTTPError {
-	return echo.NewHTTPError(code).SetInternal(pkgerrors.WithStack(cause))
+func newHTTPError(code int, err error) *echo.HTTPError {
+	return echo.NewHTTPError(code).SetInternal(pkgerrors.WithStack(err))
 }
 
 func (h *Handler) customErrorHandler(err error, c echo.Context) {
@@ -59,17 +59,15 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 
 	c.JSONPretty(code, &res, h.indent)
 
-	errs := []error{err}
-	for 0 < len(errs) {
-		causes := []error{}
+	for errs, causes := []error{err}, []error{}; 0 < len(errs); errs, causes = causes, []error{} {
 		for _, v := range errs {
 			h.logger.DebugContext(c.Request().Context(), fmt.Sprintf("%+v", v))
+
 			if e, ok := v.(interface{ Unwrap() []error }); ok {
 				causes = append(causes, e.Unwrap()...)
 			} else if e, ok := v.(interface{ Unwrap() error }); ok {
 				causes = append(causes, e.Unwrap())
 			}
 		}
-		errs = causes
 	}
 }
