@@ -277,10 +277,10 @@ type Tables struct {
 
 func (t *Tables) count() (c int) {
 	c = 0
-	if t.users != nil && len(t.users) != 0 {
+	if len(t.users) != 0 {
 		c += 1
 	}
-	if t.prices != nil && len(t.prices) != 0 {
+	if len(t.prices) != 0 {
 		c += 1
 	}
 	return
