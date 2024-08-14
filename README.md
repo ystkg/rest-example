@@ -248,7 +248,7 @@ docker-compose up -d
 #### アプリケーションの起動
 
 ```Shell
-docker run --rm --network=rest-develop -p 1323:1323 -e DBURL=postgres://postgres:develop@postgres-develop:5432/?sslmode=disable rest-example
+docker run --rm --network=backend-develop -p 1323:1323 -e DBURL=postgres://postgres:develop@postgres-develop:5432/?sslmode=disable rest-example
 ```
 
 ### 環境変数
