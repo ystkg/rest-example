@@ -8,7 +8,7 @@ services:
     ports:
       - 127.0.0.1:5432:5432
     environment:
-      POSTGRES_PASSWORD: develop
+      POSTGRES_PASSWORD: pwdev
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
       TZ: Asia/Tokyo
   postgres-test:
@@ -19,10 +19,13 @@ services:
       - 127.0.0.1:15432:5432
     shm_size: 1gb
     environment:
-      POSTGRES_PASSWORD: test
+      POSTGRES_PASSWORD: pwtest
       PGDATA: /dev/shm/pgdata
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
       TZ: Asia/Tokyo
 networks:
   backend-develop:
     name: backend-develop
+  default:
+    external:
+      name: backend-develop
