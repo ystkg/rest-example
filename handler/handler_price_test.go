@@ -136,7 +136,7 @@ func TestCreatePriceValidation(t *testing.T) {
 		)
 
 		// テストの実行
-		code, message, err := execHandlerValidation(e, req)
+		code, cause, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -144,7 +144,7 @@ func TestCreatePriceValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err, message.(error))
+			assert.Equal(t, v.err, cause)
 		}
 	}
 }
@@ -370,7 +370,7 @@ func TestFindPriceValidation(t *testing.T) {
 		)
 
 		// テストの実行
-		code, message, err := execHandlerValidation(e, req)
+		code, cause, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -378,7 +378,7 @@ func TestFindPriceValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err, message.(error))
+			assert.Equal(t, v.err, cause)
 		}
 	}
 }
@@ -500,7 +500,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		)
 
 		// テストの実行
-		code, message, err := execHandlerValidation(e, req)
+		code, cause, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -508,7 +508,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err, message.(error))
+			assert.Equal(t, v.err, cause)
 		}
 	}
 }
@@ -619,7 +619,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		)
 
 		// テストの実行
-		code, message, err := execHandlerValidation(e, req)
+		code, cause, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -627,7 +627,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err, message.(error))
+			assert.Equal(t, v.err, cause)
 		}
 	}
 }

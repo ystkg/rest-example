@@ -6,9 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
-	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,17 +21,17 @@ func TestCustomErrorHandler(t *testing.T) {
 		err  error
 		code int
 	}{
-		{echo.NewHTTPError(http.StatusBadRequest, ErrorAlreadyRegistered), 400},
-		{echo.NewHTTPError(http.StatusUnauthorized, ErrorAuthenticationFailed), 401},
-		{echo.NewHTTPError(http.StatusNotFound, ErrorNotFound), 404},
-		{echo.NewHTTPError(http.StatusServiceUnavailable, testname), 503},
-		{echo.NewHTTPError(http.StatusServiceUnavailable, time.Now()), 503}, // fmt.Stringer
+		{newHTTPError(http.StatusBadRequest, ErrorAlreadyRegistered), 400},
+		{newHTTPError(http.StatusUnauthorized, ErrorAuthenticationFailed), 401},
+		{newHTTPError(http.StatusNotFound, ErrorNotFound), 404},
+		{newHTTPError(http.StatusServiceUnavailable, errors.New(testname)), 503},
 		{errors.New(testname), 500},
 	}
 
 	for _, v := range cases {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
-		c := e.NewContext(nil, rec)
+		c := e.NewContext(req, rec)
 
 		// テストの実行
 		h.customErrorHandler(v.err, c)
