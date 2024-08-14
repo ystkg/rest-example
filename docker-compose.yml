@@ -4,7 +4,7 @@ services:
     container_name: postgres-develop
     restart: always
     networks:
-      - rest-develop
+      - backend-develop
     ports:
       - 127.0.0.1:5432:5432
     environment:
@@ -24,5 +24,5 @@ services:
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
       TZ: Asia/Tokyo
 networks:
-  rest-develop:
-    name: rest-develop
+  backend-develop:
+    name: backend-develop
