@@ -123,7 +123,7 @@ func TestCreateUserValidation(t *testing.T) {
 		)
 
 		// テストの実行
-		code, message, err := execHandlerValidation(e, req)
+		code, cause, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -131,7 +131,7 @@ func TestCreateUserValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err, message.(error))
+			assert.Equal(t, v.err, cause)
 		}
 	}
 }
@@ -240,7 +240,7 @@ func TestGenTokenValidation(t *testing.T) {
 		)
 
 		// テストの実行
-		code, message, err := execHandlerValidation(e, req)
+		code, cause, err := execHandlerValidation(e, req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -248,7 +248,7 @@ func TestGenTokenValidation(t *testing.T) {
 		// アサーション
 		assert.Equal(t, v.code, code)
 		if v.err != nil {
-			assert.Equal(t, v.err, message.(error))
+			assert.Equal(t, v.err, cause)
 		}
 	}
 }

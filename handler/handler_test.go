@@ -209,7 +209,7 @@ func execHandlerTest(e *echo.Echo, tx pgx.Tx, req *http.Request) (*httptest.Resp
 	return rec, diffTables(before, after), before, nil
 }
 
-func execHandlerValidation(e *echo.Echo, req *http.Request) (int, any, error) {
+func execHandlerValidation(e *echo.Echo, req *http.Request) (int, error, error) {
 	rec, err := execHandler(e, req)
 	if err == nil {
 		return rec.Code, nil, nil
@@ -220,7 +220,7 @@ func execHandlerValidation(e *echo.Echo, req *http.Request) (int, any, error) {
 		return 0, nil, err
 	}
 
-	return httpError.Code, httpError.Message, nil
+	return httpError.Code, httpError.Internal.(interface{ Unwrap() error }).Unwrap(), nil
 }
 
 func execHandler(e *echo.Echo, req *http.Request) (*httptest.ResponseRecorder, error) {

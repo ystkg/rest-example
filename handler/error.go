@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	pkgerrors "github.com/pkg/errors"
 	"github.com/ystkg/rest-example/api"
 )
 
@@ -22,19 +23,18 @@ var (
 	ErrorNotFound = errors.New("not found")
 )
 
+func newHTTPError(code int, cause error) *echo.HTTPError {
+	err := echo.NewHTTPError(code)
+	err.SetInternal(pkgerrors.WithStack(cause))
+	return err
+}
+
 func (h *Handler) customErrorHandler(err error, c echo.Context) {
 	var code int
 	var detail string
 	if httpError, ok := err.(*echo.HTTPError); ok {
 		code = httpError.Code
-		switch v := httpError.Message.(type) {
-		case string:
-			detail = v
-		case fmt.Stringer:
-			detail = v.String()
-		case error:
-			detail = v.Error()
-		}
+		detail = httpError.Internal.(interface{ Unwrap() error }).Unwrap().Error()
 	}
 
 	var title string
@@ -60,4 +60,18 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 	}
 
 	c.JSONPretty(code, &res, h.indent)
+
+	errs := []error{err}
+	for 0 < len(errs) {
+		causes := []error{}
+		for _, v := range errs {
+			h.logger.DebugContext(c.Request().Context(), fmt.Sprintf("%+v", v))
+			if e, ok := v.(interface{ Unwrap() []error }); ok {
+				causes = append(causes, e.Unwrap()...)
+			} else if e, ok := v.(interface{ Unwrap() error }); ok {
+				causes = append(causes, e.Unwrap())
+			}
+		}
+		errs = causes
+	}
 }

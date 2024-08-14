@@ -24,7 +24,7 @@ func (h *Handler) CreatePrice(c echo.Context) error {
 	userId := h.userId(c)
 	req := &api.Price{}
 	if err := c.Bind(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return newHTTPError(http.StatusBadRequest, err)
 	}
 	inStock := true
 	if req.InStock != nil {
@@ -33,14 +33,14 @@ func (h *Handler) CreatePrice(c echo.Context) error {
 
 	// 入力チェック
 	if err := c.Validate(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return newHTTPError(http.StatusBadRequest, err)
 	}
 	if req.ID != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, ErrorIDCannotRequest)
+		return newHTTPError(http.StatusBadRequest, ErrorIDCannotRequest)
 	}
 	dateTime, err := h.parseDateTime(req.DateTime)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return newHTTPError(http.StatusBadRequest, err)
 	}
 
 	// サービスの実行
@@ -99,7 +99,7 @@ func (h *Handler) FindPrice(c echo.Context) error {
 	// 入力チェック
 	priceId, err := strconv.ParseUint(reqId, 10, 0)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrorNotFound)
 	}
 
 	// サービスの実行
@@ -108,7 +108,7 @@ func (h *Handler) FindPrice(c echo.Context) error {
 		return err
 	}
 	if price == nil {
-		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrorNotFound)
 	}
 
 	// レスポンスの生成
@@ -126,7 +126,7 @@ func (h *Handler) UpdatePrice(c echo.Context) error {
 	reqId := c.Param("id")
 	req := &api.Price{}
 	if err := c.Bind(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return newHTTPError(http.StatusBadRequest, err)
 	}
 	inStock := true
 	if req.InStock != nil {
@@ -136,17 +136,17 @@ func (h *Handler) UpdatePrice(c echo.Context) error {
 	// 入力チェック
 	priceId, err := strconv.ParseUint(reqId, 10, 0)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrorNotFound)
 	}
 	if err = c.Validate(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return newHTTPError(http.StatusBadRequest, err)
 	}
 	if req.ID != nil && *req.ID != uint(priceId) {
-		return echo.NewHTTPError(http.StatusBadRequest, ErrorIDUnchangeable)
+		return newHTTPError(http.StatusBadRequest, ErrorIDUnchangeable)
 	}
 	dateTime, err := h.parseDateTime(req.DateTime)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return newHTTPError(http.StatusBadRequest, err)
 	}
 
 	// サービスの実行
@@ -162,7 +162,7 @@ func (h *Handler) UpdatePrice(c echo.Context) error {
 	)
 	if err != nil {
 		if errors.Is(err, service.ErrorNotFound) {
-			return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound)
+			return newHTTPError(http.StatusNotFound, ErrorNotFound)
 		}
 		return err
 	}
@@ -184,13 +184,13 @@ func (h *Handler) DeletePrice(c echo.Context) error {
 	// 入力チェック
 	priceId, err := strconv.ParseUint(reqId, 10, 0)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrorNotFound)
 	}
 
 	// サービスの実行
 	if err = h.service.DeletePrice(ctx, uint(priceId), userId); err != nil {
 		if errors.Is(err, service.ErrorNotFound) {
-			return echo.NewHTTPError(http.StatusNotFound, ErrorNotFound)
+			return newHTTPError(http.StatusNotFound, ErrorNotFound)
 		}
 		return err
 	}

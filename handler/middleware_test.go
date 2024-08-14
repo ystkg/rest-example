@@ -20,7 +20,7 @@ func TestMiddlewareTimeout(t *testing.T) {
 	h := NewHandler(slog.Default(), nil, nil, 0, nil, "", timeoutSec)
 	e := NewEcho(h)
 
-	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 

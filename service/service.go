@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"time"
 
+	pkgerrors "github.com/pkg/errors"
 	"github.com/ystkg/rest-example/entity"
 	"github.com/ystkg/rest-example/repository"
 )
@@ -165,9 +166,9 @@ func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dat
 	if rows != 1 {
 		s.rollback(ctx)
 		if rows == 0 {
-			return nil, ErrorNotFound
+			return nil, pkgerrors.WithStack(ErrorNotFound)
 		}
-		return nil, fmt.Errorf("RowsAffected:%d", rows)
+		return nil, pkgerrors.Errorf("RowsAffected:%d", rows)
 	}
 
 	// コミット
@@ -198,9 +199,9 @@ func (s *serviceImpl) DeletePrice(ctx context.Context, priceId, userId uint) err
 	if rows != 1 {
 		s.rollback(ctx)
 		if rows == 0 {
-			return ErrorNotFound
+			return pkgerrors.WithStack(ErrorNotFound)
 		}
-		return fmt.Errorf("RowsAffected:%d", rows)
+		return pkgerrors.Errorf("RowsAffected:%d", rows)
 	}
 
 	// コミット
