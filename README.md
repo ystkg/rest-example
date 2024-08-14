@@ -1,8 +1,8 @@
-# REST APIサンプル
+# REST API実装サンプル
 
 ## 概要
 
-- Go言語によるREST APIのサンプル実装
+- Go言語によるREST APIの実装サンプル
 - 題材は商品の価格推移を記録していくWebアプリケーション
 - 認証は `JWT`
 - テーブルは起動時に `GORM` のAuto Migrationで生成
@@ -92,7 +92,7 @@ docker-compose up -d
 #### 環境変数に接続先のデータベースを設定
 
 ```Shell
-export DBURL=postgres://postgres:develop@localhost:5432/?sslmode=disable
+export DBURL=postgres://postgres:pwdev@localhost:5432/?sslmode=disable
 ```
 
 #### アプリケーションの起動
@@ -248,13 +248,13 @@ docker-compose up -d
 #### アプリケーションの起動
 
 ```Shell
-docker run --rm --network=backend-develop -p 1323:1323 -e DBURL=postgres://postgres:develop@postgres-develop:5432/?sslmode=disable rest-example
+docker run --rm --network=backend-develop -p 1323:1323 -e DBURL=postgres://postgres:pwdev@postgres-develop:5432/?sslmode=disable rest-example
 ```
 
 ### 環境変数
 
 | 環境変数名 | 必須 | 説明 |
 | ---- | :----: | ---- |
-| DBURL | 〇 | PostgreSQLの接続文字列<br>例）<br> `postgres://postgres:develop@localhost:5432/?sslmode=disable` <br> _※テスト用は固定で変更不可_ |
+| DBURL | 〇 | PostgreSQLの接続文字列<br>例）<br> `postgres://postgres:pwdev@localhost:5432/?sslmode=disable` <br> _※テスト用は固定で変更不可_ |
 | JWTKEY |  | 固定したい場合などに任意の文字列を指定。<br>省略した場合、アプリケーションの起動時にランダム生成し、<br>停止すると発行したトークンは有効期限前に **無効** になる |
 | ECHOADDRESS |  | 省略時は `:1323` |

@@ -24,9 +24,7 @@ var (
 )
 
 func newHTTPError(code int, cause error) *echo.HTTPError {
-	err := echo.NewHTTPError(code)
-	err.SetInternal(pkgerrors.WithStack(cause))
-	return err
+	return echo.NewHTTPError(code).SetInternal(pkgerrors.WithStack(cause))
 }
 
 func (h *Handler) customErrorHandler(err error, c echo.Context) {

@@ -28,7 +28,7 @@ func formatDSN(dbname string) string {
 	if dbname != "" {
 		dbnameAttr = "dbname=" + dbname
 	}
-	return fmt.Sprintf("host=localhost port=15432 user=postgres password=test %s sslmode=disable TimeZone=Asia/Tokyo", dbnameAttr)
+	return fmt.Sprintf("host=localhost port=15432 user=postgres password=pwtest %s sslmode=disable TimeZone=Asia/Tokyo", dbnameAttr)
 }
 
 func connectDB(dbname string) (*pgx.Conn, error) {
