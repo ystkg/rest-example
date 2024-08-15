@@ -110,6 +110,7 @@ func TestCreateUserValidation(t *testing.T) {
 		{"name=testuser02", 400, nil},
 		{"password=testpassword", 400, nil},
 		{"name=_testuser01&password=testpassword", 400, nil},
+		{"name=%0g", 400, nil},
 	}
 
 	for _, v := range cases {

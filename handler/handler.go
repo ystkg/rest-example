@@ -41,13 +41,11 @@ func NewHandler(logger *slog.Logger, s service.Service, jwtkey []byte, validityM
 	}
 	signingMethod := jwtConfig.SigningMethod
 	if signingMethod == "" {
-		// デフォルトはHS256になる
-		signingMethod = echojwt.AlgorithmHS256
+		signingMethod = echojwt.AlgorithmHS256 // デフォルトはHS256になる
 	}
 	jwtContextKey := jwtConfig.ContextKey
 	if jwtContextKey == "" {
-		// デフォルトは"user"になる
-		jwtContextKey = "user"
+		jwtContextKey = "user" // デフォルトは"user"になる
 	}
 
 	return &Handler{

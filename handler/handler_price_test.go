@@ -19,8 +19,9 @@ import (
 func somePrices() [][6]any {
 	now := time.Now()
 	return [][6]any{
-		{1, now, "shop1", "memory8G", 3800, true},
+		{1, now.Add(-1 * time.Microsecond), "shop1", "memory8G", 3800, true},
 		{1, now, "shop2", "memory16G", 5900, true},
+		{1, now, "shop3", "memory32G", 7600, true},
 		{2, now, "shop3", "ssd1T", 7900, true},
 	}
 }

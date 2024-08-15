@@ -77,7 +77,15 @@ func (h *Handler) FindPrices(c echo.Context) error {
 	}
 
 	// レスポンスの生成
-	sort.SliceStable(entities, func(i, j int) bool { return entities[i].DateTime.Unix() > entities[j].DateTime.Unix() }) // 降順
+	sort.SliceStable(entities, func(i, j int) bool {
+		// 降順
+		iDateTime := entities[i].DateTime.UnixNano()
+		jDateTime := entities[j].DateTime.UnixNano()
+		if iDateTime == jDateTime {
+			return entities[i].ID > entities[j].ID // 第二ソートキー
+		}
+		return iDateTime > jDateTime // 第一ソートキー
+	})
 	priceList := make([]*api.Price, len(entities))
 	for i, v := range entities {
 		priceList[i] = h.entityToResponse(&v)

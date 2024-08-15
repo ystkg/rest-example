@@ -32,7 +32,11 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 	var detail string
 	if httpError, ok := err.(*echo.HTTPError); ok {
 		code = httpError.Code
-		detail = httpError.Internal.(interface{ Unwrap() error }).Unwrap().Error()
+		internal := httpError.Internal.(interface{ Unwrap() error }).Unwrap()
+		if herr, ok := internal.(*echo.HTTPError); ok && herr.Internal != nil {
+			internal = herr.Internal
+		}
+		detail = internal.Error()
 	}
 
 	var title string
