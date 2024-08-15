@@ -6,7 +6,6 @@ import (
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgconn"
-	pkgerrors "github.com/pkg/errors"
 	"github.com/ystkg/rest-example/entity"
 	"gorm.io/gorm"
 )
@@ -41,9 +40,9 @@ func (r *userRepositoryGorm) Create(ctx context.Context, name, password string) 
 	if err := tx.Create(user).Error; err != nil {
 		var pgerr *pgconn.PgError
 		if errors.As(err, &pgerr); pgerr.Code == "23505" { // unique_violation
-			return nil, errors.Join(pkgerrors.WithStack(ErrorDuplicated), err)
+			return nil, errors.Join(withStack(ErrorDuplicated), err)
 		}
-		return nil, pkgerrors.WithStack(err)
+		return nil, withStack(err)
 	}
 
 	return user, nil
@@ -63,7 +62,7 @@ func (r *userRepositoryGorm) Find(ctx context.Context, name, password string) (*
 		if errors.Is(db.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		return nil, pkgerrors.WithStack(db.Error)
+		return nil, withStack(db.Error)
 	}
 
 	return user, nil

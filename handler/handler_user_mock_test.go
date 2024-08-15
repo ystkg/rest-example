@@ -35,7 +35,7 @@ func TestCreateUserCreateError(t *testing.T) {
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
 	req := newRequest(
 		http.MethodPost,
-		"/user",
+		"/users",
 		&body,
 		echo.MIMEApplicationForm,
 		nil,
@@ -73,7 +73,7 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
 	req := newRequest(
 		http.MethodPost,
-		"/user",
+		"/users",
 		&body,
 		echo.MIMEApplicationForm,
 		nil,
@@ -111,7 +111,7 @@ func TestCreateUserCommitError(t *testing.T) {
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
 	req := newRequest(
 		http.MethodPost,
-		"/user",
+		"/users",
 		&body,
 		echo.MIMEApplicationForm,
 		nil,
@@ -154,7 +154,7 @@ func TestGenTokenFindError(t *testing.T) {
 	body := "password=" + password
 	req := newRequest(
 		http.MethodPost,
-		"/user/"+name+"/token",
+		"/users/"+name+"/token",
 		&body,
 		echo.MIMEApplicationForm,
 		nil,

@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 
-	pkgerrors "github.com/pkg/errors"
 	"github.com/ystkg/rest-example/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -38,7 +37,7 @@ type repositoryGorm struct {
 func NewRepository(logger *slog.Logger, dburl string) (Repository, error) {
 	db, err := gorm.Open(postgres.Open(dburl), &gorm.Config{})
 	if err != nil {
-		return nil, pkgerrors.WithStack(err)
+		return nil, withStack(err)
 	}
 	return &repositoryGorm{
 		logger: logger,
@@ -58,7 +57,7 @@ func (r *repositoryGorm) InitDb(ctx context.Context) error {
 func (r *repositoryGorm) BeginTx(ctx context.Context) (context.Context, error) {
 	tx := r.db.Begin()
 	if err := tx.Error; err != nil {
-		return ctx, pkgerrors.WithStack(err)
+		return ctx, withStack(err)
 	}
 	return context.WithValue(ctx, contextKeyTx, tx.WithContext(ctx)), nil
 }
@@ -70,7 +69,7 @@ func (r *repositoryGorm) Rollback(ctx context.Context) error {
 	}
 	err := tx.Rollback().Error
 	if err != nil {
-		return pkgerrors.WithStack(err)
+		return withStack(err)
 	}
 	return nil
 }
@@ -78,7 +77,7 @@ func (r *repositoryGorm) Rollback(ctx context.Context) error {
 func (r *repositoryGorm) Commit(ctx context.Context) error {
 	err := tx(ctx).Commit().Error
 	if err != nil {
-		return pkgerrors.WithStack(err)
+		return withStack(err)
 	}
 	return nil
 }

@@ -47,7 +47,7 @@ func TestCreatePrice(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPost,
-		"/v1/price",
+		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -129,7 +129,7 @@ func TestCreatePriceValidation(t *testing.T) {
 		// リクエストの生成
 		req := newRequest(
 			http.MethodPost,
-			"/v1/price",
+			"/v1/prices",
 			&v.body,
 			echo.MIMEApplicationJSON,
 			v.jwt,
@@ -169,7 +169,7 @@ func TestFindPrices(t *testing.T) {
 	userId := uint(1)
 	req := newRequest(
 		http.MethodGet,
-		"/v1/price",
+		"/v1/prices",
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),
@@ -247,7 +247,7 @@ func TestFindPricesValidation(t *testing.T) {
 		// リクエストの生成
 		req := newRequest(
 			http.MethodGet,
-			"/v1/price",
+			"/v1/prices",
 			nil,
 			"",
 			v.jwt,
@@ -290,7 +290,7 @@ func TestFindPrice(t *testing.T) {
 	// リクエストの生成
 	req := newRequest(
 		http.MethodGet,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),
@@ -363,7 +363,7 @@ func TestFindPriceValidation(t *testing.T) {
 		// リクエストの生成
 		req := newRequest(
 			http.MethodGet,
-			fmt.Sprintf("/v1/price/%s", v.priceId),
+			fmt.Sprintf("/v1/prices/%s", v.priceId),
 			nil,
 			"",
 			v.jwt,
@@ -406,7 +406,7 @@ func TestUpdatePrice(t *testing.T) {
 	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
 	req := newRequest(
 		http.MethodPut,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
 		genToken(userId, jwtkey, validityMin),
@@ -493,7 +493,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		// リクエストの生成
 		req := newRequest(
 			http.MethodPut,
-			fmt.Sprintf("/v1/price/%s", v.priceId),
+			fmt.Sprintf("/v1/prices/%s", v.priceId),
 			&v.body,
 			echo.MIMEApplicationJSON,
 			v.jwt,
@@ -534,7 +534,7 @@ func TestDeletePrice(t *testing.T) {
 	priceId := uint(1)
 	req := newRequest(
 		http.MethodDelete,
-		fmt.Sprintf("/v1/price/%d", priceId),
+		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
 		genToken(userId, jwtkey, validityMin),
@@ -612,7 +612,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		// リクエストの生成
 		req := newRequest(
 			http.MethodDelete,
-			fmt.Sprintf("/v1/price/%s", v.priceId),
+			fmt.Sprintf("/v1/prices/%s", v.priceId),
 			nil,
 			"",
 			v.jwt,
