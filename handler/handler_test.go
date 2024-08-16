@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"io"
 	"log"
@@ -13,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/ystkg/rest-example/entity"
 	"github.com/ystkg/rest-example/handler"
 	"github.com/ystkg/rest-example/repository"
@@ -82,38 +84,50 @@ func dropDatabaseIfExists(conn *pgx.Conn, dbname string) error {
 	return nil
 }
 
-func setupTest(testname string) (*echo.Echo, pgx.Tx, []byte, int, error) {
-	e, _, _, tx, jwtkey, validityMin, err := setupTestMain(testname)
-	return e, tx, jwtkey, validityMin, err
+func setupTest(testname string) (*echo.Echo, *sql.DB, pgx.Tx, []byte, int, error) {
+	e, sqlDB, _, _, tx, jwtkey, validityMin, err := setupTestMain(testname)
+	if err != nil && sqlDB != nil {
+		sqlDB.Close()
+		sqlDB = nil
+	}
+	return e, sqlDB, tx, jwtkey, validityMin, err
 }
 
-func setupMockTest(testname string) (*echo.Echo, *serviceMock, pgx.Tx, []byte, int, error) {
-	e, h, r, tx, jwtkey, validityMin, err := setupTestMain(testname)
+func setupMockTest(testname string) (*echo.Echo, *sql.DB, *serviceMock, pgx.Tx, []byte, int, error) {
+	e, sqlDB, h, r, tx, jwtkey, validityMin, err := setupTestMain(testname)
+	if err != nil && sqlDB != nil {
+		sqlDB.Close()
+		sqlDB = nil
+	}
 	var mock *serviceMock
 	if err == nil {
 		mock = newMockService(newMockRepository(r))
 		h.SetMockService(mock)
 	}
-	return e, mock, tx, jwtkey, validityMin, err
+	return e, sqlDB, mock, tx, jwtkey, validityMin, err
 }
 
-func setupTestMain(testname string) (*echo.Echo, *handler.Handler, repository.Repository, pgx.Tx, []byte, int, error) {
+func setupTestMain(testname string) (*echo.Echo, *sql.DB, *handler.Handler, repository.Repository, pgx.Tx, []byte, int, error) {
 	logger := slog.Default()
 
 	// Database
 	dbname := strings.ToLower(testname)
 	dburl, err := createTestDatabase(dbname)
 	if err != nil {
-		return nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, nil, 0, err
 	}
 
 	// Repository
-	r, err := repository.NewRepository(logger, dburl)
+	sqlDB, err := sql.Open("pgx", dburl)
 	if err != nil {
-		return nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, nil, 0, err
+	}
+	r, err := repository.NewRepository(logger, sqlDB)
+	if err != nil {
+		return nil, sqlDB, nil, nil, nil, nil, 0, err
 	}
 	if err := r.InitDb(context.Background()); err != nil {
-		return nil, nil, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, nil, 0, err
 	}
 
 	// Service
@@ -124,7 +138,7 @@ func setupTestMain(testname string) (*echo.Echo, *handler.Handler, repository.Re
 	validityMin := 1
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
-		return nil, nil, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, nil, 0, err
 	}
 	indent := "  "
 	timeoutSec := 60
@@ -136,17 +150,54 @@ func setupTestMain(testname string) (*echo.Echo, *handler.Handler, repository.Re
 	// トランザクション
 	conn, err := connectDB(dbname)
 	if err != nil {
-		return nil, nil, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, nil, 0, err
 	}
 	tx, err := conn.Begin(context.Background())
 	if err != nil {
-		return nil, nil, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, nil, 0, err
 	}
 
-	return e, h, r, tx, jwtkey, validityMin, nil
+	return e, sqlDB, h, r, tx, jwtkey, validityMin, nil
 }
 
-func cleanIfSuccess(testname string, t *testing.T) error {
+func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []byte, int, error) {
+	logger := slog.Default()
+
+	// Repository
+	sqlDB, mock, err := sqlmock.New()
+	if err != nil {
+		return nil, nil, nil, nil, 0, err
+	}
+	r, err := repository.NewRepository(logger, sqlDB)
+	if err != nil {
+		sqlDB.Close()
+		return nil, nil, nil, nil, 0, err
+	}
+
+	// Service
+	s := service.NewService(logger, r)
+
+	// Handler
+	jwtkey := []byte(testname)
+	validityMin := 1
+	location, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		sqlDB.Close()
+		return nil, nil, nil, nil, 0, err
+	}
+	indent := "  "
+	timeoutSec := 60
+	h := handler.NewHandler(logger, s, jwtkey, validityMin, location, indent, timeoutSec)
+
+	// Echo
+	e := handler.NewEcho(h)
+
+	return e, sqlDB, mock, jwtkey, validityMin, nil
+}
+
+func cleanIfSuccess(testname string, t *testing.T, sqlDB *sql.DB) error {
+	defer sqlDB.Close()
+
 	if t.Failed() {
 		return nil
 	}

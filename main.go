@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"database/sql"
 	"log"
 	"log/slog"
 	"net/http"
@@ -29,7 +30,12 @@ func main() {
 	if dburl == "" {
 		log.Fatal("DBURL is empty")
 	}
-	r, err := repository.NewRepository(logger, dburl)
+	sqlDB, err := sql.Open("pgx", dburl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sqlDB.Close()
+	r, err := repository.NewRepository(logger, sqlDB)
 	if err != nil {
 		log.Fatal(err)
 	}

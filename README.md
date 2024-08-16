@@ -10,8 +10,9 @@
 <table>
 <tr><td> Webフレームワーク </td><td> Echo </td></tr>
 <tr><td> ORMライブラリ </td><td> GORM </td></tr>
-<tr><td> テストフレームワーク </td><td> Testify </td></tr>
 <tr><td> データベース </td><td> PostgreSQL </td></tr>
+<tr><td> テストフレームワーク </td><td> Testify </td></tr>
+<tr><td> テストモック </td><td> go-sqlmock </td></tr>
 </table>
 
 ## API

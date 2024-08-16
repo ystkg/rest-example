@@ -15,11 +15,11 @@ func TestCreatePriceCreateError(t *testing.T) {
 	testname := "TestCreatePriceCreateError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.price.err = errors.New(testname)
@@ -54,11 +54,11 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 	testname := "TestCreatePriceBeginTxError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.beginTxErr = errors.New(testname)
@@ -93,11 +93,11 @@ func TestCreatePriceCommitError(t *testing.T) {
 	testname := "TestCreatePriceCommitError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.commitErr = errors.New(testname)
@@ -132,11 +132,11 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 	testname := "TestFindPricesFindByUserIdError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.price.err = errors.New(testname)
@@ -169,11 +169,11 @@ func TestFindPriceFindError(t *testing.T) {
 	testname := "TestFindPriceFindError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.price.err = errors.New(testname)
@@ -211,11 +211,11 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 	testname := "TestUpdatePriceUpdateError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.price.err = errors.New(testname)
@@ -251,11 +251,11 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	testname := "TestUpdatePriceRowsAffectedError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.price.rowsAffected, mock.repository.price.overwirte = 2, true
@@ -291,11 +291,11 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 	testname := "TestUpdatePriceBeginTxError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.beginTxErr = errors.New(testname)
@@ -331,11 +331,11 @@ func TestUpdatePriceCommitError(t *testing.T) {
 	testname := "TestUpdatePriceCommitError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.commitErr = errors.New(testname)
@@ -371,11 +371,11 @@ func TestDeletePriceDeleteError(t *testing.T) {
 	testname := "TestDeletePriceDeleteError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.price.err = errors.New(testname)
@@ -409,11 +409,11 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 	testname := "TestDeletePriceRowsAffectedError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.price.rowsAffected, mock.repository.price.overwirte = 2, true
@@ -447,11 +447,11 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 	testname := "TestDeletePriceBeginTxError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.beginTxErr = errors.New(testname)
@@ -485,11 +485,11 @@ func TestDeletePriceCommitError(t *testing.T) {
 	testname := "TestDeletePriceCommitError"
 
 	// セットアップ
-	e, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, jwtkey, validityMin, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.commitErr = errors.New(testname)
