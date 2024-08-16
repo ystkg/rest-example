@@ -1,9 +1,11 @@
 package handler_test
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"regexp"
 	"testing"
@@ -12,6 +14,9 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/ystkg/rest-example/handler"
+	"github.com/ystkg/rest-example/repository"
+	"github.com/ystkg/rest-example/service"
 )
 
 type anyTime struct{}
@@ -19,6 +24,41 @@ type anyTime struct{}
 func (a anyTime) Match(v driver.Value) bool {
 	_, ok := v.(time.Time)
 	return ok
+}
+
+func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []byte, int, error) {
+	logger := slog.Default()
+
+	// Repository
+	sqlDB, mock, err := sqlmock.New()
+	if err != nil {
+		return nil, nil, nil, nil, 0, err
+	}
+	r, err := repository.NewRepository(logger, sqlDB)
+	if err != nil {
+		sqlDB.Close()
+		return nil, nil, nil, nil, 0, err
+	}
+
+	// Service
+	s := service.NewService(logger, r)
+
+	// Handler
+	jwtkey := []byte(testname)
+	validityMin := 1
+	location, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		sqlDB.Close()
+		return nil, nil, nil, nil, 0, err
+	}
+	indent := "  "
+	timeoutSec := 60
+	h := handler.NewHandler(logger, s, jwtkey, validityMin, location, indent, timeoutSec)
+
+	// Echo
+	e := handler.NewEcho(h)
+
+	return e, sqlDB, mock, jwtkey, validityMin, nil
 }
 
 func TestBeginError(t *testing.T) {

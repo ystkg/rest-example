@@ -9,28 +9,53 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"sort"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/ystkg/rest-example/entity"
 	"github.com/ystkg/rest-example/handler"
 	"github.com/ystkg/rest-example/repository"
 	"github.com/ystkg/rest-example/service"
+	"gopkg.in/yaml.v3"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 )
 
+var pgpassword *string
+
+func init() {
+	buf, err := os.ReadFile("../docker-compose.yml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	conf := struct {
+		Services struct {
+			PostgresTest struct {
+				Environment struct {
+					PostgresPassword string `yaml:"POSTGRES_PASSWORD"`
+				}
+			} `yaml:"postgres-test"`
+		}
+	}{}
+	if err = yaml.Unmarshal(buf, &conf); err != nil {
+		log.Fatal(err)
+	}
+
+	pgpassword = &conf.Services.PostgresTest.Environment.PostgresPassword
+}
+
 func formatDSN(dbname string) string {
 	dbnameAttr := ""
 	if dbname != "" {
 		dbnameAttr = "dbname=" + dbname
 	}
-	return fmt.Sprintf("host=localhost port=15432 user=postgres password=pwtest %s sslmode=disable TimeZone=Asia/Tokyo", dbnameAttr)
+	return fmt.Sprintf("host=localhost port=15432 user=postgres password=%s %s sslmode=disable TimeZone=Asia/Tokyo", *pgpassword, dbnameAttr)
 }
 
 func connectDB(dbname string) (*pgx.Conn, error) {
@@ -158,41 +183,6 @@ func setupTestMain(testname string) (*echo.Echo, *sql.DB, *handler.Handler, repo
 	}
 
 	return e, sqlDB, h, r, tx, jwtkey, validityMin, nil
-}
-
-func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []byte, int, error) {
-	logger := slog.Default()
-
-	// Repository
-	sqlDB, mock, err := sqlmock.New()
-	if err != nil {
-		return nil, nil, nil, nil, 0, err
-	}
-	r, err := repository.NewRepository(logger, sqlDB)
-	if err != nil {
-		sqlDB.Close()
-		return nil, nil, nil, nil, 0, err
-	}
-
-	// Service
-	s := service.NewService(logger, r)
-
-	// Handler
-	jwtkey := []byte(testname)
-	validityMin := 1
-	location, err := time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		sqlDB.Close()
-		return nil, nil, nil, nil, 0, err
-	}
-	indent := "  "
-	timeoutSec := 60
-	h := handler.NewHandler(logger, s, jwtkey, validityMin, location, indent, timeoutSec)
-
-	// Echo
-	e := handler.NewEcho(h)
-
-	return e, sqlDB, mock, jwtkey, validityMin, nil
 }
 
 func cleanIfSuccess(testname string, t *testing.T, sqlDB *sql.DB) error {
