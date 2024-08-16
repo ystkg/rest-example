@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 
 	"github.com/ystkg/rest-example/entity"
@@ -34,8 +35,8 @@ type repositoryGorm struct {
 	price PriceRepository
 }
 
-func NewRepository(logger *slog.Logger, dburl string) (Repository, error) {
-	db, err := gorm.Open(postgres.Open(dburl), &gorm.Config{})
+func NewRepository(logger *slog.Logger, sqlDB *sql.DB) (Repository, error) {
+	db, err := gorm.Open(postgres.New(postgres.Config{Conn: sqlDB}), &gorm.Config{})
 	if err != nil {
 		return nil, withStack(err)
 	}

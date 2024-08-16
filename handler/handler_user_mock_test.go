@@ -15,11 +15,11 @@ func TestCreateUserCreateError(t *testing.T) {
 	testname := "TestCreateUserCreateError"
 
 	// セットアップ
-	e, mock, tx, _, _, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.user.err = errors.New(testname)
@@ -53,11 +53,11 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	testname := "TestCreateUserBeginTxError"
 
 	// セットアップ
-	e, mock, tx, _, _, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.beginTxErr = errors.New(testname)
@@ -91,11 +91,11 @@ func TestCreateUserCommitError(t *testing.T) {
 	testname := "TestCreateUserCommitError"
 
 	// セットアップ
-	e, mock, tx, _, _, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.commitErr = errors.New(testname)
@@ -129,11 +129,11 @@ func TestGenTokenFindError(t *testing.T) {
 	testname := "TestGenTokenFindError"
 
 	// セットアップ
-	e, mock, tx, _, _, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, _, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t)
+	defer cleanIfSuccess(testname, t, sqlDB)
 
 	// mockの挙動設定
 	mock.repository.user.err = errors.New(testname)
