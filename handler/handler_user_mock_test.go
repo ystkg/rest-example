@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// ユーザの登録のリポジトリエラー
 func TestCreateUserCreateError(t *testing.T) {
 	testname := "TestCreateUserCreateError"
 
@@ -49,6 +50,7 @@ func TestCreateUserCreateError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// ユーザの登録のトランザクション開始エラー
 func TestCreateUserBeginTxError(t *testing.T) {
 	testname := "TestCreateUserBeginTxError"
 
@@ -87,6 +89,7 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// ユーザの登録のコミットエラー
 func TestCreateUserCommitError(t *testing.T) {
 	testname := "TestCreateUserCommitError"
 
@@ -125,6 +128,7 @@ func TestCreateUserCommitError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// トークン発行の検索エラー
 func TestGenTokenFindError(t *testing.T) {
 	testname := "TestGenTokenFindError"
 

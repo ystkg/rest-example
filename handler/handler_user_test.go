@@ -27,6 +27,7 @@ func someUsers() [][2]any {
 	}
 }
 
+// ユーザの登録の正常系
 func TestCreateUser(t *testing.T) {
 	testname := "TestCreateUser"
 
@@ -84,6 +85,7 @@ func TestCreateUser(t *testing.T) {
 	assert.Equal(t, encodePassword(name, password), entity.Password)
 }
 
+// ユーザの登録のバリデーション
 func TestCreateUserValidation(t *testing.T) {
 	testname := "TestCreateUserValidation"
 
@@ -137,6 +139,7 @@ func TestCreateUserValidation(t *testing.T) {
 	}
 }
 
+// トークン発行の正常系
 func TestGenToken(t *testing.T) {
 	testname := "TestGenToken"
 
@@ -196,6 +199,7 @@ func TestGenToken(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// トークン発行のバリデーション
 func TestGenTokenValidation(t *testing.T) {
 	testname := "TestGenTokenValidation"
 

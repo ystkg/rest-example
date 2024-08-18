@@ -61,6 +61,7 @@ func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []
 	return e, sqlDB, mock, jwtkey, validityMin, nil
 }
 
+// トランザクション開始エラー
 func TestBeginError(t *testing.T) {
 	testname := "TestBeginError"
 
@@ -94,6 +95,7 @@ func TestBeginError(t *testing.T) {
 	assert.ErrorIs(t, act, mockerr)
 }
 
+// コミットエラー
 func TestCommitError(t *testing.T) {
 	testname := "TestCommitError"
 
@@ -132,6 +134,7 @@ func TestCommitError(t *testing.T) {
 	assert.ErrorIs(t, act, mockerr)
 }
 
+// ユーザの登録のDBエラー
 func TestCreateUserError(t *testing.T) {
 	testname := "TestCreateUserError"
 
@@ -169,6 +172,7 @@ func TestCreateUserError(t *testing.T) {
 	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 
+// トークン発行のDBエラー
 func TestGenTokenError(t *testing.T) {
 	testname := "TestGenTokenError"
 
@@ -204,6 +208,7 @@ func TestGenTokenError(t *testing.T) {
 	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 
+// 価格の登録のDBエラー
 func TestCreatePriceError(t *testing.T) {
 	testname := "TestCreatePriceError"
 
@@ -241,6 +246,7 @@ func TestCreatePriceError(t *testing.T) {
 	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 
+// 価格の一覧のDBエラー
 func TestFindPricesError(t *testing.T) {
 	testname := "TestFindPricesError"
 
@@ -274,6 +280,7 @@ func TestFindPricesError(t *testing.T) {
 	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 
+// 価格の取得のDBエラー
 func TestFindPriceError(t *testing.T) {
 	testname := "TestFindPriceError"
 
@@ -309,6 +316,7 @@ func TestFindPriceError(t *testing.T) {
 	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 
+// 価格の更新のDBエラー
 func TestUpdatePriceError(t *testing.T) {
 	testname := "TestUpdatePriceError"
 
@@ -346,6 +354,7 @@ func TestUpdatePriceError(t *testing.T) {
 	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 
+// 価格の削除のDBエラー
 func TestDeletePriceError(t *testing.T) {
 	testname := "TestDeletePriceError"
 
