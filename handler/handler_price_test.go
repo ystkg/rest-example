@@ -26,6 +26,7 @@ func somePrices() [][6]any {
 	}
 }
 
+// 価格の登録の正常系
 func TestCreatePrice(t *testing.T) {
 	testname := "TestCreatePrice"
 
@@ -89,6 +90,7 @@ func TestCreatePrice(t *testing.T) {
 	assert.Equal(t, inStock, entity.InStock)
 }
 
+// 価格の登録のバリデーション
 func TestCreatePriceValidation(t *testing.T) {
 	testname := "TestCreatePriceValidation"
 
@@ -150,6 +152,7 @@ func TestCreatePriceValidation(t *testing.T) {
 	}
 }
 
+// 価格の一覧の正常系
 func TestFindPrices(t *testing.T) {
 	testname := "TestFindPrices"
 
@@ -213,6 +216,7 @@ func TestFindPrices(t *testing.T) {
 	}
 }
 
+// 価格の一覧のバリデーション
 func TestFindPricesValidation(t *testing.T) {
 	testname := "TestFindPricesValidation"
 
@@ -265,6 +269,7 @@ func TestFindPricesValidation(t *testing.T) {
 	}
 }
 
+// 価格の取得の正常系
 func TestFindPrice(t *testing.T) {
 	testname := "TestFindPrice"
 
@@ -323,6 +328,7 @@ func TestFindPrice(t *testing.T) {
 	assert.Equal(t, *res.InStock, entity.InStock)
 }
 
+// 価格の取得のバリデーション
 func TestFindPriceValidation(t *testing.T) {
 	testname := "TestFindPriceValidation"
 
@@ -384,6 +390,7 @@ func TestFindPriceValidation(t *testing.T) {
 	}
 }
 
+// 価格の更新の正常系
 func TestUpdatePrice(t *testing.T) {
 	testname := "TestUpdatePrice"
 
@@ -446,6 +453,7 @@ func TestUpdatePrice(t *testing.T) {
 	assert.Equal(t, *res.InStock, entity.InStock)
 }
 
+// 価格の更新のバリデーション
 func TestUpdatePriceValidation(t *testing.T) {
 	testname := "TestUpdatePriceValidation"
 
@@ -514,6 +522,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 	}
 }
 
+// 価格の削除の正常系
 func TestDeletePrice(t *testing.T) {
 	testname := "TestDeletePrice"
 
@@ -571,6 +580,7 @@ func TestDeletePrice(t *testing.T) {
 	assert.Equal(t, beforeEntity.InStock, entity.InStock)
 }
 
+// 価格の削除のバリデーション
 func TestDeletePriceValidation(t *testing.T) {
 	testname := "TestDeletePriceValidation"
 

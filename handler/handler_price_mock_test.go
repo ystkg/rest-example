@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// 価格の登録のリポジトリエラー
 func TestCreatePriceCreateError(t *testing.T) {
 	testname := "TestCreatePriceCreateError"
 
@@ -50,6 +51,7 @@ func TestCreatePriceCreateError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の登録のトランザクション開始エラー
 func TestCreatePriceBeginTxError(t *testing.T) {
 	testname := "TestCreatePriceBeginTxError"
 
@@ -89,6 +91,7 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の登録のコミットエラー
 func TestCreatePriceCommitError(t *testing.T) {
 	testname := "TestCreatePriceCommitError"
 
@@ -128,6 +131,7 @@ func TestCreatePriceCommitError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の一覧の検索エラー
 func TestFindPricesFindByUserIdError(t *testing.T) {
 	testname := "TestFindPricesFindByUserIdError"
 
@@ -165,6 +169,7 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の取得の検索エラー
 func TestFindPriceFindError(t *testing.T) {
 	testname := "TestFindPriceFindError"
 
@@ -207,6 +212,7 @@ func TestFindPriceFindError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の更新のリポジトリエラー
 func TestUpdatePriceUpdateError(t *testing.T) {
 	testname := "TestUpdatePriceUpdateError"
 
@@ -247,6 +253,7 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の更新の更新件数異常
 func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	testname := "TestUpdatePriceRowsAffectedError"
 
@@ -287,6 +294,7 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の更新のトランザクション開始エラー
 func TestUpdatePriceBeginTxError(t *testing.T) {
 	testname := "TestUpdatePriceBeginTxError"
 
@@ -327,6 +335,7 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の更新のコミットエラー
 func TestUpdatePriceCommitError(t *testing.T) {
 	testname := "TestUpdatePriceCommitError"
 
@@ -367,6 +376,7 @@ func TestUpdatePriceCommitError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の削除のリポジトリエラー
 func TestDeletePriceDeleteError(t *testing.T) {
 	testname := "TestDeletePriceDeleteError"
 
@@ -405,6 +415,7 @@ func TestDeletePriceDeleteError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の削除の更新件数異常
 func TestDeletePriceRowsAffectedError(t *testing.T) {
 	testname := "TestDeletePriceRowsAffectedError"
 
@@ -443,6 +454,7 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の削除のトランザクション開始エラー
 func TestDeletePriceBeginTxError(t *testing.T) {
 	testname := "TestDeletePriceBeginTxError"
 
@@ -481,6 +493,7 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 	assert.Nil(t, diff)
 }
 
+// 価格の削除のコミットエラー
 func TestDeletePriceCommitError(t *testing.T) {
 	testname := "TestDeletePriceCommitError"
 
