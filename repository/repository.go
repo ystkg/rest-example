@@ -30,7 +30,8 @@ type Repository interface {
 type repositoryGorm struct {
 	logger *slog.Logger
 
-	db    *gorm.DB
+	db *gorm.DB
+
 	user  UserRepository
 	price PriceRepository
 }

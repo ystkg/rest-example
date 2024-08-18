@@ -38,6 +38,9 @@ func (r *priceRepositoryGorm) Create(
 	price uint,
 	inStock bool,
 ) (*entity.Price, error) {
+	r.logger.DebugContext(ctx, "priceRepositoryGorm#Create start")
+	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#Create end")
+
 	tx := tx(ctx)
 
 	priceEntity := &entity.Price{
