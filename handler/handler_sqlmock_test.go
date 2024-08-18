@@ -51,9 +51,13 @@ func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []
 		sqlDB.Close()
 		return nil, nil, nil, nil, 0, err
 	}
-	indent := "  "
-	timeoutSec := 60
-	h := handler.NewHandler(logger, s, jwtkey, validityMin, location, indent, timeoutSec)
+	h := handler.NewHandler(logger, s, &handler.HandlerConfig{
+		JwtKey:      jwtkey,
+		ValidityMin: validityMin,
+		Location:    location,
+		Indent:      "  ",
+		TimeoutSec:  60,
+	})
 
 	// Echo
 	e := handler.NewEcho(h)
