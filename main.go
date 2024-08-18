@@ -58,14 +58,18 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	validityMin := 120 // JWTのexp
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 		log.Fatal(err)
 	}
-	indent := "  " // レスポンスのJSONのインデント
-	timeoutSec := 60
-	h := handler.NewHandler(logger, s, jwtkey, validityMin, location, indent, timeoutSec)
+	const timeoutSec = 60
+	h := handler.NewHandler(logger, s, &handler.HandlerConfig{
+		JwtKey:      jwtkey,
+		ValidityMin: 120, // JWTのexp
+		Location:    location,
+		Indent:      "  ", // レスポンスのJSONのインデント
+		TimeoutSec:  timeoutSec,
+	})
 
 	// Echo(Graceful Shutdown)
 	address := os.Getenv("ECHOADDRESS")

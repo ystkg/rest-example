@@ -32,9 +32,17 @@ type Handler struct {
 	timeoutSec int
 }
 
-func NewHandler(logger *slog.Logger, s service.Service, jwtkey []byte, validityMin int, location *time.Location, indent string, timeoutSec int) *Handler {
+type HandlerConfig struct {
+	JwtKey      []byte
+	ValidityMin int // JWTのexp
+	Location    *time.Location
+	Indent      string // レスポンスのJSONのインデント
+	TimeoutSec  int
+}
+
+func NewHandler(logger *slog.Logger, s service.Service, config *HandlerConfig) *Handler {
 	jwtConfig := echojwt.Config{
-		SigningKey: jwtkey,
+		SigningKey: config.JwtKey,
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return &JwtCustomClaims{}
 		},
@@ -54,11 +62,11 @@ func NewHandler(logger *slog.Logger, s service.Service, jwtkey []byte, validityM
 		jwtConfig,
 		jwt.GetSigningMethod(signingMethod),
 		jwtContextKey,
-		validityMin,
+		config.ValidityMin,
 		time.DateTime,
-		location,
-		indent,
-		timeoutSec,
+		config.Location,
+		config.Indent,
+		config.TimeoutSec,
 	}
 }
 

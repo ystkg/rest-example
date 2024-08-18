@@ -15,7 +15,7 @@ func TestCustomErrorHandler(t *testing.T) {
 	testname := "TestCustomErrorHandler"
 
 	// セットアップ
-	h := NewHandler(slog.Default(), nil, nil, 0, nil, "", 0)
+	h := NewHandler(slog.Default(), nil, &HandlerConfig{})
 	e := NewEcho(h)
 
 	cases := []struct {
