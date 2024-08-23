@@ -11,7 +11,7 @@ func NewEcho(h *Handler) *echo.Echo {
 
 	e.HTTPErrorHandler = h.customErrorHandler
 
-	e.Validator = NewCustomValidator()
+	e.Validator = h.validator
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

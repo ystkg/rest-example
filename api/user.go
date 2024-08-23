@@ -23,7 +23,7 @@ func (p password) LogValue() slog.Value {
 type User struct {
 	ID       *uint
 	Name     string   `form:"name" validate:"required,alphanum,max=30"`
-	Password password `form:"password" validate:"required,printascii,max=50" json:"-"`
+	Password password `form:"password" validate:"required,printascii,min=5,max=50" json:"-"`
 }
 
 type UserToken struct {

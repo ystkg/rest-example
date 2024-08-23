@@ -16,6 +16,8 @@ type Handler struct {
 
 	service service.Service
 
+	validator *customValidator
+
 	// JWT
 	jwtConfig     echojwt.Config
 	signingMethod jwt.SigningMethod
@@ -36,6 +38,7 @@ type HandlerConfig struct {
 	JwtKey      []byte
 	ValidityMin int // JWTのexp
 	Location    *time.Location
+	Locale      string
 	Indent      string // レスポンスのJSONのインデント
 	TimeoutSec  int
 }
@@ -59,6 +62,7 @@ func NewHandler(logger *slog.Logger, s service.Service, config *HandlerConfig) *
 	return &Handler{
 		logger,
 		s,
+		newCustomValidator(config.Locale),
 		jwtConfig,
 		jwt.GetSigningMethod(signingMethod),
 		jwtContextKey,

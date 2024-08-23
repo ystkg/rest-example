@@ -67,6 +67,7 @@ func main() {
 		JwtKey:      jwtkey,
 		ValidityMin: 120, // JWTのexp
 		Location:    location,
+		Locale:      "en",
 		Indent:      "  ", // レスポンスのJSONのインデント
 		TimeoutSec:  timeoutSec,
 	})
