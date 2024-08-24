@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -133,8 +132,6 @@ func setupMockTest(testname string) (*echo.Echo, *sql.DB, *serviceMock, pgx.Tx, 
 }
 
 func setupTestMain(testname string) (*echo.Echo, *sql.DB, *handler.Handler, repository.Repository, pgx.Tx, []byte, int, error) {
-	logger := slog.Default()
-
 	// Database
 	dbname := strings.ToLower(testname)
 	dburl, err := createTestDatabase(dbname)
@@ -147,7 +144,7 @@ func setupTestMain(testname string) (*echo.Echo, *sql.DB, *handler.Handler, repo
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, 0, err
 	}
-	r, err := repository.NewRepository(logger, sqlDB)
+	r, err := repository.NewRepository(sqlDB)
 	if err != nil {
 		return nil, sqlDB, nil, nil, nil, nil, 0, err
 	}
@@ -156,7 +153,7 @@ func setupTestMain(testname string) (*echo.Echo, *sql.DB, *handler.Handler, repo
 	}
 
 	// Service
-	s := service.NewService(logger, r)
+	s := service.NewService(r)
 
 	// Handler
 	jwtkey := []byte(testname)
@@ -165,7 +162,7 @@ func setupTestMain(testname string) (*echo.Echo, *sql.DB, *handler.Handler, repo
 	if err != nil {
 		return nil, sqlDB, nil, nil, nil, nil, 0, err
 	}
-	h := handler.NewHandler(logger, s, &handler.HandlerConfig{
+	h := handler.NewHandler(s, &handler.HandlerConfig{
 		JwtKey:      jwtkey,
 		ValidityMin: validityMin,
 		Location:    location,

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log/slog"
 	"time"
 
 	"github.com/ystkg/rest-example/service"
@@ -12,8 +11,6 @@ import (
 )
 
 type Handler struct {
-	logger *slog.Logger
-
 	service service.Service
 
 	validator *customValidator
@@ -43,7 +40,7 @@ type HandlerConfig struct {
 	TimeoutSec  int
 }
 
-func NewHandler(logger *slog.Logger, s service.Service, config *HandlerConfig) *Handler {
+func NewHandler(s service.Service, config *HandlerConfig) *Handler {
 	jwtConfig := echojwt.Config{
 		SigningKey: config.JwtKey,
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
@@ -60,7 +57,6 @@ func NewHandler(logger *slog.Logger, s service.Service, config *HandlerConfig) *
 	}
 
 	return &Handler{
-		logger,
 		s,
 		newCustomValidator(config.Locale),
 		jwtConfig,

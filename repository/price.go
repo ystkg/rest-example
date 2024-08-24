@@ -20,13 +20,11 @@ type PriceRepository interface {
 }
 
 type priceRepositoryGorm struct {
-	logger *slog.Logger
-
 	db *gorm.DB
 }
 
-func NewPriceRepository(logger *slog.Logger, db *gorm.DB) PriceRepository {
-	return &priceRepositoryGorm{logger, db}
+func NewPriceRepository(db *gorm.DB) PriceRepository {
+	return &priceRepositoryGorm{db}
 }
 
 func (r *priceRepositoryGorm) Create(
@@ -38,8 +36,8 @@ func (r *priceRepositoryGorm) Create(
 	price uint,
 	inStock bool,
 ) (*entity.Price, error) {
-	r.logger.DebugContext(ctx, "priceRepositoryGorm#Create start")
-	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#Create end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	tx := tx(ctx)
 
@@ -60,8 +58,8 @@ func (r *priceRepositoryGorm) Create(
 }
 
 func (r *priceRepositoryGorm) Find(ctx context.Context, id, userId uint) (*entity.Price, error) {
-	r.logger.DebugContext(ctx, "priceRepositoryGorm#Find start")
-	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#Find end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	tx := tx(ctx)
 	if tx == nil {
@@ -85,8 +83,8 @@ func (r *priceRepositoryGorm) Find(ctx context.Context, id, userId uint) (*entit
 }
 
 func (r *priceRepositoryGorm) FindByUserId(ctx context.Context, userId uint) ([]entity.Price, error) {
-	r.logger.DebugContext(ctx, "priceRepositoryGorm#FindByUserId start")
-	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#FindByUserId end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	tx := tx(ctx)
 	if tx == nil {
@@ -111,8 +109,8 @@ func (r *priceRepositoryGorm) Update(
 	price uint,
 	inStock bool,
 ) (*entity.Price, int64, error) {
-	r.logger.DebugContext(ctx, "priceRepositoryGorm#Update start")
-	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#Update end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	tx := tx(ctx)
 
@@ -137,8 +135,8 @@ func (r *priceRepositoryGorm) Update(
 }
 
 func (r *priceRepositoryGorm) Delete(ctx context.Context, id, userId uint) (int64, error) {
-	r.logger.DebugContext(ctx, "priceRepositoryGorm#Delete start")
-	defer r.logger.DebugContext(ctx, "priceRepositoryGorm#Delete end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	tx := tx(ctx)
 

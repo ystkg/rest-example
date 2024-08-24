@@ -17,18 +17,16 @@ type UserRepository interface {
 }
 
 type userRepositoryGorm struct {
-	logger *slog.Logger
-
 	db *gorm.DB
 }
 
-func NewUserRepository(logger *slog.Logger, db *gorm.DB) UserRepository {
-	return &userRepositoryGorm{logger, db}
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &userRepositoryGorm{db}
 }
 
 func (r *userRepositoryGorm) Create(ctx context.Context, name, password string) (*entity.User, error) {
-	r.logger.DebugContext(ctx, "userRepositoryGorm#Create start")
-	defer r.logger.DebugContext(ctx, "userRepositoryGorm#Create end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	tx := tx(ctx)
 
@@ -49,8 +47,8 @@ func (r *userRepositoryGorm) Create(ctx context.Context, name, password string) 
 }
 
 func (r *userRepositoryGorm) Find(ctx context.Context, name, password string) (*entity.User, error) {
-	r.logger.DebugContext(ctx, "userRepositoryGorm#Find start")
-	defer r.logger.DebugContext(ctx, "userRepositoryGorm#Find end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	tx := tx(ctx)
 	if tx == nil {

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -87,8 +88,8 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 	// エラーログ
 	var chain plyerrors.Chain
 	if errors.As(err, &chain) {
-		h.logger.DebugContext(c.Request().Context(), chain.Error())
+		slog.DebugContext(c.Request().Context(), chain.Error())
 	} else {
-		h.logger.DebugContext(c.Request().Context(), err.Error())
+		slog.DebugContext(c.Request().Context(), err.Error())
 	}
 }

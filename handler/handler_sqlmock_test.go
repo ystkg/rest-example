@@ -5,7 +5,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"regexp"
 	"testing"
@@ -27,21 +26,19 @@ func (a anyTime) Match(v driver.Value) bool {
 }
 
 func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []byte, int, error) {
-	logger := slog.Default()
-
 	// Repository
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		return nil, nil, nil, nil, 0, err
 	}
-	r, err := repository.NewRepository(logger, sqlDB)
+	r, err := repository.NewRepository(sqlDB)
 	if err != nil {
 		sqlDB.Close()
 		return nil, nil, nil, nil, 0, err
 	}
 
 	// Service
-	s := service.NewService(logger, r)
+	s := service.NewService(r)
 
 	// Handler
 	jwtkey := []byte(testname)
@@ -51,7 +48,7 @@ func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []
 		sqlDB.Close()
 		return nil, nil, nil, nil, 0, err
 	}
-	h := handler.NewHandler(logger, s, &handler.HandlerConfig{
+	h := handler.NewHandler(s, &handler.HandlerConfig{
 		JwtKey:      jwtkey,
 		ValidityMin: validityMin,
 		Location:    location,
