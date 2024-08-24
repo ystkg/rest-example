@@ -40,9 +40,9 @@ func (r *userRepositoryGorm) Create(ctx context.Context, name, password string) 
 	if err := tx.Create(user).Error; err != nil {
 		var pgerr *pgconn.PgError
 		if errors.As(err, &pgerr); pgerr != nil && pgerr.Code == "23505" { // unique_violation
-			return nil, errors.Join(withStack(ErrorDuplicated), err)
+			return nil, errors.Join(wrap(ErrorDuplicated), err)
 		}
-		return nil, withStack(err)
+		return nil, wrap(err)
 	}
 
 	return user, nil
@@ -62,7 +62,7 @@ func (r *userRepositoryGorm) Find(ctx context.Context, name, password string) (*
 		if errors.Is(db.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		return nil, withStack(db.Error)
+		return nil, wrap(db.Error)
 	}
 
 	return user, nil

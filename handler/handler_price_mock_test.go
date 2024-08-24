@@ -290,7 +290,7 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.repository.price.rowsAffected).Error(), err.Error())
+	assert.EqualError(t, errors.Unwrap(err), fmt.Sprintf("RowsAffected:%d", mock.repository.price.rowsAffected))
 	assert.Nil(t, diff)
 }
 
@@ -450,7 +450,7 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 	_, diff, _, err := execHandlerTest(e, tx, req)
 
 	// アサーション
-	assert.Equal(t, fmt.Errorf("RowsAffected:%d", mock.repository.price.rowsAffected).Error(), err.Error())
+	assert.EqualError(t, errors.Unwrap(err), fmt.Sprintf("RowsAffected:%d", mock.repository.price.rowsAffected))
 	assert.Nil(t, diff)
 }
 
