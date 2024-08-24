@@ -24,13 +24,11 @@ type Service interface {
 }
 
 type serviceImpl struct {
-	logger *slog.Logger
-
 	repository repository.Repository
 }
 
-func NewService(logger *slog.Logger, r repository.Repository) Service {
-	return &serviceImpl{logger, r}
+func NewService(r repository.Repository) Service {
+	return &serviceImpl{r}
 }
 
 func (s *serviceImpl) beginTx(ctx context.Context) (context.Context, error) {
@@ -47,8 +45,8 @@ func (s *serviceImpl) commit(ctx context.Context) error {
 
 // ユーザの登録
 func (s *serviceImpl) CreateUser(ctx context.Context, name, password string) (*uint, error) {
-	s.logger.DebugContext(ctx, "serviceImpl#CreateUser start")
-	defer s.logger.DebugContext(ctx, "serviceImpl#CreateUser end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// トランザクション開始
 	ctx, err := s.beginTx(ctx)
@@ -74,8 +72,8 @@ func (s *serviceImpl) CreateUser(ctx context.Context, name, password string) (*u
 
 // ユーザIDの取得
 func (s *serviceImpl) FindUser(ctx context.Context, name, password string) (*uint, error) {
-	s.logger.DebugContext(ctx, "serviceImpl#FindUser start")
-	defer s.logger.DebugContext(ctx, "serviceImpl#FindUser end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	encPassword := encodePassword(name, password)
 	user, err := s.repository.User().Find(ctx, name, encPassword)
@@ -96,8 +94,8 @@ func encodePassword(user, password string) string {
 
 // 価格の登録
 func (s *serviceImpl) CreatePrice(ctx context.Context, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error) {
-	s.logger.DebugContext(ctx, "serviceImpl#CreatePrice start")
-	defer s.logger.DebugContext(ctx, "serviceImpl#CreatePrice end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// トランザクション開始
 	ctx, err := s.beginTx(ctx)
@@ -122,24 +120,24 @@ func (s *serviceImpl) CreatePrice(ctx context.Context, userId uint, dateTime tim
 
 // 価格の一覧
 func (s *serviceImpl) FindPrices(ctx context.Context, userId uint) ([]entity.Price, error) {
-	s.logger.DebugContext(ctx, "serviceImpl#FindPrices start")
-	defer s.logger.DebugContext(ctx, "serviceImpl#FindPrices end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	return s.repository.Price().FindByUserId(ctx, userId)
 }
 
 // 価格の取得
 func (s *serviceImpl) FindPrice(ctx context.Context, priceId, userId uint) (*entity.Price, error) {
-	s.logger.DebugContext(ctx, "serviceImpl#FindPrice start")
-	defer s.logger.DebugContext(ctx, "serviceImpl#FindPrice end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	return s.repository.Price().Find(ctx, priceId, userId)
 }
 
 // 価格の更新
 func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error) {
-	s.logger.DebugContext(ctx, "serviceImpl#UpdatePrice start")
-	defer s.logger.DebugContext(ctx, "serviceImpl#UpdatePrice end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// トランザクション開始
 	ctx, err := s.beginTx(ctx)
@@ -180,8 +178,8 @@ func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dat
 
 // 価格の削除
 func (s *serviceImpl) DeletePrice(ctx context.Context, priceId, userId uint) error {
-	s.logger.DebugContext(ctx, "serviceImpl#DeletePrice start")
-	defer s.logger.DebugContext(ctx, "serviceImpl#DeletePrice end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// トランザクション開始
 	ctx, err := s.beginTx(ctx)

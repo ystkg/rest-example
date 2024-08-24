@@ -18,7 +18,13 @@ import (
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	slog.SetDefault(slog.New(slog.NewJSONHandler(
+		os.Stdout,
+		&slog.HandlerOptions{
+			AddSource: true,
+			Level:     slog.LevelDebug,
+		},
+	)))
 
 	// リクエスト処理フロー
 	// Echo -> Handler -> Service -> Repository -> Database
@@ -35,7 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer sqlDB.Close()
-	r, err := repository.NewRepository(logger, sqlDB)
+	r, err := repository.NewRepository(sqlDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +50,7 @@ func main() {
 	}
 
 	// Service
-	s := service.NewService(logger, r)
+	s := service.NewService(r)
 
 	// Handler
 	jwtkeyStr := os.Getenv("JWTKEY")
@@ -63,7 +69,7 @@ func main() {
 		log.Fatal(err)
 	}
 	const timeoutSec = 60
-	h := handler.NewHandler(logger, s, &handler.HandlerConfig{
+	h := handler.NewHandler(s, &handler.HandlerConfig{
 		JwtKey:      jwtkey,
 		ValidityMin: 120, // JWTのexp
 		Location:    location,

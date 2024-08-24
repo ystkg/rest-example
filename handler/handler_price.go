@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"sort"
 	"strconv"
@@ -17,8 +18,8 @@ import (
 // 価格の登録
 func (h *Handler) CreatePrice(c echo.Context) error {
 	ctx := c.Request().Context()
-	h.logger.DebugContext(ctx, "Handler#CreatePrice start")
-	defer h.logger.DebugContext(ctx, "Handler#CreatePrice end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// リクエストの取得
 	userId := h.userId(c)
@@ -64,8 +65,8 @@ func (h *Handler) CreatePrice(c echo.Context) error {
 // 価格の一覧
 func (h *Handler) FindPrices(c echo.Context) error {
 	ctx := c.Request().Context()
-	h.logger.DebugContext(ctx, "Handler#FindPrices start")
-	defer h.logger.DebugContext(ctx, "Handler#FindPrices end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// リクエストの取得
 	userId := h.userId(c)
@@ -97,8 +98,8 @@ func (h *Handler) FindPrices(c echo.Context) error {
 // 価格の取得
 func (h *Handler) FindPrice(c echo.Context) error {
 	ctx := c.Request().Context()
-	h.logger.DebugContext(ctx, "Handler#FindPrice start")
-	defer h.logger.DebugContext(ctx, "Handler#FindPrice end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// リクエストの取得
 	userId := h.userId(c)
@@ -126,8 +127,8 @@ func (h *Handler) FindPrice(c echo.Context) error {
 // 価格の更新
 func (h *Handler) UpdatePrice(c echo.Context) error {
 	ctx := c.Request().Context()
-	h.logger.DebugContext(ctx, "Handler#UpdatePrice start")
-	defer h.logger.DebugContext(ctx, "Handler#UpdatePrice end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// リクエストの取得
 	userId := h.userId(c)
@@ -182,8 +183,8 @@ func (h *Handler) UpdatePrice(c echo.Context) error {
 // 価格の削除
 func (h *Handler) DeletePrice(c echo.Context) error {
 	ctx := c.Request().Context()
-	h.logger.DebugContext(ctx, "Handler#DeletePrice start")
-	defer h.logger.DebugContext(ctx, "Handler#DeletePrice end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// リクエストの取得
 	userId := h.userId(c)

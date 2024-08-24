@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -15,8 +16,8 @@ import (
 // ユーザの登録
 func (h *Handler) CreateUser(c echo.Context) error {
 	ctx := c.Request().Context()
-	h.logger.DebugContext(ctx, "Handler#CreateUser start")
-	defer h.logger.DebugContext(ctx, "Handler#CreateUser end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// リクエストの取得
 	req := &api.User{}
@@ -45,8 +46,8 @@ func (h *Handler) CreateUser(c echo.Context) error {
 // トークン発行
 func (h *Handler) GenToken(c echo.Context) error {
 	ctx := c.Request().Context()
-	h.logger.DebugContext(ctx, "Handler#GenToken start")
-	defer h.logger.DebugContext(ctx, "Handler#GenToken end")
+	slog.DebugContext(ctx, "start")
+	defer slog.DebugContext(ctx, "end")
 
 	// リクエストの取得
 	name := c.Param("name")

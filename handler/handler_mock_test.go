@@ -2,7 +2,6 @@ package handler_test
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/ystkg/rest-example/entity"
@@ -18,7 +17,7 @@ type serviceMock struct {
 }
 
 func newMockService(mock *repositoryMock) *serviceMock {
-	s := service.NewService(slog.Default(), mock)
+	s := service.NewService(mock)
 	return &serviceMock{s, s, mock}
 }
 
