@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	pkgerrors "github.com/pkg/errors"
 	"github.com/ystkg/rest-example/api"
@@ -30,13 +31,22 @@ func newHTTPError(code int, err error) *echo.HTTPError {
 func (h *Handler) customErrorHandler(err error, c echo.Context) {
 	var code int
 	var detail string
-	if httpError, ok := err.(*echo.HTTPError); ok {
-		code = httpError.Code
-		internal := httpError.Internal.(interface{ Unwrap() error }).Unwrap()
-		if herr, ok := internal.(*echo.HTTPError); ok && herr.Internal != nil {
-			internal = herr.Internal
+	var internal error
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+		internal = he.Internal
+		if _, ok := internal.(interface{ Unwrap() error }); ok {
+			internal = internal.(interface{ Unwrap() error }).Unwrap()
+			if herr, ok := internal.(*echo.HTTPError); ok && herr.Internal != nil {
+				internal = herr.Internal
+			}
 		}
-		detail = internal.Error()
+		switch m := he.Message.(type) {
+		case string:
+			detail = m
+		case error:
+			detail = m.Error()
+		}
 	}
 
 	var title string
@@ -56,8 +66,23 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 		detail = "Internal Server Error"
 	}
 
-	res := api.ErrorResponse{Title: title}
-	if detail != "" {
+	var params []api.InvalidParam
+	if verrs, ok := internal.(validator.ValidationErrors); ok {
+		trans := verrs.Translate(h.validator.translator)
+		params = make([]api.InvalidParam, len(verrs))
+		for i, v := range verrs {
+			params[i] = api.InvalidParam{
+				Name:   v.Field(),
+				Reason: trans[v.Namespace()],
+			}
+		}
+	}
+
+	res := api.ErrorResponse{
+		Title:         title,
+		InvalidParams: params,
+	}
+	if params == nil && detail != "" {
 		res.Detail = &detail
 	}
 
