@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	plyerrors "github.com/go-playground/errors/v5"
 	"github.com/go-playground/validator/v10"
@@ -24,22 +25,15 @@ var (
 )
 
 func newHTTPError(code int, err error) *echo.HTTPError {
-	return echo.NewHTTPError(code).SetInternal(plyerrors.WrapSkipFrames(err, "", 1))
+	return echo.NewHTTPError(code, err).SetInternal(plyerrors.WrapSkipFrames(err, "", 1))
 }
 
 func (h *Handler) customErrorHandler(err error, c echo.Context) {
 	var code int
 	var detail string
-	var internal error
-	if he, ok := err.(*echo.HTTPError); ok {
+	var he *echo.HTTPError
+	if errors.As(err, &he) {
 		code = he.Code
-		internal = he.Internal
-		if _, ok := internal.(interface{ Unwrap() error }); ok {
-			internal = internal.(interface{ Unwrap() error }).Unwrap()
-			if herr, ok := internal.(*echo.HTTPError); ok && herr.Internal != nil {
-				internal = herr.Internal
-			}
-		}
 		switch m := he.Message.(type) {
 		case string:
 			detail = m
@@ -48,6 +42,7 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 		}
 	}
 
+	// ステータスコードとエラーメッセージ
 	var title string
 	switch code {
 	case http.StatusBadRequest:
@@ -65,8 +60,10 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 		detail = "Internal Server Error"
 	}
 
+	// バリデーションエラー
 	var params []api.InvalidParam
-	if verrs, ok := internal.(validator.ValidationErrors); ok {
+	var verrs validator.ValidationErrors
+	if errors.As(err, &verrs) {
 		trans := verrs.Translate(h.validator.translator)
 		params = make([]api.InvalidParam, len(verrs))
 		for i, v := range verrs {
@@ -77,16 +74,17 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 		}
 	}
 
+	// レスポンスの生成
 	res := api.ErrorResponse{
 		Title:         title,
 		InvalidParams: params,
 	}
-	if params == nil && detail != "" {
+	if params == nil && detail != "" && !strings.EqualFold(detail, title) {
 		res.Detail = &detail
 	}
-
 	c.JSONPretty(code, &res, h.indent)
 
+	// エラーログ
 	var chain plyerrors.Chain
 	if errors.As(err, &chain) {
 		h.logger.DebugContext(c.Request().Context(), chain.Error())
