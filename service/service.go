@@ -165,9 +165,9 @@ func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dat
 	if rows != 1 {
 		s.rollback(ctx)
 		if rows == 0 {
-			return nil, withStack(ErrorNotFound)
+			return nil, wrap(ErrorNotFound)
 		}
-		return nil, withStack(fmt.Errorf("RowsAffected:%d", rows))
+		return nil, wrap(fmt.Errorf("RowsAffected:%d", rows))
 	}
 
 	// コミット
@@ -198,9 +198,9 @@ func (s *serviceImpl) DeletePrice(ctx context.Context, priceId, userId uint) err
 	if rows != 1 {
 		s.rollback(ctx)
 		if rows == 0 {
-			return withStack(ErrorNotFound)
+			return wrap(ErrorNotFound)
 		}
-		return withStack(fmt.Errorf("RowsAffected:%d", rows))
+		return wrap(fmt.Errorf("RowsAffected:%d", rows))
 	}
 
 	// コミット

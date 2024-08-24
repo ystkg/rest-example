@@ -2,12 +2,11 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
+	plyerrors "github.com/go-playground/errors/v5"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	pkgerrors "github.com/pkg/errors"
 	"github.com/ystkg/rest-example/api"
 )
 
@@ -25,7 +24,7 @@ var (
 )
 
 func newHTTPError(code int, err error) *echo.HTTPError {
-	return echo.NewHTTPError(code).SetInternal(pkgerrors.WithStack(err))
+	return echo.NewHTTPError(code).SetInternal(plyerrors.WrapSkipFrames(err, "", 1))
 }
 
 func (h *Handler) customErrorHandler(err error, c echo.Context) {
@@ -88,15 +87,10 @@ func (h *Handler) customErrorHandler(err error, c echo.Context) {
 
 	c.JSONPretty(code, &res, h.indent)
 
-	for errs, causes := []error{err}, []error{}; 0 < len(errs); errs, causes = causes, []error{} {
-		for _, v := range errs {
-			h.logger.DebugContext(c.Request().Context(), fmt.Sprintf("%+v", v))
-
-			if e, ok := v.(interface{ Unwrap() []error }); ok {
-				causes = append(causes, e.Unwrap()...)
-			} else if e, ok := v.(interface{ Unwrap() error }); ok {
-				causes = append(causes, e.Unwrap())
-			}
-		}
+	var chain plyerrors.Chain
+	if errors.As(err, &chain) {
+		h.logger.DebugContext(c.Request().Context(), chain.Error())
+	} else {
+		h.logger.DebugContext(c.Request().Context(), err.Error())
 	}
 }

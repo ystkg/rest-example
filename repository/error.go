@@ -3,13 +3,13 @@ package repository
 import (
 	"errors"
 
-	pkgerrors "github.com/pkg/errors"
+	plyerrors "github.com/go-playground/errors/v5"
 )
 
 var (
 	ErrorDuplicated = errors.New("duplicated")
 )
 
-func withStack(err error) error {
-	return pkgerrors.WithStack(err)
+func wrap(err error) error {
+	return plyerrors.WrapSkipFrames(err, "", 1)
 }

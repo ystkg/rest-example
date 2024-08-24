@@ -39,7 +39,7 @@ type repositoryGorm struct {
 func NewRepository(logger *slog.Logger, sqlDB *sql.DB) (Repository, error) {
 	db, err := gorm.Open(postgres.New(postgres.Config{Conn: sqlDB}), &gorm.Config{})
 	if err != nil {
-		return nil, withStack(err)
+		return nil, wrap(err)
 	}
 	return &repositoryGorm{
 		logger: logger,
@@ -59,7 +59,7 @@ func (r *repositoryGorm) InitDb(ctx context.Context) error {
 func (r *repositoryGorm) BeginTx(ctx context.Context) (context.Context, error) {
 	tx := r.db.Begin()
 	if err := tx.Error; err != nil {
-		return ctx, withStack(err)
+		return ctx, wrap(err)
 	}
 	return context.WithValue(ctx, contextKeyTx, tx.WithContext(ctx)), nil
 }
@@ -71,7 +71,7 @@ func (r *repositoryGorm) Rollback(ctx context.Context) error {
 	}
 	err := tx.Rollback().Error
 	if err != nil {
-		return withStack(err)
+		return wrap(err)
 	}
 	return nil
 }
@@ -79,7 +79,7 @@ func (r *repositoryGorm) Rollback(ctx context.Context) error {
 func (r *repositoryGorm) Commit(ctx context.Context) error {
 	err := tx(ctx).Commit().Error
 	if err != nil {
-		return withStack(err)
+		return wrap(err)
 	}
 	return nil
 }
