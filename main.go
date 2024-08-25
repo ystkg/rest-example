@@ -18,13 +18,7 @@ import (
 )
 
 func main() {
-	slog.SetDefault(slog.New(slog.NewJSONHandler(
-		os.Stdout,
-		&slog.HandlerOptions{
-			AddSource: true,
-			Level:     slog.LevelDebug,
-		},
-	)))
+	slog.SetDefault(handler.NewLogger())
 
 	// リクエスト処理フロー
 	// Echo -> Handler -> Service -> Repository -> Database
@@ -88,13 +82,13 @@ func main() {
 	defer stop()
 	go func() {
 		if err := e.Start(address); err != nil && err != http.ErrServerClosed {
-			e.Logger.Fatal("shutting down the server")
+			log.Fatal("shutting down the server")
 		}
 	}()
 	<-ctx.Done()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutSec)*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
+		log.Fatal(err)
 	}
 }
