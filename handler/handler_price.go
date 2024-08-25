@@ -16,7 +16,7 @@ import (
 )
 
 // 価格の登録
-func (h *Handler) CreatePrice(c echo.Context) error {
+func (h *Handler) createPrice(c echo.Context) error {
 	ctx := c.Request().Context()
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
@@ -63,7 +63,7 @@ func (h *Handler) CreatePrice(c echo.Context) error {
 }
 
 // 価格の一覧
-func (h *Handler) FindPrices(c echo.Context) error {
+func (h *Handler) findPrices(c echo.Context) error {
 	ctx := c.Request().Context()
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
@@ -96,7 +96,7 @@ func (h *Handler) FindPrices(c echo.Context) error {
 }
 
 // 価格の取得
-func (h *Handler) FindPrice(c echo.Context) error {
+func (h *Handler) findPrice(c echo.Context) error {
 	ctx := c.Request().Context()
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
@@ -125,7 +125,7 @@ func (h *Handler) FindPrice(c echo.Context) error {
 }
 
 // 価格の更新
-func (h *Handler) UpdatePrice(c echo.Context) error {
+func (h *Handler) updatePrice(c echo.Context) error {
 	ctx := c.Request().Context()
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
@@ -181,7 +181,7 @@ func (h *Handler) UpdatePrice(c echo.Context) error {
 }
 
 // 価格の削除
-func (h *Handler) DeletePrice(c echo.Context) error {
+func (h *Handler) deletePrice(c echo.Context) error {
 	ctx := c.Request().Context()
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")

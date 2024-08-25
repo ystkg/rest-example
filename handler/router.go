@@ -9,7 +9,7 @@ import (
 func NewEcho(h *Handler) *echo.Echo {
 	e := echo.New()
 
-	e.HTTPErrorHandler = h.customErrorHandler
+	e.HTTPErrorHandler = h.errorHandler
 
 	e.Validator = h.validator
 
@@ -18,17 +18,17 @@ func NewEcho(h *Handler) *echo.Echo {
 	e.Use(timeout(h.timeoutSec))
 	e.Use(traceRequest)
 
-	e.POST("/users", h.CreateUser)
-	e.POST("/users/:name/token", h.GenToken)
+	e.POST("/users", h.createUser)
+	e.POST("/users/:name/token", h.genToken)
 
 	g := e.Group("/v1")
 	g.Use(echojwt.WithConfig(h.jwtConfig))
 
-	g.POST("/prices", h.CreatePrice)
-	g.GET("/prices", h.FindPrices)
-	g.GET("/prices/:id", h.FindPrice)
-	g.PUT("/prices/:id", h.UpdatePrice)
-	g.DELETE("/prices/:id", h.DeletePrice)
+	g.POST("/prices", h.createPrice)
+	g.GET("/prices", h.findPrices)
+	g.GET("/prices/:id", h.findPrice)
+	g.PUT("/prices/:id", h.updatePrice)
+	g.DELETE("/prices/:id", h.deletePrice)
 
 	return e
 }

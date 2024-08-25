@@ -14,7 +14,7 @@ import (
 )
 
 // ユーザの登録
-func (h *Handler) CreateUser(c echo.Context) error {
+func (h *Handler) createUser(c echo.Context) error {
 	ctx := c.Request().Context()
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
@@ -44,7 +44,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 }
 
 // トークン発行
-func (h *Handler) GenToken(c echo.Context) error {
+func (h *Handler) genToken(c echo.Context) error {
 	ctx := c.Request().Context()
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
