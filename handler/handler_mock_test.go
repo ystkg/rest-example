@@ -10,20 +10,18 @@ import (
 )
 
 type serviceMock struct {
-	service.Service                 // 暗黙的な委譲
-	base            service.Service // 明示的に委譲
+	service.Service
 
 	repository *repositoryMock
 }
 
 func newMockService(mock *repositoryMock) *serviceMock {
 	s := service.NewService(mock)
-	return &serviceMock{s, s, mock}
+	return &serviceMock{s, mock}
 }
 
 type repositoryMock struct {
-	repository.Repository                       // 暗黙的な委譲
-	base                  repository.Repository // 明示的に委譲
+	repository.Repository
 
 	user  *userRepositoryMock
 	price *priceRepositoryMock
@@ -33,21 +31,21 @@ type repositoryMock struct {
 }
 
 func newMockRepository(r repository.Repository) *repositoryMock {
-	return &repositoryMock{r, r, newMockUserRepository(r.User()), newMockPriceRepository(r.Price()), nil, nil}
+	return &repositoryMock{r, newMockUserRepository(r.User()), newMockPriceRepository(r.Price()), nil, nil}
 }
 
 func (m *repositoryMock) BeginTx(ctx context.Context) (context.Context, error) {
 	if m.beginTxErr != nil {
 		return ctx, m.beginTxErr
 	}
-	return m.base.BeginTx(ctx)
+	return m.Repository.BeginTx(ctx)
 }
 
 func (m *repositoryMock) Commit(ctx context.Context) error {
 	if m.commitErr != nil {
 		return m.commitErr
 	}
-	return m.base.Commit(ctx)
+	return m.Repository.Commit(ctx)
 }
 
 func (m *repositoryMock) User() repository.UserRepository {
@@ -59,33 +57,31 @@ func (m *repositoryMock) Price() repository.PriceRepository {
 }
 
 type userRepositoryMock struct {
-	repository.UserRepository                           // 暗黙的な委譲
-	base                      repository.UserRepository // 明示的に委譲
+	repository.UserRepository
 
 	err error
 }
 
 func newMockUserRepository(r repository.UserRepository) *userRepositoryMock {
-	return &userRepositoryMock{r, r, nil}
+	return &userRepositoryMock{r, nil}
 }
 
 func (m *userRepositoryMock) Create(ctx context.Context, name, password string) (*entity.User, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
-	return m.base.Create(ctx, name, password)
+	return m.UserRepository.Create(ctx, name, password)
 }
 
 func (m *userRepositoryMock) Find(ctx context.Context, name, password string) (*entity.User, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
-	return m.base.Find(ctx, name, password)
+	return m.UserRepository.Find(ctx, name, password)
 }
 
 type priceRepositoryMock struct {
-	repository.PriceRepository                            // 暗黙的な委譲
-	base                       repository.PriceRepository // 明示的に委譲
+	repository.PriceRepository
 
 	rowsAffected int
 	overwirte    bool
@@ -94,7 +90,7 @@ type priceRepositoryMock struct {
 }
 
 func newMockPriceRepository(r repository.PriceRepository) *priceRepositoryMock {
-	return &priceRepositoryMock{r, r, 0, false, nil}
+	return &priceRepositoryMock{r, 0, false, nil}
 }
 
 func (m *priceRepositoryMock) Create(
@@ -109,7 +105,7 @@ func (m *priceRepositoryMock) Create(
 	if m.err != nil {
 		return nil, m.err
 	}
-	return m.base.Create(
+	return m.PriceRepository.Create(
 		ctx,
 		userId,
 		dateTime,
@@ -124,14 +120,14 @@ func (m *priceRepositoryMock) Find(ctx context.Context, id, userId uint) (*entit
 	if m.err != nil {
 		return nil, m.err
 	}
-	return m.base.Find(ctx, id, userId)
+	return m.PriceRepository.Find(ctx, id, userId)
 }
 
 func (m *priceRepositoryMock) FindByUserId(ctx context.Context, userId uint) ([]entity.Price, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
-	return m.base.FindByUserId(ctx, userId)
+	return m.PriceRepository.FindByUserId(ctx, userId)
 }
 
 func (m *priceRepositoryMock) Update(
@@ -150,7 +146,7 @@ func (m *priceRepositoryMock) Update(
 	if m.overwirte {
 		return nil, int64(m.rowsAffected), nil
 	}
-	return m.base.Update(
+	return m.PriceRepository.Update(
 		ctx,
 		id,
 		userId,
@@ -169,5 +165,5 @@ func (m *priceRepositoryMock) Delete(ctx context.Context, id, userId uint) (int6
 	if m.overwirte {
 		return int64(m.rowsAffected), nil
 	}
-	return m.base.Delete(ctx, id, userId)
+	return m.PriceRepository.Delete(ctx, id, userId)
 }
