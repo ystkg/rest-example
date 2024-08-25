@@ -16,6 +16,7 @@ func NewEcho(h *Handler) *echo.Echo {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(timeout(h.timeoutSec))
+	e.Use(traceRequest)
 
 	e.POST("/users", h.CreateUser)
 	e.POST("/users/:name/token", h.GenToken)
