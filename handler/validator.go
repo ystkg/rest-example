@@ -14,7 +14,7 @@ type customValidator struct {
 	translator ut.Translator
 }
 
-func newCustomValidator(locale string) *customValidator {
+func newValidator(locale string) *customValidator {
 	v := validator.New()
 
 	var trans ut.Translator

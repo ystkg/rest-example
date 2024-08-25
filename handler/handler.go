@@ -58,7 +58,7 @@ func NewHandler(s service.Service, config *HandlerConfig) *Handler {
 
 	return &Handler{
 		s,
-		newCustomValidator(config.Locale),
+		newValidator(config.Locale),
 		jwtConfig,
 		jwt.GetSigningMethod(signingMethod),
 		jwtContextKey,

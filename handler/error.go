@@ -29,7 +29,7 @@ func newHTTPError(code int, err error) *echo.HTTPError {
 	return echo.NewHTTPError(code, err).SetInternal(plyerrors.WrapSkipFrames(err, "", 1))
 }
 
-func (h *Handler) customErrorHandler(err error, c echo.Context) {
+func (h *Handler) errorHandler(err error, c echo.Context) {
 	var code int
 	var detail string
 	var he *echo.HTTPError

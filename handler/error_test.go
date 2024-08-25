@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCustomErrorHandler(t *testing.T) {
-	testname := "TestCustomErrorHandler"
+func TestErrorHandler(t *testing.T) {
+	testname := "TestErrorHandler"
 
 	// セットアップ
 	h := NewHandler(nil, &HandlerConfig{})
@@ -36,7 +36,7 @@ func TestCustomErrorHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		// テストの実行
-		h.customErrorHandler(v.err, c)
+		h.errorHandler(v.err, c)
 
 		// アサーション
 		assert.Equal(t, v.code, c.Response().Status)
