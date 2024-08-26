@@ -31,7 +31,7 @@ func TestCreatePrice(t *testing.T) {
 	testname := "TestCreatePrice"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func TestCreatePrice(t *testing.T) {
 		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -95,7 +95,7 @@ func TestCreatePriceValidation(t *testing.T) {
 	testname := "TestCreatePriceValidation"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func TestCreatePriceValidation(t *testing.T) {
 	}
 
 	userId := uint(1)
-	jwt := genToken(userId, conf.JwtKey, conf.ValidityMin)
+	jwt := genToken(conf, userId)
 	cases := []struct {
 		jwt  *string
 		body string
@@ -157,7 +157,7 @@ func TestFindPrices(t *testing.T) {
 	testname := "TestFindPrices"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,7 +176,7 @@ func TestFindPrices(t *testing.T) {
 		"/v1/prices",
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -221,7 +221,7 @@ func TestFindPricesValidation(t *testing.T) {
 	testname := "TestFindPricesValidation"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -239,7 +239,7 @@ func TestFindPricesValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt := genToken(userId, conf.JwtKey, conf.ValidityMin)
+	jwt := genToken(conf, userId)
 	cases := []struct {
 		jwt  *string
 		code int
@@ -274,7 +274,7 @@ func TestFindPrice(t *testing.T) {
 	testname := "TestFindPrice"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -299,7 +299,7 @@ func TestFindPrice(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -333,7 +333,7 @@ func TestFindPriceValidation(t *testing.T) {
 	testname := "TestFindPriceValidation"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -352,7 +352,7 @@ func TestFindPriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt := genToken(userId, conf.JwtKey, conf.ValidityMin)
+	jwt := genToken(conf, userId)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string
@@ -395,7 +395,7 @@ func TestUpdatePrice(t *testing.T) {
 	testname := "TestUpdatePrice"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -417,7 +417,7 @@ func TestUpdatePrice(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -458,7 +458,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 	testname := "TestUpdatePriceValidation"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -477,7 +477,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt := genToken(userId, conf.JwtKey, conf.ValidityMin)
+	jwt := genToken(conf, userId)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string
@@ -527,7 +527,7 @@ func TestDeletePrice(t *testing.T) {
 	testname := "TestDeletePrice"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -547,7 +547,7 @@ func TestDeletePrice(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -585,7 +585,7 @@ func TestDeletePriceValidation(t *testing.T) {
 	testname := "TestDeletePriceValidation"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -604,7 +604,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt := genToken(userId, conf.JwtKey, conf.ValidityMin)
+	jwt := genToken(conf, userId)
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string

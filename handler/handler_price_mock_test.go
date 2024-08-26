@@ -16,7 +16,7 @@ func TestCreatePriceCreateError(t *testing.T) {
 	testname := "TestCreatePriceCreateError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func TestCreatePriceCreateError(t *testing.T) {
 		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -56,7 +56,7 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 	testname := "TestCreatePriceBeginTxError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +80,7 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -96,7 +96,7 @@ func TestCreatePriceCommitError(t *testing.T) {
 	testname := "TestCreatePriceCommitError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,7 +120,7 @@ func TestCreatePriceCommitError(t *testing.T) {
 		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -136,7 +136,7 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 	testname := "TestFindPricesFindByUserIdError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -158,7 +158,7 @@ func TestFindPricesFindByUserIdError(t *testing.T) {
 		"/v1/prices",
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -174,7 +174,7 @@ func TestFindPriceFindError(t *testing.T) {
 	testname := "TestFindPriceFindError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -201,7 +201,7 @@ func TestFindPriceFindError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -217,7 +217,7 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 	testname := "TestUpdatePriceUpdateError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,7 +242,7 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -258,7 +258,7 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	testname := "TestUpdatePriceRowsAffectedError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -283,7 +283,7 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -299,7 +299,7 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 	testname := "TestUpdatePriceBeginTxError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -324,7 +324,7 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -340,7 +340,7 @@ func TestUpdatePriceCommitError(t *testing.T) {
 	testname := "TestUpdatePriceCommitError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -365,7 +365,7 @@ func TestUpdatePriceCommitError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -381,7 +381,7 @@ func TestDeletePriceDeleteError(t *testing.T) {
 	testname := "TestDeletePriceDeleteError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -404,7 +404,7 @@ func TestDeletePriceDeleteError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -420,7 +420,7 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 	testname := "TestDeletePriceRowsAffectedError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -443,7 +443,7 @@ func TestDeletePriceRowsAffectedError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -459,7 +459,7 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 	testname := "TestDeletePriceBeginTxError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -482,7 +482,7 @@ func TestDeletePriceBeginTxError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -498,7 +498,7 @@ func TestDeletePriceCommitError(t *testing.T) {
 	testname := "TestDeletePriceCommitError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, conf, err := setupMockTest(testname)
+	e, conf, sqlDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -521,7 +521,7 @@ func TestDeletePriceCommitError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, conf.JwtKey, conf.ValidityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
