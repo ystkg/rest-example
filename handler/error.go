@@ -86,10 +86,5 @@ func (h *Handler) errorHandler(err error, c echo.Context) {
 	c.JSONPretty(code, &res, h.indent)
 
 	// エラーログ
-	var chain plyerrors.Chain
-	if errors.As(err, &chain) {
-		slog.DebugContext(c.Request().Context(), chain.Error())
-	} else {
-		slog.DebugContext(c.Request().Context(), err.Error())
-	}
+	slog.DebugContext(c.Request().Context(), err.Error())
 }
