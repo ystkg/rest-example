@@ -108,46 +108,50 @@ func dropDatabaseIfExists(conn *pgx.Conn, dbname string) error {
 	return nil
 }
 
-func setupTest(testname string) (*echo.Echo, *sql.DB, pgx.Tx, []byte, int, error) {
-	e, sqlDB, _, tx, jwtkey, validityMin, err := setupTestMain(testname, service.NewService)
+func setupTest(testname string) (*echo.Echo, *sql.DB, pgx.Tx, *handler.HandlerConfig, error) {
+	e, sqlDB, _, tx, conf, err := setupTestMain(testname, service.NewService)
 	if err != nil {
 		cleanDB(testname, sqlDB)
 		sqlDB = nil
 	}
-	return e, sqlDB, tx, jwtkey, validityMin, err
+	return e, sqlDB, tx, conf, err
 }
 
-func setupMockTest(testname string) (*echo.Echo, *sql.DB, *serviceMock, pgx.Tx, []byte, int, error) {
+func setupMockTest(testname string) (*echo.Echo, *sql.DB, *serviceMock, pgx.Tx, *handler.HandlerConfig, error) {
 	newService := func(r repository.Repository) service.Service {
 		return newMockService(newMockRepository(r))
 	}
-	e, sqlDB, s, tx, jwtkey, validityMin, err := setupTestMain(testname, newService)
+	e, sqlDB, s, tx, conf, err := setupTestMain(testname, newService)
 	if err != nil {
 		cleanDB(testname, sqlDB)
 		sqlDB = nil
 	}
-	return e, sqlDB, s.(*serviceMock), tx, jwtkey, validityMin, err
+	var mock *serviceMock
+	if s != nil {
+		mock = s.(*serviceMock)
+	}
+	return e, sqlDB, mock, tx, conf, err
 }
 
-func setupTestMain(testname string, newService func(repository.Repository) service.Service) (*echo.Echo, *sql.DB, service.Service, pgx.Tx, []byte, int, error) {
+func setupTestMain(testname string, newService func(repository.Repository) service.Service) (*echo.Echo, *sql.DB, service.Service, pgx.Tx, *handler.HandlerConfig, error) {
 	// Database
 	dbname := strings.ToLower(testname)
 	dburl, err := createTestDatabase(dbname)
 	if err != nil {
-		return nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, err
 	}
 
 	// Repository
 	sqlDB, err := sql.Open("pgx", dburl)
 	if err != nil {
-		return nil, nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, nil, err
 	}
 	r, err := repository.NewRepository(sqlDB)
 	if err != nil {
-		return nil, sqlDB, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, err
 	}
 	if err := r.InitDb(context.Background()); err != nil {
-		return nil, sqlDB, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, err
 	}
 
 	// Service
@@ -158,15 +162,16 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	validityMin := 1
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
-		return nil, sqlDB, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, err
 	}
-	h := handler.NewHandler(s, &handler.HandlerConfig{
+	conf := &handler.HandlerConfig{
 		JwtKey:      jwtkey,
 		ValidityMin: validityMin,
 		Location:    location,
 		Indent:      "  ",
 		TimeoutSec:  60,
-	})
+	}
+	h := handler.NewHandler(s, conf)
 
 	// Echo
 	e := handler.NewEcho(h)
@@ -174,14 +179,14 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	// トランザクション
 	conn, err := connectDB(dbname)
 	if err != nil {
-		return nil, sqlDB, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, err
 	}
 	tx, err := conn.Begin(context.Background())
 	if err != nil {
-		return nil, sqlDB, nil, nil, nil, 0, err
+		return nil, sqlDB, nil, nil, nil, err
 	}
 
-	return e, sqlDB, s, tx, jwtkey, validityMin, nil
+	return e, sqlDB, s, tx, conf, nil
 }
 
 func cleanIfSuccess(testname string, t *testing.T, sqlDB *sql.DB) error {

@@ -16,7 +16,7 @@ func TestCreateUserCreateError(t *testing.T) {
 	testname := "TestCreateUserCreateError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, _, _, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	testname := "TestCreateUserBeginTxError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, _, _, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func TestCreateUserCommitError(t *testing.T) {
 	testname := "TestCreateUserCommitError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, _, _, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -133,7 +133,7 @@ func TestGenTokenFindError(t *testing.T) {
 	testname := "TestGenTokenFindError"
 
 	// セットアップ
-	e, sqlDB, mock, tx, _, _, err := setupMockTest(testname)
+	e, sqlDB, mock, tx, _, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
