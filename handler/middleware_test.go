@@ -38,8 +38,8 @@ func TestMiddlewareTimeout(t *testing.T) {
 	// アサーション
 	act, ok := c.Request().Context().Deadline()
 	assert.True(t, ok)
-	assert.LessOrEqual(t, before.Add(time.Duration(h.timeoutSec)*time.Second), act)
-	assert.GreaterOrEqual(t, after.Add(time.Duration(h.timeoutSec)*time.Second), act)
+	assert.LessOrEqual(t, before.UTC().Add(time.Duration(h.timeoutSec)*time.Second), act.UTC())
+	assert.GreaterOrEqual(t, after.UTC().Add(time.Duration(h.timeoutSec)*time.Second), act.UTC())
 
 	assert.True(t, called)
 	assert.Equal(t, ret, err)

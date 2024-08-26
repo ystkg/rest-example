@@ -126,7 +126,11 @@ func setupMockTest(testname string) (*echo.Echo, *sql.DB, *serviceMock, pgx.Tx, 
 		cleanDB(testname, sqlDB)
 		sqlDB = nil
 	}
-	return e, sqlDB, s.(*serviceMock), tx, jwtkey, validityMin, err
+	var mock *serviceMock
+	if s != nil {
+		mock = s.(*serviceMock)
+	}
+	return e, sqlDB, mock, tx, jwtkey, validityMin, err
 }
 
 func setupTestMain(testname string, newService func(repository.Repository) service.Service) (*echo.Echo, *sql.DB, service.Service, pgx.Tx, []byte, int, error) {
