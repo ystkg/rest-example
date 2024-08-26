@@ -25,16 +25,16 @@ func (a anyTime) Match(v driver.Value) bool {
 	return ok
 }
 
-func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []byte, int, error) {
+func setupSqlMockTest(testname string) (*echo.Echo, *handler.HandlerConfig, *sql.DB, sqlmock.Sqlmock, error) {
 	// Repository
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
-		return nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, err
 	}
 	r, err := repository.NewRepository(sqlDB)
 	if err != nil {
 		sqlDB.Close()
-		return nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, err
 	}
 
 	// Service
@@ -46,20 +46,21 @@ func setupSqlMockTest(testname string) (*echo.Echo, *sql.DB, sqlmock.Sqlmock, []
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 		sqlDB.Close()
-		return nil, nil, nil, nil, 0, err
+		return nil, nil, nil, nil, err
 	}
-	h := handler.NewHandler(s, &handler.HandlerConfig{
+	conf := &handler.HandlerConfig{
 		JwtKey:      jwtkey,
 		ValidityMin: validityMin,
 		Location:    location,
 		Indent:      "  ",
 		TimeoutSec:  60,
-	})
+	}
+	h := handler.NewHandler(s, conf)
 
 	// Echo
 	e := handler.NewEcho(h)
 
-	return e, sqlDB, mock, jwtkey, validityMin, nil
+	return e, conf, sqlDB, mock, nil
 }
 
 // トランザクション開始エラー
@@ -67,7 +68,7 @@ func TestBeginError(t *testing.T) {
 	testname := "TestBeginError"
 
 	// セットアップ
-	e, sqlDB, mock, _, _, err := setupSqlMockTest(testname)
+	e, _, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,7 +102,7 @@ func TestCommitError(t *testing.T) {
 	testname := "TestCommitError"
 
 	// セットアップ
-	e, sqlDB, mock, _, _, err := setupSqlMockTest(testname)
+	e, _, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,7 +141,7 @@ func TestCreateUserError(t *testing.T) {
 	testname := "TestCreateUserError"
 
 	// セットアップ
-	e, sqlDB, mock, _, _, err := setupSqlMockTest(testname)
+	e, _, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +179,7 @@ func TestGenTokenError(t *testing.T) {
 	testname := "TestGenTokenError"
 
 	// セットアップ
-	e, sqlDB, mock, _, _, err := setupSqlMockTest(testname)
+	e, _, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -214,7 +215,7 @@ func TestCreatePriceError(t *testing.T) {
 	testname := "TestCreatePriceError"
 
 	// セットアップ
-	e, sqlDB, mock, jwtkey, validityMin, err := setupSqlMockTest(testname)
+	e, conf, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -237,7 +238,7 @@ func TestCreatePriceError(t *testing.T) {
 		"/v1/prices",
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, jwtkey, validityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -252,7 +253,7 @@ func TestFindPricesError(t *testing.T) {
 	testname := "TestFindPricesError"
 
 	// セットアップ
-	e, sqlDB, mock, jwtkey, validityMin, err := setupSqlMockTest(testname)
+	e, conf, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -271,7 +272,7 @@ func TestFindPricesError(t *testing.T) {
 		"/v1/prices",
 		nil,
 		"",
-		genToken(userId, jwtkey, validityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -286,7 +287,7 @@ func TestFindPriceError(t *testing.T) {
 	testname := "TestFindPriceError"
 
 	// セットアップ
-	e, sqlDB, mock, jwtkey, validityMin, err := setupSqlMockTest(testname)
+	e, conf, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -307,7 +308,7 @@ func TestFindPriceError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, jwtkey, validityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -322,7 +323,7 @@ func TestUpdatePriceError(t *testing.T) {
 	testname := "TestUpdatePriceError"
 
 	// セットアップ
-	e, sqlDB, mock, jwtkey, validityMin, err := setupSqlMockTest(testname)
+	e, conf, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -345,7 +346,7 @@ func TestUpdatePriceError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		&body,
 		echo.MIMEApplicationJSON,
-		genToken(userId, jwtkey, validityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行
@@ -360,7 +361,7 @@ func TestDeletePriceError(t *testing.T) {
 	testname := "TestDeletePriceError"
 
 	// セットアップ
-	e, sqlDB, mock, jwtkey, validityMin, err := setupSqlMockTest(testname)
+	e, conf, sqlDB, mock, err := setupSqlMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -382,7 +383,7 @@ func TestDeletePriceError(t *testing.T) {
 		fmt.Sprintf("/v1/prices/%d", priceId),
 		nil,
 		"",
-		genToken(userId, jwtkey, validityMin),
+		genToken(conf, userId),
 	)
 
 	// テストの実行

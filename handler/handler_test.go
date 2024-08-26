@@ -108,20 +108,20 @@ func dropDatabaseIfExists(conn *pgx.Conn, dbname string) error {
 	return nil
 }
 
-func setupTest(testname string) (*echo.Echo, *sql.DB, pgx.Tx, *handler.HandlerConfig, error) {
-	e, sqlDB, _, tx, conf, err := setupTestMain(testname, service.NewService)
+func setupTest(testname string) (*echo.Echo, *handler.HandlerConfig, *sql.DB, pgx.Tx, error) {
+	e, conf, sqlDB, tx, _, err := setupTestMain(testname, service.NewService)
 	if err != nil {
 		cleanDB(testname, sqlDB)
 		sqlDB = nil
 	}
-	return e, sqlDB, tx, conf, err
+	return e, conf, sqlDB, tx, err
 }
 
-func setupMockTest(testname string) (*echo.Echo, *sql.DB, *serviceMock, pgx.Tx, *handler.HandlerConfig, error) {
+func setupMockTest(testname string) (*echo.Echo, *handler.HandlerConfig, *sql.DB, pgx.Tx, *serviceMock, error) {
 	newService := func(r repository.Repository) service.Service {
 		return newMockService(newMockRepository(r))
 	}
-	e, sqlDB, s, tx, conf, err := setupTestMain(testname, newService)
+	e, conf, sqlDB, tx, s, err := setupTestMain(testname, newService)
 	if err != nil {
 		cleanDB(testname, sqlDB)
 		sqlDB = nil
@@ -130,10 +130,10 @@ func setupMockTest(testname string) (*echo.Echo, *sql.DB, *serviceMock, pgx.Tx, 
 	if s != nil {
 		mock = s.(*serviceMock)
 	}
-	return e, sqlDB, mock, tx, conf, err
+	return e, conf, sqlDB, tx, mock, err
 }
 
-func setupTestMain(testname string, newService func(repository.Repository) service.Service) (*echo.Echo, *sql.DB, service.Service, pgx.Tx, *handler.HandlerConfig, error) {
+func setupTestMain(testname string, newService func(repository.Repository) service.Service) (*echo.Echo, *handler.HandlerConfig, *sql.DB, pgx.Tx, service.Service, error) {
 	// Database
 	dbname := strings.ToLower(testname)
 	dburl, err := createTestDatabase(dbname)
@@ -148,10 +148,10 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	}
 	r, err := repository.NewRepository(sqlDB)
 	if err != nil {
-		return nil, sqlDB, nil, nil, nil, err
+		return nil, nil, sqlDB, nil, nil, err
 	}
 	if err := r.InitDb(context.Background()); err != nil {
-		return nil, sqlDB, nil, nil, nil, err
+		return nil, nil, sqlDB, nil, nil, err
 	}
 
 	// Service
@@ -162,7 +162,7 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	validityMin := 1
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
-		return nil, sqlDB, nil, nil, nil, err
+		return nil, nil, sqlDB, nil, nil, err
 	}
 	conf := &handler.HandlerConfig{
 		JwtKey:      jwtkey,
@@ -179,14 +179,14 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	// トランザクション
 	conn, err := connectDB(dbname)
 	if err != nil {
-		return nil, sqlDB, nil, nil, nil, err
+		return nil, nil, sqlDB, nil, nil, err
 	}
 	tx, err := conn.Begin(context.Background())
 	if err != nil {
-		return nil, sqlDB, nil, nil, nil, err
+		return nil, nil, sqlDB, nil, nil, err
 	}
 
-	return e, sqlDB, s, tx, conf, nil
+	return e, conf, sqlDB, tx, s, nil
 }
 
 func cleanIfSuccess(testname string, t *testing.T, sqlDB *sql.DB) error {
@@ -301,20 +301,20 @@ func newRequest(method, target string, body *string, contentType string, jwt *st
 	return req
 }
 
-func genToken(userId uint, jwtkey []byte, validityMin int) *string {
+func genToken(conf *handler.HandlerConfig, userId uint) *string {
 	iat := time.Now()
 	claims := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		&handler.JwtCustomClaims{
 			jwt.RegisteredClaims{
-				ExpiresAt: jwt.NewNumericDate(iat.Add(time.Duration(validityMin) * time.Minute)),
+				ExpiresAt: jwt.NewNumericDate(iat.Add(time.Duration(conf.ValidityMin) * time.Minute)),
 				IssuedAt:  jwt.NewNumericDate(iat),
 			},
 			userId,
 		},
 	)
 
-	signed, err := claims.SignedString(jwtkey)
+	signed, err := claims.SignedString(conf.JwtKey)
 	if err != nil {
 		log.Fatal(err)
 	}

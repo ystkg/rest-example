@@ -32,7 +32,7 @@ func TestCreateUser(t *testing.T) {
 	testname := "TestCreateUser"
 
 	// セットアップ
-	e, sqlDB, tx, _, err := setupTest(testname)
+	e, _, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,7 +90,7 @@ func TestCreateUserValidation(t *testing.T) {
 	testname := "TestCreateUserValidation"
 
 	// セットアップ
-	e, sqlDB, tx, _, err := setupTest(testname)
+	e, _, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,7 +145,7 @@ func TestGenToken(t *testing.T) {
 	testname := "TestGenToken"
 
 	// セットアップ
-	e, sqlDB, tx, conf, err := setupTest(testname)
+	e, conf, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,7 +205,7 @@ func TestGenTokenValidation(t *testing.T) {
 	testname := "TestGenTokenValidation"
 
 	// セットアップ
-	e, sqlDB, tx, _, err := setupTest(testname)
+	e, _, sqlDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
