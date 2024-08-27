@@ -32,12 +32,13 @@ type Handler struct {
 }
 
 type HandlerConfig struct {
-	JwtKey      []byte
-	ValidityMin int // JWTのexp
-	Location    *time.Location
-	Locale      string
-	Indent      string // レスポンスのJSONのインデント
-	TimeoutSec  int
+	JwtKey         []byte
+	ValidityMin    int // JWTのexp
+	DateTimeLayout string
+	Location       *time.Location
+	Locale         string
+	Indent         string // レスポンスのJSONのインデント
+	TimeoutSec     int
 }
 
 func NewHandler(s service.Service, config *HandlerConfig) *Handler {
@@ -57,16 +58,16 @@ func NewHandler(s service.Service, config *HandlerConfig) *Handler {
 	}
 
 	return &Handler{
-		s,
-		newValidator(config.Locale),
-		jwtConfig,
-		jwt.GetSigningMethod(signingMethod),
-		jwtContextKey,
-		config.ValidityMin,
-		time.DateTime,
-		config.Location,
-		config.Indent,
-		config.TimeoutSec,
+		service:       s,
+		validator:     newValidator(config.Locale),
+		jwtConfig:     jwtConfig,
+		signingMethod: jwt.GetSigningMethod(signingMethod),
+		jwtContextKey: jwtContextKey,
+		validityMin:   config.ValidityMin,
+		layout:        config.DateTimeLayout,
+		location:      config.Location,
+		indent:        config.Indent,
+		timeoutSec:    config.TimeoutSec,
 	}
 }
 
