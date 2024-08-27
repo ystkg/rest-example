@@ -64,12 +64,13 @@ func main() {
 	}
 	const timeoutSec = 60
 	h := handler.NewHandler(s, &handler.HandlerConfig{
-		JwtKey:      jwtkey,
-		ValidityMin: 120, // JWTのexp
-		Location:    location,
-		Locale:      "en",
-		Indent:      "  ", // レスポンスのJSONのインデント
-		TimeoutSec:  timeoutSec,
+		JwtKey:         jwtkey,
+		ValidityMin:    120, // JWTのexp
+		DateTimeLayout: time.DateTime,
+		Location:       location,
+		Locale:         "en",
+		Indent:         "  ", // レスポンスのJSONのインデント
+		TimeoutSec:     timeoutSec,
 	})
 
 	// Echo(Graceful Shutdown)

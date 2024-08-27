@@ -215,8 +215,12 @@ func (h *Handler) parseDateTime(dateTime *string) (time.Time, error) {
 	return time.ParseInLocation(h.layout, *dateTime, h.location)
 }
 
+func (h *Handler) formatDateTime(dateTime time.Time) string {
+	return dateTime.In(h.location).Format(h.layout)
+}
+
 func (h *Handler) entityToResponse(entity *entity.Price) *api.Price {
-	dateTime := entity.DateTime.Format(h.layout)
+	dateTime := h.formatDateTime(entity.DateTime)
 	return &api.Price{
 		ID:       &entity.ID,
 		DateTime: &dateTime,

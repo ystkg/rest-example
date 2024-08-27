@@ -49,11 +49,12 @@ func setupSqlMockTest(testname string) (*echo.Echo, *handler.HandlerConfig, *sql
 		return nil, nil, nil, nil, err
 	}
 	conf := &handler.HandlerConfig{
-		JwtKey:      jwtkey,
-		ValidityMin: validityMin,
-		Location:    location,
-		Indent:      "  ",
-		TimeoutSec:  60,
+		JwtKey:         jwtkey,
+		ValidityMin:    validityMin,
+		DateTimeLayout: time.DateTime,
+		Location:       location,
+		Indent:         "  ",
+		TimeoutSec:     60,
 	}
 	h := handler.NewHandler(s, conf)
 
