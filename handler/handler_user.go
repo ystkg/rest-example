@@ -33,8 +33,8 @@ func (h *Handler) createUser(c echo.Context) error {
 	// サービスの実行
 	userId, err := h.service.CreateUser(ctx, req.Name, string(req.Password))
 	if err != nil {
-		if errors.Is(err, repository.ErrorDuplicated) {
-			return newHTTPError(http.StatusBadRequest, ErrorAlreadyRegistered)
+		if errors.Is(err, repository.ErrDuplicated) {
+			return newHTTPError(http.StatusBadRequest, ErrAlreadyRegistered)
 		}
 		return err
 	}
@@ -55,7 +55,7 @@ func (h *Handler) genToken(c echo.Context) error {
 
 	// 入力チェック
 	if name == "" {
-		return newHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrNotFound)
 	}
 
 	// サービスの実行
@@ -64,7 +64,7 @@ func (h *Handler) genToken(c echo.Context) error {
 		return err
 	}
 	if userId == nil {
-		return newHTTPError(http.StatusUnauthorized, ErrorAuthenticationFailed)
+		return newHTTPError(http.StatusUnauthorized, ErrAuthenticationFailed)
 	}
 
 	// トークンの生成

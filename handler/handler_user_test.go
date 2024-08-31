@@ -107,7 +107,7 @@ func TestCreateUserValidation(t *testing.T) {
 		err  error
 	}{
 		{"name=testuser01&password=testpassword", 201, nil},
-		{"name=testuser01&password=testpassword", 400, handler.ErrorAlreadyRegistered},
+		{"name=testuser01&password=testpassword", 400, handler.ErrAlreadyRegistered},
 		{"", 400, nil},
 		{"name=testuser02", 400, nil},
 		{"password=testpassword", 400, nil},
@@ -230,9 +230,9 @@ func TestGenTokenValidation(t *testing.T) {
 		err  error
 	}{
 		{name, "password=" + password, 201, nil},
-		{"", "", 404, handler.ErrorNotFound},
-		{name, "password=" + password + "a", 401, handler.ErrorAuthenticationFailed},
-		{name + "a", "password=" + password, 401, handler.ErrorAuthenticationFailed},
+		{"", "", 404, handler.ErrNotFound},
+		{name, "password=" + password + "a", 401, handler.ErrAuthenticationFailed},
+		{name + "a", "password=" + password, 401, handler.ErrAuthenticationFailed},
 	}
 
 	for _, v := range cases {

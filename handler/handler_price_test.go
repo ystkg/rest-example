@@ -126,7 +126,7 @@ func TestCreatePriceValidation(t *testing.T) {
 		{jwt, `{"Store":"", "Product":"ssd2T", "Price":1200}`, 400, nil},
 		{jwt, `{"Store":"pcshop", "Product":"", "Price":1200}`, 400, nil},
 		{jwt, `{"Store":"pcshop", "Product":"ssd2T"}`, 400, nil},
-		{jwt, `{"ID":1, "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 400, handler.ErrorIDCannotRequest},
+		{jwt, `{"ID":1, "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 400, handler.ErrIDCannotRequest},
 	}
 
 	for _, v := range cases {
@@ -363,8 +363,8 @@ func TestFindPriceValidation(t *testing.T) {
 	}{
 		{nil, priceIdStr, 401, nil},
 		{jwt, priceIdStr, 200, nil},
-		{jwt, priceIdStr + "1", 404, handler.ErrorNotFound},
-		{jwt, "a", 404, handler.ErrorNotFound},
+		{jwt, priceIdStr + "1", 404, handler.ErrNotFound},
+		{jwt, "a", 404, handler.ErrNotFound},
 	}
 
 	for _, v := range cases {
@@ -494,10 +494,10 @@ func TestUpdatePriceValidation(t *testing.T) {
 		{jwt, priceIdStr, `{"DateTime":"2023-05-15 12:15:30", "Store":"pcshop", "Product":"ssd2T", "Price":1200, "InStock":true}`, 200, nil},
 		{jwt, priceIdStr, `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 200, nil},
 		{jwt, priceIdStr, fmt.Sprintf(`{"ID":%s ,"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, priceIdStr), 200, nil},
-		{jwt, priceIdStr, fmt.Sprintf(`{"ID":%s ,"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, priceIdStr+"1"), 400, handler.ErrorIDUnchangeable},
+		{jwt, priceIdStr, fmt.Sprintf(`{"ID":%s ,"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, priceIdStr+"1"), 400, handler.ErrIDUnchangeable},
 		{jwt, priceIdStr, `{"DateTime":"2023-05-15", "Store":"pcshop", "Product":"ssd2T", "Price":1200, "InStock":true}`, 400, nil},
-		{jwt, priceIdStr + "1", `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 404, handler.ErrorNotFound},
-		{jwt, "a", `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 404, handler.ErrorNotFound},
+		{jwt, priceIdStr + "1", `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 404, handler.ErrNotFound},
+		{jwt, "a", `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 404, handler.ErrNotFound},
 	}
 
 	for _, v := range cases {
@@ -615,10 +615,10 @@ func TestDeletePriceValidation(t *testing.T) {
 		err     error
 	}{
 		{nil, priceIdStr, 401, nil},
-		{jwt, priceIdStr + "1", 404, handler.ErrorNotFound},
-		{jwt, "a", 404, handler.ErrorNotFound},
+		{jwt, priceIdStr + "1", 404, handler.ErrNotFound},
+		{jwt, "a", 404, handler.ErrNotFound},
 		{jwt, priceIdStr, 204, nil},
-		{jwt, priceIdStr, 404, handler.ErrorNotFound},
+		{jwt, priceIdStr, 404, handler.ErrNotFound},
 	}
 
 	for _, v := range cases {

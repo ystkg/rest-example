@@ -38,7 +38,7 @@ func (r *userRepositoryGorm) Create(ctx context.Context, name, password string) 
 	if err := tx.Create(user).Error; err != nil {
 		var pgerr *pgconn.PgError
 		if errors.As(err, &pgerr); pgerr != nil && pgerr.Code == "23505" { // unique_violation
-			return nil, errors.Join(wrap(ErrorDuplicated), err)
+			return nil, errors.Join(wrap(ErrDuplicated), err)
 		}
 		return nil, wrap(err)
 	}
