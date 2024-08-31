@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrorDuplicated = errors.New("duplicated")
+	ErrDuplicated = errors.New("duplicated")
 )
 
 func wrap(err error) error {

@@ -14,15 +14,15 @@ import (
 
 var (
 	// 400
-	ErrorAlreadyRegistered = errors.New("already registered")
-	ErrorIDCannotRequest   = errors.New("ID cannot be requested")
-	ErrorIDUnchangeable    = errors.New("ID is unchangeable")
+	ErrAlreadyRegistered = errors.New("already registered")
+	ErrIDCannotRequest   = errors.New("ID cannot be requested")
+	ErrIDUnchangeable    = errors.New("ID is unchangeable")
 
 	// 401
-	ErrorAuthenticationFailed = errors.New("authentication failed")
+	ErrAuthenticationFailed = errors.New("authentication failed")
 
 	// 404
-	ErrorNotFound = errors.New("not found")
+	ErrNotFound = errors.New("not found")
 )
 
 func newHTTPError(code int, err error) *echo.HTTPError {

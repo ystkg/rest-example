@@ -37,7 +37,7 @@ func (h *Handler) createPrice(c echo.Context) error {
 		return newHTTPError(http.StatusBadRequest, err)
 	}
 	if req.ID != nil {
-		return newHTTPError(http.StatusBadRequest, ErrorIDCannotRequest)
+		return newHTTPError(http.StatusBadRequest, ErrIDCannotRequest)
 	}
 	dateTime, err := h.parseDateTime(req.DateTime)
 	if err != nil {
@@ -108,7 +108,7 @@ func (h *Handler) findPrice(c echo.Context) error {
 	// 入力チェック
 	priceId, err := strconv.ParseUint(reqId, 10, 0)
 	if err != nil {
-		return newHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrNotFound)
 	}
 
 	// サービスの実行
@@ -117,7 +117,7 @@ func (h *Handler) findPrice(c echo.Context) error {
 		return err
 	}
 	if price == nil {
-		return newHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrNotFound)
 	}
 
 	// レスポンスの生成
@@ -145,13 +145,13 @@ func (h *Handler) updatePrice(c echo.Context) error {
 	// 入力チェック
 	priceId, err := strconv.ParseUint(reqId, 10, 0)
 	if err != nil {
-		return newHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrNotFound)
 	}
 	if err = c.Validate(req); err != nil {
 		return newHTTPError(http.StatusBadRequest, err)
 	}
 	if req.ID != nil && *req.ID != uint(priceId) {
-		return newHTTPError(http.StatusBadRequest, ErrorIDUnchangeable)
+		return newHTTPError(http.StatusBadRequest, ErrIDUnchangeable)
 	}
 	dateTime, err := h.parseDateTime(req.DateTime)
 	if err != nil {
@@ -170,8 +170,8 @@ func (h *Handler) updatePrice(c echo.Context) error {
 		inStock,
 	)
 	if err != nil {
-		if errors.Is(err, service.ErrorNotFound) {
-			return newHTTPError(http.StatusNotFound, ErrorNotFound)
+		if errors.Is(err, service.ErrNotFound) {
+			return newHTTPError(http.StatusNotFound, ErrNotFound)
 		}
 		return err
 	}
@@ -193,13 +193,13 @@ func (h *Handler) deletePrice(c echo.Context) error {
 	// 入力チェック
 	priceId, err := strconv.ParseUint(reqId, 10, 0)
 	if err != nil {
-		return newHTTPError(http.StatusNotFound, ErrorNotFound)
+		return newHTTPError(http.StatusNotFound, ErrNotFound)
 	}
 
 	// サービスの実行
 	if err = h.service.DeletePrice(ctx, uint(priceId), userId); err != nil {
-		if errors.Is(err, service.ErrorNotFound) {
-			return newHTTPError(http.StatusNotFound, ErrorNotFound)
+		if errors.Is(err, service.ErrNotFound) {
+			return newHTTPError(http.StatusNotFound, ErrNotFound)
 		}
 		return err
 	}
