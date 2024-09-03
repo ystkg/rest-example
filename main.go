@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime/debug"
 	"syscall"
 	"time"
 
@@ -19,6 +20,14 @@ import (
 
 func main() {
 	slog.SetDefault(handler.NewLogger())
+
+	if info, ok := debug.ReadBuildInfo(); ok {
+		settings := make(map[string]string, len(info.Settings))
+		for _, v := range info.Settings {
+			settings[v.Key] = v.Value
+		}
+		slog.Debug("BuildInfo", "path", info.Main.Path, "version", info.Main.Version, "sum", info.Main.Sum, "settings", settings)
+	}
 
 	// リクエスト処理フロー
 	// Echo -> Handler -> Service -> Repository -> Database
