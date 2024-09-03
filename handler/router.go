@@ -9,6 +9,8 @@ import (
 func NewEcho(h *Handler) *echo.Echo {
 	e := echo.New()
 
+	e.HideBanner = true
+
 	e.HTTPErrorHandler = h.errorHandler
 
 	e.Validator = h.validator
