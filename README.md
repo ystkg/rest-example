@@ -1,8 +1,8 @@
-# REST API実装サンプル
+# REST APIアプリケーション
 
 ## 概要
 
-- Go言語によるREST APIの実装サンプル
+- GoによるREST APIの実装モデル
 - 題材は商品の価格推移を記録していくWebアプリケーション
 - 認証は `JWT`
 - テーブルは起動時に `GORM` のAuto Migrationで生成
@@ -71,7 +71,7 @@ Go（version 1.23以降）がインストールされていること
 
 ```ShellSession
 $ go version
-go version go1.23.0 linux/amd64
+go version go1.23.1 linux/amd64
 ```
 
 ### 起動方法
