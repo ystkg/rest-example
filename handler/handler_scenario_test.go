@@ -37,6 +37,13 @@ func TestScenario(t *testing.T) {
 	}
 	assert.Equal(t, 201, rec.Code)
 
+	// ユーザの登録（重複）
+	rec, err = execHandler(e, req)
+	assert.NotNil(t, err)
+	httperr, ok := err.(*echo.HTTPError)
+	assert.True(t, ok)
+	assert.Equal(t, 400, httperr.Code)
+
 	// トークン発行
 	body = "password=" + password
 	req = newRequest(
@@ -164,7 +171,7 @@ func TestScenario(t *testing.T) {
 	)
 	rec, err = execHandler(e, req)
 	assert.NotNil(t, err)
-	httperr, ok := err.(*echo.HTTPError)
+	httperr, ok = err.(*echo.HTTPError)
 	assert.True(t, ok)
 	assert.Equal(t, 404, httperr.Code)
 }
