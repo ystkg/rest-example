@@ -31,7 +31,7 @@ func setupSqlMockTest(testname string) (*echo.Echo, *handler.HandlerConfig, *sql
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	r, err := repository.NewRepository(sqlDB)
+	r, err := repository.NewRepository("pgx", sqlDB)
 	if err != nil {
 		sqlDB.Close()
 		return nil, nil, nil, nil, err

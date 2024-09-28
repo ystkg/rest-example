@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/ystkg/rest-example/entity"
 	"gorm.io/gorm"
@@ -38,6 +39,10 @@ func (r *userRepositoryGorm) Create(ctx context.Context, name, password string) 
 	if err := tx.Create(user).Error; err != nil {
 		var pgerr *pgconn.PgError
 		if errors.As(err, &pgerr); pgerr != nil && pgerr.Code == "23505" { // unique_violation
+			return nil, errors.Join(wrap(ErrDuplicated), err)
+		}
+		var mysqlerr *mysql.MySQLError
+		if errors.As(err, &mysqlerr); mysqlerr != nil && mysqlerr.Number == 1062 {
 			return nil, errors.Join(wrap(ErrDuplicated), err)
 		}
 		return nil, wrap(err)

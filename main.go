@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime/debug"
+	"strings"
 	"syscall"
 	"time"
 
@@ -39,12 +40,22 @@ func main() {
 	if dburl == "" {
 		log.Fatal("DBURL is empty")
 	}
-	sqlDB, err := sql.Open("pgx", dburl)
+	var driverName string
+	switch {
+	case strings.HasPrefix(dburl, "postgres://"):
+		driverName = "pgx"
+	case strings.HasPrefix(dburl, "mysql://"):
+		driverName = "mysql"
+		dburl, _ = strings.CutPrefix(dburl, "mysql://")
+	default:
+		log.Fatal("DBURL is invalid")
+	}
+	sqlDB, err := sql.Open(driverName, dburl)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sqlDB.Close()
-	r, err := repository.NewRepository(sqlDB)
+	r, err := repository.NewRepository(driverName, sqlDB)
 	if err != nil {
 		log.Fatal(err)
 	}
