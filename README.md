@@ -82,7 +82,7 @@ go version go1.23.1 linux/amd64
 go mod tidy
 ```
 
-#### PostgreSQLの起動
+#### データベースのコンテナ起動
 
 ```Shell
 docker-compose up -d
@@ -92,13 +92,13 @@ docker-compose up -d
 
 #### 環境変数に接続先のデータベースを設定
 
-##### PostgreSQL
+##### PostgreSQL使用時
 
 ```Shell
 export DBURL=postgres://postgres:pwdev@localhost:5432/?sslmode=disable
 ```
 
-##### MySQL
+##### MySQL使用時
 
 ```Shell
 export DBURL=mysql://root:pwdev@tcp(localhost:3306)/devdb?parseTime=true
@@ -254,13 +254,13 @@ docker-compose up -d
 
 #### アプリケーションの起動
 
-##### PostgreSQL
+##### PostgreSQL使用時
 
 ```Shell
 docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL=postgres://postgres:pwdev@postgres-develop:5432/?sslmode=disable rest-example
 ```
 
-##### MySQL
+##### MySQL使用時
 
 ```Shell
 docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL='mysql://root:pwdev@tcp(mysql-develop:3306)/devdb?parseTime=true' rest-example
