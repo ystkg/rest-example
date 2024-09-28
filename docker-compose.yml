@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres
+    image: postgres:17
     container_name: postgres-develop
     restart: always
     networks:
@@ -12,7 +12,7 @@ services:
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
       TZ: Asia/Tokyo
   postgres-test:
-    image: postgres
+    image: postgres:17
     container_name: postgres-test
     restart: always
     ports:
