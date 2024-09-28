@@ -3,10 +3,10 @@
 ## 概要
 
 - GoによるREST APIの実装モデル
-- 題材は商品の価格推移を記録していくWebアプリケーション
 - データベースは環境変数のDBURLの値によりPostgreSQLとMySQLのどちらかを選択
 - テーブルは起動時に `GORM` のAuto Migrationで生成
 - 認証は `JWT`
+- 題材は商品の価格推移を記録していくWebアプリケーション
 
 <table>
 <tr><td> Webフレームワーク </td><td> Echo </td></tr>
