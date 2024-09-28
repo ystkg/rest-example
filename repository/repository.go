@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/ystkg/rest-example/entity"
+	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -33,8 +35,21 @@ type repositoryGorm struct {
 	price PriceRepository
 }
 
-func NewRepository(sqlDB *sql.DB) (Repository, error) {
-	db, err := gorm.Open(postgres.New(postgres.Config{Conn: sqlDB}), &gorm.Config{})
+func NewRepository(driverName string, sqlDB *sql.DB) (Repository, error) {
+	var dialector gorm.Dialector
+	switch driverName {
+	case "pgx":
+		dialector = postgres.New(postgres.Config{Conn: sqlDB})
+	case "mysql":
+		dialector = mysql.New(mysql.Config{Conn: sqlDB})
+	default:
+		return nil, fmt.Errorf("unsupported:%s", driverName)
+	}
+	return newRepositoryByDialector(dialector)
+}
+
+func newRepositoryByDialector(dialector gorm.Dialector) (Repository, error) {
+	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		return nil, wrap(err)
 	}

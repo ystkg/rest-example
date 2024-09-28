@@ -16,10 +16,10 @@ type Service interface {
 	CreateUser(ctx context.Context, name, password string) (*uint, error)
 	FindUser(ctx context.Context, name, password string) (*uint, error)
 
-	CreatePrice(ctx context.Context, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error)
+	CreatePrice(ctx context.Context, userId uint, dateTime time.Time, store, product string, price uint) (*entity.Price, error)
 	FindPrices(ctx context.Context, userId uint) ([]entity.Price, error)
 	FindPrice(ctx context.Context, priceId, userId uint) (*entity.Price, error)
-	UpdatePrice(ctx context.Context, priceId, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error)
+	UpdatePrice(ctx context.Context, priceId, userId uint, dateTime time.Time, store, product string, price uint) (*entity.Price, error)
 	DeletePrice(ctx context.Context, priceId, userId uint) error
 }
 
@@ -93,7 +93,7 @@ func encodePassword(user, password string) string {
 }
 
 // 価格の登録
-func (s *serviceImpl) CreatePrice(ctx context.Context, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error) {
+func (s *serviceImpl) CreatePrice(ctx context.Context, userId uint, dateTime time.Time, store, product string, price uint) (*entity.Price, error) {
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
 
@@ -105,7 +105,7 @@ func (s *serviceImpl) CreatePrice(ctx context.Context, userId uint, dateTime tim
 	defer s.rollback(ctx)
 
 	// 価格の登録
-	priceEntity, err := s.repository.Price().Create(ctx, userId, dateTime, store, product, price, inStock)
+	priceEntity, err := s.repository.Price().Create(ctx, userId, dateTime, store, product, price)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (s *serviceImpl) FindPrice(ctx context.Context, priceId, userId uint) (*ent
 }
 
 // 価格の更新
-func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error) {
+func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dateTime time.Time, store, product string, price uint) (*entity.Price, error) {
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
 
@@ -155,7 +155,6 @@ func (s *serviceImpl) UpdatePrice(ctx context.Context, priceId, userId uint, dat
 		store,
 		product,
 		price,
-		inStock,
 	)
 	if err != nil {
 		return nil, err

@@ -12,10 +12,10 @@ import (
 
 // 価格テーブル操作
 type PriceRepository interface {
-	Create(ctx context.Context, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, error)
+	Create(ctx context.Context, userId uint, dateTime time.Time, store, product string, price uint) (*entity.Price, error)
 	Find(ctx context.Context, id, userId uint) (*entity.Price, error)
 	FindByUserId(ctx context.Context, userId uint) ([]entity.Price, error)
-	Update(ctx context.Context, id, userId uint, dateTime time.Time, store, product string, price uint, inStock bool) (*entity.Price, int64, error)
+	Update(ctx context.Context, id, userId uint, dateTime time.Time, store, product string, price uint) (*entity.Price, int64, error)
 	Delete(ctx context.Context, id, userId uint) (int64, error)
 }
 
@@ -34,7 +34,6 @@ func (r *priceRepositoryGorm) Create(
 	store string,
 	product string,
 	price uint,
-	inStock bool,
 ) (*entity.Price, error) {
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
@@ -47,7 +46,6 @@ func (r *priceRepositoryGorm) Create(
 		Store:    store,
 		Product:  product,
 		Price:    price,
-		InStock:  inStock,
 	}
 
 	if err := tx.Create(priceEntity).Error; err != nil {
@@ -107,7 +105,6 @@ func (r *priceRepositoryGorm) Update(
 	store string,
 	product string,
 	price uint,
-	inStock bool,
 ) (*entity.Price, int64, error) {
 	slog.DebugContext(ctx, "start")
 	defer slog.DebugContext(ctx, "end")
@@ -123,7 +120,6 @@ func (r *priceRepositoryGorm) Update(
 		Store:    store,
 		Product:  product,
 		Price:    price,
-		InStock:  inStock,
 	}
 
 	db := tx.Where("user_id = ? and deleted_at is null", userId).Updates(priceEntity)
