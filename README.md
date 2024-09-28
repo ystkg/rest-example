@@ -255,7 +255,7 @@ docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL=postgres:
 ```
 
 ```Shell:MySQL
-docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL='mysql://root:pwdev@tcp(localhost:3306)/devdb?parseTime=true' rest-example
+docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL='mysql://root:pwdev@tcp(mysql-develop:3306)/devdb?parseTime=true' rest-example
 ```
 
 ### 環境変数
