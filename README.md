@@ -92,11 +92,15 @@ docker-compose up -d
 
 #### 環境変数に接続先のデータベースを設定
 
-```Shell:PostgreSQL
+##### PostgreSQL
+
+```Shell
 export DBURL=postgres://postgres:pwdev@localhost:5432/?sslmode=disable
 ```
 
-```Shell:MySQL
+##### MySQL
+
+```Shell
 export DBURL=mysql://root:pwdev@tcp(localhost:3306)/devdb?parseTime=true
 ```
 
@@ -250,11 +254,15 @@ docker-compose up -d
 
 #### アプリケーションの起動
 
-```Shell:PostgreSQL
+##### PostgreSQL
+
+```Shell
 docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL=postgres://postgres:pwdev@postgres-develop:5432/?sslmode=disable rest-example
 ```
 
-```Shell:MySQL
+##### MySQL
+
+```Shell
 docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL='mysql://root:pwdev@tcp(mysql-develop:3306)/devdb?parseTime=true' rest-example
 ```
 
