@@ -16,13 +16,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func somePrices() [][6]any {
+func somePrices() [][5]any {
 	now := time.Now()
-	return [][6]any{
-		{1, now.Add(-1 * time.Microsecond), "shop1", "memory8G", 3800, true},
-		{1, now, "shop2", "memory16G", 5900, true},
-		{1, now, "shop3", "memory32G", 7600, true},
-		{2, now, "shop3", "ssd1T", 7900, true},
+	return [][5]any{
+		{1, now.Add(-1 * time.Microsecond), "shop1", "memory8G", 3800},
+		{1, now, "shop2", "memory16G", 5900},
+		{1, now, "shop3", "memory32G", 7600},
+		{2, now, "shop3", "ssd1T", 7900},
 	}
 }
 
@@ -45,8 +45,8 @@ func TestCreatePrice(t *testing.T) {
 
 	// リクエストの生成
 	userId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPost,
 		"/v1/prices",
@@ -88,7 +88,6 @@ func TestCreatePrice(t *testing.T) {
 	assert.Equal(t, store, entity.Store)
 	assert.Equal(t, product, entity.Product)
 	assert.Equal(t, price, entity.Price)
-	assert.Equal(t, inStock, entity.InStock)
 }
 
 // 価格の登録のバリデーション
@@ -118,9 +117,7 @@ func TestCreatePriceValidation(t *testing.T) {
 		{nil, "", 401, nil},
 		{jwt, "", 400, nil},
 		{jwt, "=", 400, nil},
-		{jwt, `{"DateTime":"2023-05-15 12:15:30", "Store":"pcshop", "Product":"ssd2T", "Price":1200, "InStock":true}`, 201, nil},
 		{jwt, `{"DateTime":"2023-05-15 12:15:30", "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 201, nil},
-		{jwt, `{"Store":"pcshop", "Product":"ssd2T", "Price":1200, "InStock":true}`, 201, nil},
 		{jwt, `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 201, nil},
 		{jwt, `{"DateTime":"2023-05-15", "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 400, nil},
 		{jwt, `{"Store":"", "Product":"ssd2T", "Price":1200}`, 400, nil},
@@ -213,7 +210,6 @@ func TestFindPrices(t *testing.T) {
 		assert.Equal(t, v.Store, entity.Store)
 		assert.Equal(t, v.Product, entity.Product)
 		assert.Equal(t, v.Price, entity.Price)
-		assert.Equal(t, *v.InStock, entity.InStock)
 	}
 }
 
@@ -231,7 +227,7 @@ func TestFindPricesValidation(t *testing.T) {
 	// データベースの初期データ生成
 	userId := uint(1)
 	now := time.Now()
-	if _, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true); err != nil {
+	if _, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100); err != nil {
 		t.Fatal(err)
 	}
 
@@ -288,8 +284,8 @@ func TestFindPrice(t *testing.T) {
 	}
 
 	userId := uint(1)
-	store, product, price, inStock := "pcshop", "ssd1T", uint(9500), true
-	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, store, product, price, inStock)
+	store, product, price := "pcshop", "ssd1T", uint(9500)
+	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, store, product, price)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -326,7 +322,6 @@ func TestFindPrice(t *testing.T) {
 	assert.Equal(t, res.Store, entity.Store)
 	assert.Equal(t, res.Product, entity.Product)
 	assert.Equal(t, res.Price, entity.Price)
-	assert.Equal(t, *res.InStock, entity.InStock)
 }
 
 // 価格の取得のバリデーション
@@ -343,7 +338,7 @@ func TestFindPriceValidation(t *testing.T) {
 	// データベースの初期データ生成
 	userId := uint(1)
 	now := time.Now()
-	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
+	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -411,8 +406,8 @@ func TestUpdatePrice(t *testing.T) {
 	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/prices/%d", priceId),
@@ -452,7 +447,6 @@ func TestUpdatePrice(t *testing.T) {
 	assert.Equal(t, res.Store, entity.Store)
 	assert.Equal(t, res.Product, entity.Product)
 	assert.Equal(t, res.Price, entity.Price)
-	assert.Equal(t, *res.InStock, entity.InStock)
 }
 
 // 価格の更新のバリデーション
@@ -469,7 +463,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 	// データベースの初期データ生成
 	userId := uint(1)
 	now := time.Now()
-	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
+	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -491,11 +485,11 @@ func TestUpdatePriceValidation(t *testing.T) {
 		{nil, priceIdStr, "", 401, nil},
 		{jwt, priceIdStr, "", 400, nil},
 		{jwt, priceIdStr, "=", 400, nil},
-		{jwt, priceIdStr, `{"DateTime":"2023-05-15 12:15:30", "Store":"pcshop", "Product":"ssd2T", "Price":1200, "InStock":true}`, 200, nil},
+		{jwt, priceIdStr, `{"DateTime":"2023-05-15 12:15:30", "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 200, nil},
 		{jwt, priceIdStr, `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 200, nil},
 		{jwt, priceIdStr, fmt.Sprintf(`{"ID":%s ,"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, priceIdStr), 200, nil},
 		{jwt, priceIdStr, fmt.Sprintf(`{"ID":%s ,"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, priceIdStr+"1"), 400, handler.ErrIDUnchangeable},
-		{jwt, priceIdStr, `{"DateTime":"2023-05-15", "Store":"pcshop", "Product":"ssd2T", "Price":1200, "InStock":true}`, 400, nil},
+		{jwt, priceIdStr, `{"DateTime":"2023-05-15", "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 400, nil},
 		{jwt, priceIdStr + "1", `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 404, handler.ErrNotFound},
 		{jwt, "a", `{"Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 404, handler.ErrNotFound},
 	}
@@ -579,7 +573,6 @@ func TestDeletePrice(t *testing.T) {
 	assert.Equal(t, beforeEntity.Store, entity.Store)
 	assert.Equal(t, beforeEntity.Product, entity.Product)
 	assert.Equal(t, beforeEntity.Price, entity.Price)
-	assert.Equal(t, beforeEntity.InStock, entity.InStock)
 }
 
 // 価格の削除のバリデーション
@@ -596,7 +589,7 @@ func TestDeletePriceValidation(t *testing.T) {
 	// データベースの初期データ生成
 	userId := uint(1)
 	now := time.Now()
-	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100, true)
+	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, "store", "product", 100)
 	if err != nil {
 		t.Fatal(err)
 	}

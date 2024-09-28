@@ -491,7 +491,7 @@ func loadUsers(tx pgx.Tx) (map[uint]*entity.User, error) {
 }
 
 func loadPrices(tx pgx.Tx) (map[uint]*entity.Price, error) {
-	const SQL = "SELECT id, created_at, updated_at, deleted_at, user_id, date_time, store, product, price, in_stock FROM prices"
+	const SQL = "SELECT id, created_at, updated_at, deleted_at, user_id, date_time, store, product, price FROM prices"
 	rows, err := tx.Query(context.Background(), SQL)
 	if err != nil {
 		return nil, err
@@ -511,7 +511,6 @@ func loadPrices(tx pgx.Tx) (map[uint]*entity.Price, error) {
 			&price.Store,
 			&price.Product,
 			&price.Price,
-			&price.InStock,
 		)
 		prices[price.ID] = price
 	}
@@ -621,21 +620,21 @@ func insertUsers(tx pgx.Tx, t *time.Time, rows [][2]any) (int64, error) {
 	)
 }
 
-func insertPrice(tx pgx.Tx, createdAt, updatedAt, deletedAt *time.Time, userID uint, dateTime time.Time, store, product string, price uint, inStock bool) (id uint, err error) {
-	const SQL = "INSERT INTO prices (created_at, updated_at, deleted_at, user_id, date_time, store, product, price, in_stock) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id"
-	err = tx.QueryRow(context.Background(), SQL, createdAt, updatedAt, deletedAt, userID, dateTime, store, product, price, inStock).Scan(&id)
+func insertPrice(tx pgx.Tx, createdAt, updatedAt, deletedAt *time.Time, userID uint, dateTime time.Time, store, product string, price uint) (id uint, err error) {
+	const SQL = "INSERT INTO prices (created_at, updated_at, deleted_at, user_id, date_time, store, product, price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
+	err = tx.QueryRow(context.Background(), SQL, createdAt, updatedAt, deletedAt, userID, dateTime, store, product, price).Scan(&id)
 	return
 }
 
-func insertPrices(tx pgx.Tx, t *time.Time, rows [][6]any) (int64, error) {
+func insertPrices(tx pgx.Tx, t *time.Time, rows [][5]any) (int64, error) {
 	inputRows := make([][]any, len(rows))
 	for i, v := range rows {
-		inputRows[i] = []any{t, t, v[0], v[1], v[2], v[3], v[4], v[5]}
+		inputRows[i] = []any{t, t, v[0], v[1], v[2], v[3], v[4]}
 	}
 	return tx.CopyFrom(
 		context.Background(),
 		pgx.Identifier{"prices"},
-		[]string{"created_at", "updated_at", "user_id", "date_time", "store", "product", "price", "in_stock"},
+		[]string{"created_at", "updated_at", "user_id", "date_time", "store", "product", "price"},
 		pgx.CopyFromRows(inputRows),
 	)
 }

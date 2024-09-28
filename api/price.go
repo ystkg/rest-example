@@ -6,5 +6,4 @@ type Price struct {
 	Store    string  `validate:"required,max=100"`
 	Product  string  `validate:"required,max=100"`
 	Price    uint    `validate:"required"`
-	InStock  *bool
 }

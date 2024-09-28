@@ -27,10 +27,6 @@ func (h *Handler) createPrice(c echo.Context) error {
 	if err := c.Bind(req); err != nil {
 		return newHTTPError(http.StatusBadRequest, err)
 	}
-	inStock := true
-	if req.InStock != nil {
-		inStock = *req.InStock
-	}
 
 	// 入力チェック
 	if err := c.Validate(req); err != nil {
@@ -52,7 +48,6 @@ func (h *Handler) createPrice(c echo.Context) error {
 		req.Store,
 		req.Product,
 		req.Price,
-		inStock,
 	)
 	if err != nil {
 		return err
@@ -137,10 +132,6 @@ func (h *Handler) updatePrice(c echo.Context) error {
 	if err := c.Bind(req); err != nil {
 		return newHTTPError(http.StatusBadRequest, err)
 	}
-	inStock := true
-	if req.InStock != nil {
-		inStock = *req.InStock
-	}
 
 	// 入力チェック
 	priceId, err := strconv.ParseUint(reqId, 10, 0)
@@ -167,7 +158,6 @@ func (h *Handler) updatePrice(c echo.Context) error {
 		req.Store,
 		req.Product,
 		req.Price,
-		inStock,
 	)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
@@ -227,6 +217,5 @@ func (h *Handler) entityToResponse(entity *entity.Price) *api.Price {
 		Store:    entity.Store,
 		Product:  entity.Product,
 		Price:    entity.Price,
-		InStock:  &entity.InStock,
 	}
 }

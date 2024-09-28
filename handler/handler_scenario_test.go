@@ -58,8 +58,8 @@ func TestScenario(t *testing.T) {
 	token := resToken.Token
 
 	// 価格の登録
-	dateTime, store, product, price, inStock := "2024-09-28 12:34:56", "pcshop", "ssd1T", uint(9500), false
-	body = fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2024-09-28 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body = fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req = newRequest(
 		http.MethodPost,
 		"/v1/prices",
@@ -100,11 +100,10 @@ func TestScenario(t *testing.T) {
 	assert.Equal(t, store, resPrice.Store)
 	assert.Equal(t, product, resPrice.Product)
 	assert.Equal(t, price, resPrice.Price)
-	assert.Equal(t, inStock, *resPrice.InStock)
 
 	// 価格の更新
-	dateTime, store, product, price, inStock = "2024-09-28 23:45:01", "pcstore", "ssd2T", uint(9200), true
-	body = fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price = "2024-09-28 23:45:01", "pcstore", "ssd2T", uint(9200)
+	body = fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req = newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/prices/%d", priceId),
@@ -140,7 +139,6 @@ func TestScenario(t *testing.T) {
 	assert.Equal(t, store, resPrice.Store)
 	assert.Equal(t, product, resPrice.Product)
 	assert.Equal(t, price, resPrice.Price)
-	assert.Equal(t, inStock, *resPrice.InStock)
 
 	// 価格の削除
 	req = newRequest(

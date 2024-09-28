@@ -226,14 +226,14 @@ func TestCreatePriceError(t *testing.T) {
 	mock.ExpectBegin()
 	mockerr := errors.New(testname)
 	// PostgreSQLの場合はINSERTでもRETURNがあるのでExpectQueryを使う
-	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "prices" ("created_at","updated_at","deleted_at","user_id","date_time","store","product","price","in_stock") `)).
+	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "prices" ("created_at","updated_at","deleted_at","user_id","date_time","store","product","price") `)).
 		WillReturnError(mockerr)
 	mock.ExpectRollback()
 
 	// リクエストの生成
 	userId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPost,
 		"/v1/prices",
@@ -340,8 +340,8 @@ func TestUpdatePriceError(t *testing.T) {
 	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(2)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/prices/%d", priceId),

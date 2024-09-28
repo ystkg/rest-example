@@ -100,7 +100,6 @@ func (m *priceRepositoryMock) Create(
 	store string,
 	product string,
 	price uint,
-	inStock bool,
 ) (*entity.Price, error) {
 	if m.err != nil {
 		return nil, m.err
@@ -112,7 +111,6 @@ func (m *priceRepositoryMock) Create(
 		store,
 		product,
 		price,
-		inStock,
 	)
 }
 
@@ -138,7 +136,6 @@ func (m *priceRepositoryMock) Update(
 	store string,
 	product string,
 	price uint,
-	inStock bool,
 ) (*entity.Price, int64, error) {
 	if m.err != nil {
 		return nil, 0, m.err
@@ -154,7 +151,6 @@ func (m *priceRepositoryMock) Update(
 		store,
 		product,
 		price,
-		inStock,
 	)
 }
 

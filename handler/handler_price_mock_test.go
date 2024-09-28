@@ -33,8 +33,8 @@ func TestCreatePriceCreateError(t *testing.T) {
 
 	// リクエストの生成
 	userId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPost,
 		"/v1/prices",
@@ -73,8 +73,8 @@ func TestCreatePriceBeginTxError(t *testing.T) {
 
 	// リクエストの生成
 	userId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPost,
 		"/v1/prices",
@@ -113,8 +113,8 @@ func TestCreatePriceCommitError(t *testing.T) {
 
 	// リクエストの生成
 	userId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPost,
 		"/v1/prices",
@@ -191,8 +191,8 @@ func TestFindPriceFindError(t *testing.T) {
 
 	// リクエストの生成
 	userId := uint(1)
-	store, product, price, inStock := "pcshop", "ssd1T", uint(9500), true
-	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, store, product, price, inStock)
+	store, product, price := "pcshop", "ssd1T", uint(9500)
+	priceId, err := insertPrice(tx, &now, &now, nil, userId, now, store, product, price)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -235,8 +235,8 @@ func TestUpdatePriceUpdateError(t *testing.T) {
 	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/prices/%d", priceId),
@@ -276,8 +276,8 @@ func TestUpdatePriceRowsAffectedError(t *testing.T) {
 	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/prices/%d", priceId),
@@ -317,8 +317,8 @@ func TestUpdatePriceBeginTxError(t *testing.T) {
 	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/prices/%d", priceId),
@@ -358,8 +358,8 @@ func TestUpdatePriceCommitError(t *testing.T) {
 	// リクエストの生成
 	userId := uint(1)
 	priceId := uint(1)
-	dateTime, store, product, price, inStock := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500), true
-	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d, "InStock":%t}`, dateTime, store, product, price, inStock)
+	dateTime, store, product, price := "2023-05-19 12:34:56", "pcshop", "ssd1T", uint(9500)
+	body := fmt.Sprintf(`{"DateTime":"%s", "Store":"%s", "Product":"%s", "Price":%d}`, dateTime, store, product, price)
 	req := newRequest(
 		http.MethodPut,
 		fmt.Sprintf("/v1/prices/%d", priceId),

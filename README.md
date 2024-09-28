@@ -58,7 +58,6 @@ erDiagram
         string store
         string product
         uint price
-        bool in_stock
     }
 ```
 
@@ -120,7 +119,7 @@ curl -X POST -d 'name=user1' -d 'password=pw123' http://localhost:1323/users
 ```JSON
 {
   "ID": 1,
-  "name": "user1"
+  "Name": "user1"
 }
 ```
 
@@ -132,7 +131,7 @@ curl -X POST -d 'password=pw123' http://localhost:1323/users/user1/token
 
 ```JSON
 {
-  "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjMzNzI1NjQsImlhdCI6MTcyMzM2NTM2NCwiVXNlcklkIjoxfQ._fIC46X44z8zcNta12IZ1a7l_TozE49bRoE1X7wXGaw"
+  "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjc1MTg5NjksImlhdCI6MTcyNzUxMTc2OSwiVXNlcklkIjoxfQ.NHgBt3VlVwukGmQWKVJyGYC3vjcibzQQFsm1apauPac"
 }
 ```
 
@@ -147,17 +146,16 @@ TOKEN=`curl -s -X POST -d 'password=pw123' http://localhost:1323/users/user1/tok
 #### 価格を登録
 
 ```Shell
-curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17800, "InStock":true}' http://localhost:1323/v1/prices
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17800}' http://localhost:1323/v1/prices
 ```
 
 ```JSON
 {
   "ID": 1,
-  "DateTime": "2023-05-15 10:10:10",
+  "DateTime": "2023-05-15 12:10:30",
   "Store": "pcshop",
   "Product": "ssd1T",
-  "Price": 17800,
-  "InStock": true
+  "Price": 17800
 }
 ```
 
@@ -171,11 +169,10 @@ curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/prices
 [
   {
     "ID": 1,
-    "DateTime": "2023-05-15 01:10:10",
+    "DateTime": "2023-05-15 12:10:30",
     "Store": "pcshop",
     "Product": "ssd1T",
-    "Price": 17800,
-    "InStock": true
+    "Price": 17800
   }
 ]
 ```
@@ -189,28 +186,26 @@ curl -X GET -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/prices/1
 ```JSON
 {
   "ID": 1,
-  "DateTime": "2023-05-15 01:10:10",
+  "DateTime": "2023-05-15 12:10:30",
   "Store": "pcshop",
   "Product": "ssd1T",
-  "Price": 17800,
-  "InStock": true
+  "Price": 17800
 }
 ```
 
 #### 価格の更新
 
 ```Shell
-curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17500, "InStock":true}' http://localhost:1323/v1/prices/1
+curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"DateTime":"2023-05-15 12:10:30", "Store":"pcshop", "Product":"ssd1T", "Price":17500}' http://localhost:1323/v1/prices/1
 ```
 
 ```JSON
 {
   "ID": 1,
-  "DateTime": "2023-05-15 10:10:10",
+  "DateTime": "2023-05-15 12:10:30",
   "Store": "pcshop",
   "Product": "ssd1T",
-  "Price": 17500,
-  "InStock": true
+  "Price": 17500
 }
 ```
 
