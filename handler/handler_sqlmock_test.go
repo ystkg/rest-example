@@ -64,6 +64,46 @@ func setupSqlMockTest(testname string) (*echo.Echo, *handler.HandlerConfig, *sql
 	return e, conf, sqlDB, mock, nil
 }
 
+// SQLドライバエラー
+func TestDriverError(t *testing.T) {
+	testname := "TestDriverError"
+
+	// セットアップ
+	sqlDB, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// テストの実行
+	r, act := repository.NewRepository(testname, sqlDB)
+
+	// アサーション
+	assert.Nil(t, r)
+	assert.Equal(t, fmt.Errorf("unsupported:%s", testname), act)
+}
+
+// Pingエラー
+func TestPingError(t *testing.T) {
+	testname := "TestPingError"
+
+	// セットアップ
+	sqlDB, mock, err := sqlmock.New(sqlmock.MonitorPingsOption(true))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// mockの挙動設定
+	mockerr := errors.New(testname)
+	mock.ExpectPing().WillReturnError(mockerr)
+
+	// テストの実行
+	r, act := repository.NewRepository("pgx", sqlDB)
+
+	// アサーション
+	assert.Nil(t, r)
+	assert.ErrorIs(t, act, mockerr)
+}
+
 // トランザクション開始エラー
 func TestBeginError(t *testing.T) {
 	testname := "TestBeginError"
