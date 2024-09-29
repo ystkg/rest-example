@@ -247,7 +247,7 @@ go test -count=1 -coverpkg=./handler,./service,./repository ./handler
 docker build -t rest-example .
 ```
 
-#### PostgreSQLの起動
+#### データベースのコンテナ起動
 
 ```Shell
 docker-compose up -d
