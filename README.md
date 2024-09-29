@@ -3,7 +3,7 @@
 ## 概要
 
 - GoによるREST APIの実装モデル
-- データベースは環境変数のDBURLの値によりPostgreSQLとMySQLのどちらかを選択
+- データベースは環境変数の値でPostgreSQLとMySQLのどちらかを選択
 - テーブルは起動時に `GORM` のAuto Migrationで生成
 - 認証は `JWT`
 - 題材は商品の価格推移を記録していくWebアプリケーション
@@ -223,10 +223,11 @@ curl -X DELETE -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/prices
 
 ### テスト
 
-- テスト用に `PostgreSQL` を `15432` ポートで起動させた状態でテスト実行
-- テスト毎に個別のデータベースを作成し、テストが成功したら削除。失敗時は確認用に最後に実行した状態を保持
+- テスト用に `PostgreSQL` を `15432` ポートで、 `MySQL` を `13306` ポートで起動させた状態でテスト実行
+- `PostgreSQL` に接続するテストでは、テスト毎に個別のデータベースを作成し、テストが成功したらデータベースを削除。失敗時は確認用に最後に実行した状態を保持
+- `MySQL` に接続するテストでは、テスト毎にユーザ（usersテーブル）を新規登録し、テストが成功しても失敗しても残す。次の実行時のセットアップ処理でusersテーブルからレコード削除
 
-#### PostgreSQLの起動
+#### データベースのコンテナ起動
 
 ```Shell
 docker-compose up -d
@@ -235,7 +236,7 @@ docker-compose up -d
 #### テストの実行
 
 ```Shell
-go test -coverpkg=./handler,./service,./repository ./handler
+go test -count=1 -coverpkg=./handler,./service,./repository ./handler
 ```
 
 ### Docker
