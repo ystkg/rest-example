@@ -21,6 +21,12 @@ func TestScenario(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// テストシナリオの実行
+	scenario(t, e, testname)
+}
+
+// テストシナリオ
+func scenario(t *testing.T, e *echo.Echo, testname string) {
 	// ユーザの登録
 	name, password := testname, "testpassword"
 	body := fmt.Sprintf("name=%s&password=%s", name, password)
