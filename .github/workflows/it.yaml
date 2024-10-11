@@ -43,4 +43,4 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go vet ./...
-      - run: go test -coverpkg=./handler,./service,./repository ./handler
+      - run: go test -short -coverpkg=./handler,./service,./repository ./handler

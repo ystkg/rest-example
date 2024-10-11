@@ -25,6 +25,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var pgimage, mysqlimage *string
 var pgpassword, mysqlpassword *string
 
 func init() {
@@ -35,11 +36,17 @@ func init() {
 
 	conf := struct {
 		Services struct {
+			Postgres struct {
+				Image string
+			}
 			PostgresTest struct {
 				Environment struct {
 					PostgresPassword string `yaml:"POSTGRES_PASSWORD"`
 				}
 			} `yaml:"postgres-test"`
+			MySQL struct {
+				Image string
+			}
 			MySQLTest struct {
 				Environment struct {
 					MySQLRootPassword string `yaml:"MYSQL_ROOT_PASSWORD"`
@@ -51,6 +58,8 @@ func init() {
 		log.Fatal(err)
 	}
 
+	pgimage = &conf.Services.Postgres.Image
+	mysqlimage = &conf.Services.MySQL.Image
 	pgpassword = &conf.Services.PostgresTest.Environment.PostgresPassword
 	mysqlpassword = &conf.Services.MySQLTest.Environment.MySQLRootPassword
 }

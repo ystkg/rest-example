@@ -14,6 +14,7 @@
 <tr><td> データベース </td><td> PostgreSQL or MySQL </td></tr>
 <tr><td> テストフレームワーク </td><td> Testify </td></tr>
 <tr><td> テストモック </td><td> go-sqlmock </td></tr>
+<tr><td> テストコンテナ </td><td> testcontainers-go <br> dockertest </td></tr>
 </table>
 
 ## API
@@ -234,6 +235,14 @@ docker-compose up -d
 ```
 
 #### テストの実行
+
+##### Testcontainers/Dockertestを使うテストケースを含まない
+
+```Shell
+go test -short -count=1 -coverpkg=./handler,./service,./repository ./handler
+```
+
+##### Testcontainers/Dockertestを使うテストケースを含む
 
 ```Shell
 go test -count=1 -coverpkg=./handler,./service,./repository ./handler
