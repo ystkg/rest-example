@@ -18,8 +18,8 @@ func NewEcho(h *Handler) *echo.Echo {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.BodyLimit("1K"))
-	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(10))))
+	e.Use(middleware.BodyLimit(h.requestBodyLimit))
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(h.rateLimit))))
 	e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
 		XSSProtection:         middleware.DefaultSecureConfig.XSSProtection,
 		ContentTypeNosniff:    middleware.DefaultSecureConfig.ContentTypeNosniff,

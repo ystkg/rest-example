@@ -16,7 +16,7 @@ func TestMiddlewareTimeout(t *testing.T) {
 
 	// セットアップ
 	const timeoutSec = 60
-	h := NewHandler(nil, &HandlerConfig{TimeoutSec: timeoutSec})
+	h := NewHandler(nil, &HandlerConfig{TimeoutSec: timeoutSec, RequestBodyLimit: "1K"})
 	e := NewEcho(h)
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -49,7 +49,7 @@ func TestTraceRequestWithReqHeader(t *testing.T) {
 	testname := "TestTraceRequestWithReqHeader"
 
 	// セットアップ
-	e := NewEcho(NewHandler(nil, &HandlerConfig{}))
+	e := NewEcho(NewHandler(nil, &HandlerConfig{RequestBodyLimit: "1K"}))
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	const traceID = "tid"
@@ -78,7 +78,7 @@ func TestTraceRequestWithoutReqHeader(t *testing.T) {
 	testname := "TestTraceRequestWithoutReqHeader"
 
 	// セットアップ
-	e := NewEcho(NewHandler(nil, &HandlerConfig{}))
+	e := NewEcho(NewHandler(nil, &HandlerConfig{RequestBodyLimit: "1K"}))
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
@@ -106,7 +106,7 @@ func TestNoCache(t *testing.T) {
 	testname := "TestNoCache"
 
 	// セットアップ
-	e := NewEcho(NewHandler(nil, &HandlerConfig{}))
+	e := NewEcho(NewHandler(nil, &HandlerConfig{RequestBodyLimit: "1K"}))
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
