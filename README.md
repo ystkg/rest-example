@@ -86,10 +86,10 @@ go mod tidy
 #### データベースのコンテナ起動
 
 ```Shell
-docker-compose up -d
+docker compose up -d --wait
 ```
 
-- Docker Composeのプラグイン版の場合は `docker compose`
+- Docker Composeはプラグイン版
 
 #### 環境変数に接続先のデータベースを設定
 
@@ -231,7 +231,7 @@ curl -X DELETE -H "Authorization: Bearer $TOKEN" http://localhost:1323/v1/prices
 #### データベースのコンテナ起動
 
 ```Shell
-docker-compose up -d
+docker compose up -d --wait postgres-test mysql-test
 ```
 
 #### テストの実行
@@ -259,7 +259,7 @@ docker build -t rest-example .
 #### データベースのコンテナ起動
 
 ```Shell
-docker-compose up -d
+docker compose up -d --wait
 ```
 
 #### アプリケーションの起動

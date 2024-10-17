@@ -11,6 +11,11 @@ services:
       POSTGRES_PASSWORD: pwdev
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
       TZ: Asia/Tokyo
+    healthcheck:
+      test: "pg_isready || exit 1"
+      interval: 1s
+      timeout: 5s
+      retries: 10
   postgres-test:
     image: postgres:17
     container_name: postgres-test
@@ -23,6 +28,11 @@ services:
       PGDATA: /dev/shm/pgdata
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
       TZ: Asia/Tokyo
+    healthcheck:
+      test: "pg_isready || exit 1"
+      interval: 1s
+      timeout: 5s
+      retries: 10
   mysql:
     image: mysql:8.4
     container_name: mysql-develop
@@ -35,6 +45,11 @@ services:
       MYSQL_ROOT_PASSWORD: pwdev
       MYSQL_DATABASE: devdb
       TZ: Asia/Tokyo
+    healthcheck:
+      test: "mysqladmin ping || exit 1"
+      interval: 1s
+      timeout: 5s
+      retries: 50
   mysql-test:
     image: mysql:8.4
     container_name: mysql-test
@@ -45,6 +60,11 @@ services:
       MYSQL_ROOT_PASSWORD: pwtest
       MYSQL_DATABASE: testdb
       TZ: Asia/Tokyo
+    healthcheck:
+      test: "mysql -u root -ppwtest testdb -e 'SELECT 1' || exit 1"
+      interval: 1s
+      timeout: 5s
+      retries: 50
 networks:
   backend-develop:
     name: backend-develop
