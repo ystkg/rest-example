@@ -101,3 +101,29 @@ func TestTraceRequestWithoutReqHeader(t *testing.T) {
 	assert.True(t, called)
 	assert.Equal(t, ret, err)
 }
+
+func TestNoCache(t *testing.T) {
+	testname := "TestNoCache"
+
+	// セットアップ
+	e := NewEcho(NewHandler(nil, &HandlerConfig{}))
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	err := errors.New(testname)
+	called := false
+	next := func(c echo.Context) error {
+		called = true
+		return err
+	}
+
+	// テストの実行
+	ret := noCache(next)(c)
+
+	// アサーション
+	assert.Equal(t, "no-store", rec.Header().Get(echo.HeaderCacheControl))
+	assert.True(t, called)
+	assert.Equal(t, ret, err)
+}
