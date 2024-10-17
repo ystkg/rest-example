@@ -29,16 +29,22 @@ type Handler struct {
 	indent string
 
 	timeoutSec int
+
+	// Limit
+	requestBodyLimit string
+	rateLimit        int
 }
 
 type HandlerConfig struct {
-	JwtKey         []byte
-	ValidityMin    int // JWTのexp
-	DateTimeLayout string
-	Location       *time.Location
-	Locale         string
-	Indent         string // レスポンスのJSONのインデント
-	TimeoutSec     int
+	JwtKey           []byte
+	ValidityMin      int // JWTのexp
+	DateTimeLayout   string
+	Location         *time.Location
+	Locale           string
+	Indent           string // レスポンスのJSONのインデント
+	TimeoutSec       int
+	RequestBodyLimit string
+	RateLimit        int
 }
 
 func NewHandler(s service.Service, config *HandlerConfig) *Handler {
@@ -58,16 +64,18 @@ func NewHandler(s service.Service, config *HandlerConfig) *Handler {
 	}
 
 	return &Handler{
-		service:       s,
-		validator:     newValidator(config.Locale),
-		jwtConfig:     jwtConfig,
-		signingMethod: jwt.GetSigningMethod(signingMethod),
-		jwtContextKey: jwtContextKey,
-		validityMin:   config.ValidityMin,
-		layout:        config.DateTimeLayout,
-		location:      config.Location,
-		indent:        config.Indent,
-		timeoutSec:    config.TimeoutSec,
+		service:          s,
+		validator:        newValidator(config.Locale),
+		jwtConfig:        jwtConfig,
+		signingMethod:    jwt.GetSigningMethod(signingMethod),
+		jwtContextKey:    jwtContextKey,
+		validityMin:      config.ValidityMin,
+		layout:           config.DateTimeLayout,
+		location:         config.Location,
+		indent:           config.Indent,
+		timeoutSec:       config.TimeoutSec,
+		requestBodyLimit: config.RequestBodyLimit,
+		rateLimit:        config.RateLimit,
 	}
 }
 

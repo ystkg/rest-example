@@ -41,12 +41,14 @@ func setupContainerTest(testname, driverName string, sqlDB *sql.DB) (*echo.Echo,
 		return nil, err
 	}
 	conf := &handler.HandlerConfig{
-		JwtKey:         []byte(testname),
-		ValidityMin:    1,
-		DateTimeLayout: time.DateTime,
-		Location:       location,
-		Indent:         "  ",
-		TimeoutSec:     60,
+		JwtKey:           []byte(testname),
+		ValidityMin:      1,
+		DateTimeLayout:   time.DateTime,
+		Location:         location,
+		Indent:           "  ",
+		TimeoutSec:       60,
+		RequestBodyLimit: "1K",
+		RateLimit:        10,
 	}
 	h := handler.NewHandler(s, conf)
 

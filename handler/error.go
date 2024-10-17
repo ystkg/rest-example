@@ -55,6 +55,12 @@ func (h *Handler) errorHandler(err error, c echo.Context) {
 	case http.StatusServiceUnavailable:
 		title = "System Error"
 		detail = "Service Unavailable"
+	case http.StatusRequestEntityTooLarge:
+		title = "Payload Too Large"
+		detail = "Request Entity Too Large"
+	case http.StatusTooManyRequests:
+		title = "Too Many Requests"
+		detail = "Rate Limit Exceeded"
 	default:
 		code = http.StatusInternalServerError
 		title = "System Error"

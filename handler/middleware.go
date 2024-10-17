@@ -36,3 +36,10 @@ func traceRequest(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+func noCache(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set(echo.HeaderCacheControl, "no-store")
+		return next(c)
+	}
+}

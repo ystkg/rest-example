@@ -17,7 +17,7 @@ func TestErrorHandler(t *testing.T) {
 	testname := "TestErrorHandler"
 
 	// セットアップ
-	h := handler.NewHandler(nil, &handler.HandlerConfig{})
+	h := handler.NewHandler(nil, &handler.HandlerConfig{RequestBodyLimit: "1K"})
 	e := handler.NewEcho(h)
 
 	cause := errors.New(testname)
@@ -30,6 +30,8 @@ func TestErrorHandler(t *testing.T) {
 		{echo.NewHTTPError(http.StatusBadRequest, cause).SetInternal(cause), 400},
 		{echo.NewHTTPError(http.StatusUnauthorized).SetInternal(cause), 401},
 		{echo.NewHTTPError(http.StatusNotFound).SetInternal(cause), 404},
+		{echo.NewHTTPError(http.StatusRequestEntityTooLarge).SetInternal(cause), 413},
+		{echo.NewHTTPError(http.StatusTooManyRequests).SetInternal(cause), 429},
 		{echo.NewHTTPError(http.StatusServiceUnavailable).SetInternal(cause), 503},
 		{errors.Join(cause), 500},
 	}
@@ -49,7 +51,7 @@ func TestErrorHandler(t *testing.T) {
 
 func TestErrorHandlerEn(t *testing.T) {
 	// セットアップ
-	h := handler.NewHandler(nil, &handler.HandlerConfig{})
+	h := handler.NewHandler(nil, &handler.HandlerConfig{RequestBodyLimit: "1K"})
 	e := handler.NewEcho(h)
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -76,7 +78,7 @@ func TestErrorHandlerEn(t *testing.T) {
 
 func TestErrorHandlerJa(t *testing.T) {
 	// セットアップ
-	h := handler.NewHandler(nil, &handler.HandlerConfig{Locale: "ja"})
+	h := handler.NewHandler(nil, &handler.HandlerConfig{Locale: "ja", RequestBodyLimit: "1K"})
 	e := handler.NewEcho(h)
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
