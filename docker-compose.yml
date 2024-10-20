@@ -45,7 +45,7 @@ services:
       MYSQL_DATABASE: devdb
       TZ: Asia/Tokyo
     healthcheck:
-      test: "MYSQL_PWD=pwdev mysql devdb -e 'SELECT 1' || exit 1"
+      test: "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql $$MYSQL_DATABASE -e 'SELECT 1' || exit 1"
       interval: 1s
       timeout: 5s
       retries: 50
@@ -59,7 +59,7 @@ services:
       MYSQL_DATABASE: testdb
       TZ: Asia/Tokyo
     healthcheck:
-      test: "MYSQL_PWD=pwtest mysql testdb -e 'SELECT 1' || exit 1"
+      test: "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql $$MYSQL_DATABASE -e 'SELECT 1' || exit 1"
       interval: 1s
       timeout: 5s
       retries: 50
