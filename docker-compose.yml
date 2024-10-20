@@ -19,7 +19,6 @@ services:
   postgres-test:
     image: postgres:17
     container_name: postgres-test
-    restart: always
     ports:
       - 127.0.0.1:15432:5432
     shm_size: 1gb
@@ -53,7 +52,6 @@ services:
   mysql-test:
     image: mysql:8.4
     container_name: mysql-test
-    restart: always
     ports:
       - 127.0.0.1:13306:3306
     environment:
