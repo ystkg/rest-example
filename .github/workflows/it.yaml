@@ -14,7 +14,7 @@ jobs:
         image: postgres:17
         env:
           POSTGRES_PASSWORD: pwtest
-          POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8"
+          POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8 -A scram-sha-256"
           TZ: Asia/Tokyo
         options: >-
           --health-cmd pg_isready
