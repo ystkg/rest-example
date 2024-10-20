@@ -85,11 +85,19 @@ go mod tidy
 
 #### データベースのコンテナ起動
 
+Docker Composeはプラグイン版
+
+##### PostgreSQL
+
 ```Shell
-docker compose up -d --wait
+docker compose up -d --wait postgres
 ```
 
-- Docker Composeはプラグイン版
+##### MySQL
+
+```Shell
+docker compose up -d --wait mysql
+```
 
 #### 環境変数に接続先のデータベースを設定
 
@@ -242,6 +250,8 @@ docker compose up -d --wait postgres-test mysql-test
 go test -short -count=1 -coverpkg=./handler,./service,./repository ./handler
 ```
 
+- `make test`でデータベースのコンテナ起動も含めて実行
+
 ##### Testcontainers/Dockertestを使うテストケースを含む
 
 ```Shell
@@ -258,8 +268,16 @@ docker build -t rest-example .
 
 #### データベースのコンテナ起動
 
+##### PostgreSQL
+
 ```Shell
-docker compose up -d --wait
+docker compose up -d --wait postgres
+```
+
+##### MySQL
+
+```Shell
+docker compose up -d --wait mysql
 ```
 
 #### アプリケーションの起動
