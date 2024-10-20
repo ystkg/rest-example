@@ -258,6 +258,8 @@ go test -short -count=1 -coverpkg=./handler,./service,./repository ./handler
 go test -count=1 -coverpkg=./handler,./service,./repository ./handler
 ```
 
+- `make testall`でデータベースのコンテナ起動も含めて実行
+
 ### Docker
 
 #### イメージの作成

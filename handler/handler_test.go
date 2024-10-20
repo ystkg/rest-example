@@ -22,11 +22,21 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/labstack/echo/v4"
 )
 
+type testPgDB struct {
+	dbname string
+	sqlDB  *sql.DB
+	pool   *pgxpool.Pool
+	conn   *pgxpool.Conn
+}
+
 var pgimage, mysqlimage *string
 var pgpassword, mysqlpassword *string
+var pgpool *pgxpool.Pool
 
 func init() {
 	buf, err := os.ReadFile("../docker-compose.yml")
@@ -62,41 +72,47 @@ func init() {
 	mysqlimage = &conf.Services.MySQL.Image
 	pgpassword = &conf.Services.PostgresTest.Environment.PostgresPassword
 	mysqlpassword = &conf.Services.MySQLTest.Environment.MySQLRootPassword
-}
 
-func formatDSN(dbname string) string {
-	dbnameAttr := ""
-	if dbname != "" {
-		dbnameAttr = "dbname=" + dbname
+	if pgpool, err = pgxpool.New(context.Background(), formatDSN("postgres")); err != nil {
+		log.Fatal(err)
 	}
-	return fmt.Sprintf("host=localhost port=15432 user=postgres password=%s %s sslmode=disable TimeZone=Asia/Tokyo", *pgpassword, dbnameAttr)
 }
 
-func connectDB(dbname string) (*pgx.Conn, error) {
-	return pgx.Connect(context.Background(), formatDSN(dbname))
+func formatDSN(user string) string {
+	// dbnameは指定しないとuserと同じになる
+	return fmt.Sprintf("host=localhost port=15432 user=%s password=%s sslmode=disable TimeZone=Asia/Tokyo", user, *pgpassword)
 }
 
 func createTestDatabase(dbname string) (string, error) {
-	conn, err := connectDB("")
+	ctx := context.Background()
+
+	conn, err := pgpool.Acquire(ctx)
 	if err != nil {
 		return "", err
 	}
-	defer conn.Close(context.Background())
+	defer conn.Release()
 
 	if err := dropDatabaseIfExists(conn, dbname); err != nil {
 		return "", err
 	}
 
-	if _, err := conn.Exec(context.Background(), "CREATE DATABASE "+dbname); err != nil {
+	// dbnameと同一名のuser（LOGIN権限のあるROLE）を作成
+	if _, err := conn.Exec(ctx, "CREATE ROLE "+dbname+" LOGIN PASSWORD '"+*pgpassword+"'"); err != nil {
+		return "", err
+	}
+
+	if _, err := conn.Exec(ctx, "CREATE DATABASE "+dbname+" OWNER "+dbname); err != nil {
 		return "", err
 	}
 
 	return formatDSN(dbname), nil
 }
 
-func dropDatabaseIfExists(conn *pgx.Conn, dbname string) error {
+func dropDatabaseIfExists(conn *pgxpool.Conn, dbname string) error {
+	ctx := context.Background()
+
 	const SQL = "SELECT pid FROM pg_stat_activity WHERE datname = $1"
-	rows, err := conn.Query(context.Background(), SQL, dbname)
+	rows, err := conn.Query(ctx, SQL, dbname)
 	if err != nil {
 		return err
 	}
@@ -111,44 +127,50 @@ func dropDatabaseIfExists(conn *pgx.Conn, dbname string) error {
 	rows.Close()
 
 	for _, v := range pids {
-		if _, err := conn.Exec(context.Background(), "SELECT pg_terminate_backend($1)", v); err != nil {
+		if _, err := conn.Exec(ctx, "SELECT pg_terminate_backend($1)", v); err != nil {
 			return err
 		}
 	}
 
-	if _, err := conn.Exec(context.Background(), "DROP DATABASE IF EXISTS "+dbname); err != nil {
+	if _, err := conn.Exec(ctx, "DROP DATABASE IF EXISTS "+dbname); err != nil {
+		return err
+	}
+
+	if _, err := conn.Exec(ctx, "DROP ROLE IF EXISTS "+dbname); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func setupTest(testname string) (*echo.Echo, *handler.HandlerConfig, *sql.DB, pgx.Tx, error) {
-	e, conf, sqlDB, tx, _, err := setupTestMain(testname, service.NewService)
+func setupTest(testname string) (*echo.Echo, *handler.HandlerConfig, *testPgDB, pgx.Tx, error) {
+	e, conf, testDB, tx, _, err := setupTestMain(testname, service.NewService)
 	if err != nil {
-		cleanDB(testname, sqlDB)
-		sqlDB = nil
+		cleanDB(testDB)
+		testDB = nil
 	}
-	return e, conf, sqlDB, tx, err
+	return e, conf, testDB, tx, err
 }
 
-func setupMockTest(testname string) (*echo.Echo, *handler.HandlerConfig, *sql.DB, pgx.Tx, *serviceMock, error) {
+func setupMockTest(testname string) (*echo.Echo, *handler.HandlerConfig, *testPgDB, pgx.Tx, *serviceMock, error) {
 	newService := func(r repository.Repository) service.Service {
 		return newMockService(newMockRepository(r))
 	}
-	e, conf, sqlDB, tx, s, err := setupTestMain(testname, newService)
+	e, conf, testDB, tx, s, err := setupTestMain(testname, newService)
 	if err != nil {
-		cleanDB(testname, sqlDB)
-		sqlDB = nil
+		cleanDB(testDB)
+		testDB = nil
 	}
 	var mock *serviceMock
 	if s != nil {
 		mock = s.(*serviceMock)
 	}
-	return e, conf, sqlDB, tx, mock, err
+	return e, conf, testDB, tx, mock, err
 }
 
-func setupTestMain(testname string, newService func(repository.Repository) service.Service) (*echo.Echo, *handler.HandlerConfig, *sql.DB, pgx.Tx, service.Service, error) {
+func setupTestMain(testname string, newService func(repository.Repository) service.Service) (*echo.Echo, *handler.HandlerConfig, *testPgDB, pgx.Tx, service.Service, error) {
+	ctx := context.Background()
+
 	// Database
 	dbname := strings.ToLower(testname)
 	dburl, err := createTestDatabase(dbname)
@@ -157,17 +179,19 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	}
 
 	// Repository
-	driverName := "pgx"
-	sqlDB, err := sql.Open(driverName, dburl)
+	pool, err := pgxpool.New(ctx, dburl)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
+	sqlDB := stdlib.OpenDBFromPool(pool)
+	testDB := &testPgDB{dbname: dbname, sqlDB: sqlDB, pool: pool}
+	driverName := "pgx"
 	r, err := repository.NewRepository(driverName, sqlDB)
 	if err != nil {
-		return nil, nil, sqlDB, nil, nil, err
+		return nil, nil, testDB, nil, nil, err
 	}
-	if err := r.InitDb(context.Background()); err != nil {
-		return nil, nil, sqlDB, nil, nil, err
+	if err := r.InitDb(ctx); err != nil {
+		return nil, nil, testDB, nil, nil, err
 	}
 
 	// Service
@@ -178,7 +202,7 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	validityMin := 1
 	location, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
-		return nil, nil, sqlDB, nil, nil, err
+		return nil, nil, testDB, nil, nil, err
 	}
 	conf := &handler.HandlerConfig{
 		JwtKey:           jwtkey,
@@ -196,19 +220,20 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	e := handler.NewEcho(h)
 
 	// トランザクション
-	conn, err := connectDB(dbname)
-	if err != nil {
-		return nil, nil, sqlDB, nil, nil, err
+	if testDB.conn, err = pool.Acquire(ctx); err != nil {
+		return nil, nil, testDB, nil, nil, err
 	}
-	tx, err := conn.Begin(context.Background())
+	tx, err := testDB.conn.Begin(ctx)
 	if err != nil {
-		return nil, nil, sqlDB, nil, nil, err
+		return nil, nil, testDB, nil, nil, err
 	}
 
-	return e, conf, sqlDB, tx, s, nil
+	return e, conf, testDB, tx, s, nil
 }
 
 func setupMySQLTest(testname string) (*echo.Echo, error) {
+	ctx := context.Background()
+
 	// Repository
 	driverName := "mysql"
 	sqlDB, err := sql.Open(driverName, fmt.Sprintf("root:%s@tcp(localhost:13306)/testdb?parseTime=true", *mysqlpassword))
@@ -220,11 +245,11 @@ func setupMySQLTest(testname string) (*echo.Echo, error) {
 		sqlDB.Close()
 		return nil, err
 	}
-	if err := r.InitDb(context.Background()); err != nil {
+	if err := r.InitDb(ctx); err != nil {
 		sqlDB.Close()
 		return nil, err
 	}
-	sqlDB.ExecContext(context.Background(), "DELETE FROM users WHERE name = ?", testname)
+	sqlDB.ExecContext(ctx, "DELETE FROM users WHERE name = ?", testname)
 
 	// Service
 	s := service.NewService(r)
@@ -255,43 +280,49 @@ func setupMySQLTest(testname string) (*echo.Echo, error) {
 	return e, nil
 }
 
-func cleanIfSuccess(testname string, t *testing.T, sqlDB *sql.DB) error {
+func cleanIfSuccess(t *testing.T, testDB *testPgDB) error {
 	if t.Failed() {
-		sqlDB.Close()
+		testDB.sqlDB.Close()
 		return nil
 	}
-	return cleanDB(testname, sqlDB)
+	return cleanDB(testDB)
 }
 
-func cleanDB(testname string, sqlDB *sql.DB) error {
-	if sqlDB == nil {
+func cleanDB(testDB *testPgDB) error {
+	if testDB == nil {
 		return nil
 	}
-	defer sqlDB.Close()
+	if testDB.sqlDB == nil {
+		return nil
+	}
+	testDB.sqlDB.Close()
 
-	conn, err := connectDB("")
+	conn, err := pgpool.Acquire(context.Background())
 	if err != nil {
 		return err
 	}
-	defer conn.Close(context.Background())
+	defer conn.Release()
 
-	dbname := strings.ToLower(testname)
-	return dropDatabaseIfExists(conn, dbname)
+	return dropDatabaseIfExists(conn, testDB.dbname)
 }
 
-func execHandlerTest(e *echo.Echo, tx pgx.Tx, req *http.Request) (*httptest.ResponseRecorder, *DiffTables, *TestDB, error) {
+func execHandlerTest(e *echo.Echo, testDB *testPgDB, tx pgx.Tx, req *http.Request) (*httptest.ResponseRecorder, *DiffTables, *TestDB, error) {
 	loadedTime := time.Now()
+
+	ctx := context.Background()
 
 	tables, err := loadTables(tx)
 	if err != nil {
-		tx.Rollback(context.Background())
+		tx.Rollback(ctx)
 		return nil, nil, nil, err
 	}
 
-	if err := tx.Commit(context.Background()); err != nil {
-		tx.Rollback(context.Background())
+	if err := tx.Commit(ctx); err != nil {
+		tx.Rollback(ctx)
 		return nil, nil, nil, err
 	}
+
+	testDB.conn.Release()
 
 	before := &TestDB{
 		loadedTime,
@@ -303,14 +334,17 @@ func execHandlerTest(e *echo.Echo, tx pgx.Tx, req *http.Request) (*httptest.Resp
 		return nil, nil, nil, err
 	}
 
-	conn := tx.Conn()
-	defer conn.Close(context.Background())
-
-	tx, err = conn.BeginTx(context.Background(), pgx.TxOptions{AccessMode: pgx.ReadOnly})
+	conn, err := testDB.pool.Acquire(ctx)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	defer tx.Rollback(context.Background())
+	defer conn.Release()
+
+	tx, err = conn.BeginTx(ctx, pgx.TxOptions{AccessMode: pgx.ReadOnly})
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	defer tx.Rollback(ctx)
 
 	loadedTime = time.Now()
 

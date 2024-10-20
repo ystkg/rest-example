@@ -32,11 +32,11 @@ func TestCreateUser(t *testing.T) {
 	testname := "TestCreateUser"
 
 	// セットアップ
-	e, _, sqlDB, tx, err := setupTest(testname)
+	e, _, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -56,7 +56,7 @@ func TestCreateUser(t *testing.T) {
 	)
 
 	// テストの実行
-	rec, diff, _, err := execHandlerTest(e, tx, req)
+	rec, diff, _, err := execHandlerTest(e, testDB, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,11 +90,11 @@ func TestCreateUserValidation(t *testing.T) {
 	testname := "TestCreateUserValidation"
 
 	// セットアップ
-	e, _, sqlDB, tx, err := setupTest(testname)
+	e, _, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
@@ -145,11 +145,11 @@ func TestGenToken(t *testing.T) {
 	testname := "TestGenToken"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -174,7 +174,7 @@ func TestGenToken(t *testing.T) {
 	)
 
 	// テストの実行
-	rec, diff, _, err := execHandlerTest(e, tx, req)
+	rec, diff, _, err := execHandlerTest(e, testDB, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,11 +205,11 @@ func TestGenTokenValidation(t *testing.T) {
 	testname := "TestGenTokenValidation"
 
 	// セットアップ
-	e, _, sqlDB, tx, err := setupTest(testname)
+	e, _, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	name, password := "testuser01", "testpassword"
