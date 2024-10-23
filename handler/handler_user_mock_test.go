@@ -16,11 +16,11 @@ func TestCreateUserCreateError(t *testing.T) {
 	testname := "TestCreateUserCreateError"
 
 	// セットアップ
-	e, _, sqlDB, tx, mock, err := setupMockTest(testname)
+	e, _, testDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// mockの挙動設定
 	mock.repository.user.err = errors.New(testname)
@@ -43,7 +43,7 @@ func TestCreateUserCreateError(t *testing.T) {
 	)
 
 	// テストの実行
-	_, diff, _, err := execHandlerTest(e, tx, req)
+	_, diff, _, err := execHandlerTest(e, testDB, tx, req)
 
 	// アサーション
 	assert.Equal(t, mock.repository.user.err, err)
@@ -55,11 +55,11 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	testname := "TestCreateUserBeginTxError"
 
 	// セットアップ
-	e, _, sqlDB, tx, mock, err := setupMockTest(testname)
+	e, _, testDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// mockの挙動設定
 	mock.repository.beginTxErr = errors.New(testname)
@@ -82,7 +82,7 @@ func TestCreateUserBeginTxError(t *testing.T) {
 	)
 
 	// テストの実行
-	_, diff, _, err := execHandlerTest(e, tx, req)
+	_, diff, _, err := execHandlerTest(e, testDB, tx, req)
 
 	// アサーション
 	assert.Equal(t, mock.repository.beginTxErr, err)
@@ -94,11 +94,11 @@ func TestCreateUserCommitError(t *testing.T) {
 	testname := "TestCreateUserCommitError"
 
 	// セットアップ
-	e, _, sqlDB, tx, mock, err := setupMockTest(testname)
+	e, _, testDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// mockの挙動設定
 	mock.repository.commitErr = errors.New(testname)
@@ -121,7 +121,7 @@ func TestCreateUserCommitError(t *testing.T) {
 	)
 
 	// テストの実行
-	_, diff, _, err := execHandlerTest(e, tx, req)
+	_, diff, _, err := execHandlerTest(e, testDB, tx, req)
 
 	// アサーション
 	assert.Equal(t, mock.repository.commitErr, err)
@@ -133,11 +133,11 @@ func TestGenTokenFindError(t *testing.T) {
 	testname := "TestGenTokenFindError"
 
 	// セットアップ
-	e, _, sqlDB, tx, mock, err := setupMockTest(testname)
+	e, _, testDB, tx, mock, err := setupMockTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// mockの挙動設定
 	mock.repository.user.err = errors.New(testname)
@@ -165,7 +165,7 @@ func TestGenTokenFindError(t *testing.T) {
 	)
 
 	// テストの実行
-	_, diff, _, err := execHandlerTest(e, tx, req)
+	_, diff, _, err := execHandlerTest(e, testDB, tx, req)
 
 	// アサーション
 	assert.Equal(t, mock.repository.user.err, err)

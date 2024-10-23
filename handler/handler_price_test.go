@@ -31,11 +31,11 @@ func TestCreatePrice(t *testing.T) {
 	testname := "TestCreatePrice"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -56,7 +56,7 @@ func TestCreatePrice(t *testing.T) {
 	)
 
 	// テストの実行
-	rec, diff, _, err := execHandlerTest(e, tx, req)
+	rec, diff, _, err := execHandlerTest(e, testDB, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,11 +95,11 @@ func TestCreatePriceValidation(t *testing.T) {
 	testname := "TestCreatePriceValidation"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
 	if err := tx.Commit(context.Background()); err != nil {
@@ -155,11 +155,11 @@ func TestFindPrices(t *testing.T) {
 	testname := "TestFindPrices"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -178,7 +178,7 @@ func TestFindPrices(t *testing.T) {
 	)
 
 	// テストの実行
-	rec, diff, before, err := execHandlerTest(e, tx, req)
+	rec, diff, before, err := execHandlerTest(e, testDB, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -218,11 +218,11 @@ func TestFindPricesValidation(t *testing.T) {
 	testname := "TestFindPricesValidation"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	userId := uint(1)
@@ -271,11 +271,11 @@ func TestFindPrice(t *testing.T) {
 	testname := "TestFindPrice"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -300,7 +300,7 @@ func TestFindPrice(t *testing.T) {
 	)
 
 	// テストの実行
-	rec, diff, before, err := execHandlerTest(e, tx, req)
+	rec, diff, before, err := execHandlerTest(e, testDB, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -329,11 +329,11 @@ func TestFindPriceValidation(t *testing.T) {
 	testname := "TestFindPriceValidation"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	userId := uint(1)
@@ -391,11 +391,11 @@ func TestUpdatePrice(t *testing.T) {
 	testname := "TestUpdatePrice"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -417,7 +417,7 @@ func TestUpdatePrice(t *testing.T) {
 	)
 
 	// テストの実行
-	rec, diff, before, err := execHandlerTest(e, tx, req)
+	rec, diff, before, err := execHandlerTest(e, testDB, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -454,11 +454,11 @@ func TestUpdatePriceValidation(t *testing.T) {
 	testname := "TestUpdatePriceValidation"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	userId := uint(1)
@@ -523,11 +523,11 @@ func TestDeletePrice(t *testing.T) {
 	testname := "TestDeletePrice"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	now := time.Now()
@@ -547,7 +547,7 @@ func TestDeletePrice(t *testing.T) {
 	)
 
 	// テストの実行
-	rec, diff, before, err := execHandlerTest(e, tx, req)
+	rec, diff, before, err := execHandlerTest(e, testDB, tx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -580,11 +580,11 @@ func TestDeletePriceValidation(t *testing.T) {
 	testname := "TestDeletePriceValidation"
 
 	// セットアップ
-	e, conf, sqlDB, tx, err := setupTest(testname)
+	e, conf, testDB, tx, err := setupTest(testname)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanIfSuccess(testname, t, sqlDB)
+	defer cleanIfSuccess(t, testDB)
 
 	// データベースの初期データ生成
 	userId := uint(1)
