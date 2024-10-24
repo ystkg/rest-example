@@ -92,7 +92,7 @@ func createTestDatabase(dbname string) (string, error) {
 	}
 	defer conn.Release()
 
-	if err := dropDatabaseIfExists(conn, dbname); err != nil {
+	if err := dropDatabaseIfExists(ctx, conn, dbname); err != nil {
 		return "", err
 	}
 
@@ -108,36 +108,20 @@ func createTestDatabase(dbname string) (string, error) {
 	return formatDSN(dbname), nil
 }
 
-func dropDatabaseIfExists(conn *pgxpool.Conn, dbname string) error {
-	ctx := context.Background()
-
-	const SQL = "SELECT pid FROM pg_stat_activity WHERE datname = $1"
-	rows, err := conn.Query(ctx, SQL, dbname)
-	if err != nil {
+func dropDatabaseIfExists(ctx context.Context, conn *pgxpool.Conn, dbname string) error {
+	if _, err := conn.Exec(ctx, "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1", dbname); err != nil {
 		return err
 	}
-	defer rows.Close()
 
-	pids := make([]int, 0)
-	for rows.Next() {
-		var pid int
-		rows.Scan(&pid)
-		pids = append(pids, pid)
-	}
-	rows.Close()
-
-	for _, v := range pids {
-		if _, err := conn.Exec(ctx, "SELECT pg_terminate_backend($1)", v); err != nil {
+	batch := &pgx.Batch{}
+	batch.Queue("DROP DATABASE IF EXISTS " + dbname)
+	batch.Queue("DROP ROLE IF EXISTS " + dbname)
+	results := conn.SendBatch(ctx, batch)
+	defer results.Close()
+	for range batch.Len() {
+		if _, err := results.Exec(); err != nil {
 			return err
 		}
-	}
-
-	if _, err := conn.Exec(ctx, "DROP DATABASE IF EXISTS "+dbname); err != nil {
-		return err
-	}
-
-	if _, err := conn.Exec(ctx, "DROP ROLE IF EXISTS "+dbname); err != nil {
-		return err
 	}
 
 	return nil
@@ -297,13 +281,15 @@ func cleanDB(testDB *testPgDB) error {
 	}
 	testDB.sqlDB.Close()
 
-	conn, err := pgpool.Acquire(context.Background())
+	ctx := context.Background()
+
+	conn, err := pgpool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 	defer conn.Release()
 
-	return dropDatabaseIfExists(conn, testDB.dbname)
+	return dropDatabaseIfExists(ctx, conn, testDB.dbname)
 }
 
 func execHandlerTest(e *echo.Echo, testDB *testPgDB, tx pgx.Tx, req *http.Request) (*httptest.ResponseRecorder, *DiffTables, *TestDB, error) {
