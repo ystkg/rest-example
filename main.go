@@ -59,8 +59,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := r.InitDb(context.Background()); err != nil {
+	if ok, checked, err := r.Owner(context.Background()); err != nil {
 		log.Fatal(err)
+	} else if ok || !checked { // データベースのオーナーでなければAuto Migrationはスキップ
+		if err := r.InitDb(context.Background()); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// Service

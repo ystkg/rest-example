@@ -7,6 +7,8 @@ services:
       - backend-develop
     ports:
       - 127.0.0.1:5432:5432
+    volumes:
+      - ./initdb/pg:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_PASSWORD: pwdev
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8 -A scram-sha-256"
@@ -40,9 +42,13 @@ services:
       - backend-develop
     ports:
       - 127.0.0.1:3306:3306
+    volumes:
+      - ./initdb/mysql:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: pwdev
       MYSQL_DATABASE: devdb
+      MYSQL_USER: devdbuser
+      MYSQL_PASSWORD: pwdevdbuser
       TZ: Asia/Tokyo
     healthcheck:
       test: "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql $$MYSQL_DATABASE -e 'SELECT 1' || exit 1"
@@ -57,6 +63,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: pwtest
       MYSQL_DATABASE: testdb
+      MYSQL_USER: testdbuser
+      MYSQL_PASSWORD: pwtestdbuser
       TZ: Asia/Tokyo
     healthcheck:
       test: "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql $$MYSQL_DATABASE -e 'SELECT 1' || exit 1"
