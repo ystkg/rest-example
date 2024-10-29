@@ -8,9 +8,10 @@ services:
     ports:
       - 127.0.0.1:5432:5432
     volumes:
+      - ./db.sec:/run/secrets/postgres
       - ./createuser.pg:/docker-entrypoint-initdb.d/createuser.sql
     environment:
-      POSTGRES_PASSWORD: pwdev
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8 -A scram-sha-256"
       TZ: Asia/Tokyo
     healthcheck:
@@ -43,15 +44,16 @@ services:
     ports:
       - 127.0.0.1:3306:3306
     volumes:
+      - ./db.sec:/run/secrets/mysql-root
       - ./createuser.mysql:/docker-entrypoint-initdb.d/createuser.sql
     environment:
-      MYSQL_ROOT_PASSWORD: pwdev
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql-root
       MYSQL_DATABASE: devdb
       MYSQL_USER: devdbuser
       MYSQL_PASSWORD: pwdevdbuser
       TZ: Asia/Tokyo
     healthcheck:
-      test: "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql $$MYSQL_DATABASE -e 'SELECT 1' || exit 1"
+      test: "MYSQL_PWD=`cat /run/secrets/mysql-root` mysql $$MYSQL_DATABASE -e 'SELECT 1' || exit 1"
       interval: 1s
       timeout: 5s
       retries: 50
