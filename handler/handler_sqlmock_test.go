@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -104,6 +105,63 @@ func TestPingError(t *testing.T) {
 	// アサーション
 	assert.Nil(t, r)
 	assert.ErrorIs(t, act, mockerr)
+}
+
+// オーナー確認時エラー（PostgreSQL）
+func TestPgOwnerError(t *testing.T) {
+	testname := "TestPgOwnerError"
+
+	// セットアップ
+	sqlDB, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// mockの挙動設定
+	mockerr := errors.New(testname)
+	mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT count(*) FROM pg_database, pg_user WHERE datdba = usesysid AND datname = current_database() AND usename = current_user",
+	)).WillReturnError(mockerr)
+
+	// テストの実行
+	r, err := repository.NewRepository("pgx", sqlDB)
+	if err != nil {
+		t.Fatal(err)
+	}
+	owner, act := r.Owner(context.Background())
+
+	// アサーション
+	assert.False(t, owner)
+	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
+}
+
+// オーナー確認時エラー（MySQL）
+func TestMySQLOwnerError(t *testing.T) {
+	testname := "TestMySQLOwnerError"
+
+	// セットアップ
+	sqlDB, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// mockの挙動設定
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT VERSION()")).WillReturnRows(sqlmock.NewRows([]string{"VERSION()"}).AddRow("8.4.2"))
+	mockerr := errors.New(testname)
+	mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT count(*) FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES WHERE TABLE_SCHEMA = DATABASE() AND PRIVILEGE_TYPE = 'CREATE'",
+	)).WillReturnError(mockerr)
+
+	// テストの実行
+	r, err := repository.NewRepository("mysql", sqlDB)
+	if err != nil {
+		t.Fatal(err)
+	}
+	owner, act := r.Owner(context.Background())
+
+	// アサーション
+	assert.False(t, owner)
+	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 
 // トランザクション開始エラー

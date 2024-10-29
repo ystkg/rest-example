@@ -104,13 +104,25 @@ docker compose up -d --wait mysql
 ##### PostgreSQL使用時
 
 ```Shell
-export DBURL=postgres://postgres:pwdev@localhost:5432/?sslmode=disable
+export DBURL=postgres://devdb:pwdevdb@localhost:5432/?sslmode=disable
+```
+
+- Auto Migrationが不要な場合は `appuser` で接続
+
+```Shell
+export DBURL=postgres://appuser:pwappuser@localhost:5432/devdb?sslmode=disable
 ```
 
 ##### MySQL使用時
 
 ```Shell
-export DBURL=mysql://root:pwdev@tcp(localhost:3306)/devdb?parseTime=true
+export DBURL='mysql://devdbuser:pwdevdbuser@tcp(localhost:3306)/devdb?parseTime=true'
+```
+
+- Auto Migrationが不要な場合は `appuser` で接続
+
+```Shell
+export DBURL='mysql://appuser:pwappuser@tcp(localhost:3306)/devdb?parseTime=true'
 ```
 
 - 識別用にMySQLの通常の接続文字列の前に `mysql://` を付与
@@ -287,19 +299,19 @@ docker compose up -d --wait mysql
 ##### PostgreSQL使用時
 
 ```Shell
-docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL=postgres://postgres:pwdev@postgres-develop:5432/?sslmode=disable rest-example
+docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL=postgres://devdb:pwdevdb@postgres-develop:5432/?sslmode=disable rest-example
 ```
 
 ##### MySQL使用時
 
 ```Shell
-docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL='mysql://root:pwdev@tcp(mysql-develop:3306)/devdb?parseTime=true' rest-example
+docker run --init --rm --network=backend-develop -p 1323:1323 -e DBURL='mysql://devdbuser:pwdevdbuser@tcp(mysql-develop:3306)/devdb?parseTime=true' rest-example
 ```
 
 ### 環境変数
 
 | 環境変数名 | 必須 | 説明 |
 | ---- | :----: | ---- |
-| DBURL | 〇 | データベースの接続文字列<br>例）<br> `postgres://postgres:pwdev@localhost:5432/?sslmode=disable` <br> MySQLはプレフィックスに `mysql://` を付与 <br> _※テスト用は固定で変更不可_ |
+| DBURL | 〇 | データベースの接続文字列<br>例）<br> `postgres://devdb:pwdevdb@localhost:5432/?sslmode=disable` <br> MySQLはプレフィックスに `mysql://` を付与 <br> _※テスト用は固定で変更不可_ |
 | JWTKEY |  | 固定したい場合などに任意の文字列を指定。<br>省略した場合、アプリケーションの起動時にランダム生成し、<br>停止すると発行したトークンは有効期限前に **無効** になる |
 | ECHOADDRESS |  | 省略時は `:1323` |

@@ -28,6 +28,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: pwtest
           MYSQL_DATABASE: testdb
+          MYSQL_USER: testdbuser
+          MYSQL_PASSWORD: pwtestdbuser
           TZ: Asia/Tokyo
         options: >-
           --health-cmd "mysqladmin ping"

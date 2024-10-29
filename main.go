@@ -59,8 +59,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := r.InitDb(context.Background()); err != nil {
+	owner, err := r.Owner(context.Background())
+	if err != nil {
 		log.Fatal(err)
+	}
+	if owner {
+		if err := r.InitDb(context.Background()); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// Service

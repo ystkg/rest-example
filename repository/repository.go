@@ -19,6 +19,7 @@ const (
 
 type Repository interface {
 	InitDb(ctx context.Context) error
+	Owner(ctx context.Context) (bool, error)
 
 	BeginTx(ctx context.Context) (context.Context, error)
 	Rollback(ctx context.Context) error
@@ -29,7 +30,8 @@ type Repository interface {
 }
 
 type repositoryGorm struct {
-	db *gorm.DB
+	db    *gorm.DB
+	owner func(context.Context) (bool, error)
 
 	user  UserRepository
 	price PriceRepository
@@ -37,27 +39,51 @@ type repositoryGorm struct {
 
 func NewRepository(driverName string, sqlDB *sql.DB) (Repository, error) {
 	var dialector gorm.Dialector
+	var owner func(context.Context) (bool, error)
 	switch driverName {
 	case "pgx":
 		dialector = postgres.New(postgres.Config{Conn: sqlDB})
+		owner = func(ctx context.Context) (bool, error) {
+			var cnt int
+			if err := sqlDB.QueryRowContext(ctx,
+				"SELECT count(*) FROM pg_database, pg_user WHERE datdba = usesysid AND datname = current_database() AND usename = current_user",
+			).Scan(&cnt); err != nil {
+				return false, wrap(err)
+			}
+			return cnt == 1, nil
+		}
 	case "mysql":
 		dialector = mysql.New(mysql.Config{Conn: sqlDB})
+		owner = func(ctx context.Context) (bool, error) {
+			var cnt int
+			if err := sqlDB.QueryRowContext(ctx,
+				"SELECT count(*) FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES WHERE TABLE_SCHEMA = DATABASE() AND PRIVILEGE_TYPE = 'CREATE'",
+			).Scan(&cnt); err != nil {
+				return false, wrap(err)
+			}
+			return cnt == 1, nil
+		}
 	default:
 		return nil, fmt.Errorf("unsupported:%s", driverName)
 	}
-	return newRepositoryByDialector(dialector)
+	return newRepositoryByDialector(dialector, owner)
 }
 
-func newRepositoryByDialector(dialector gorm.Dialector) (Repository, error) {
+func newRepositoryByDialector(dialector gorm.Dialector, owner func(context.Context) (bool, error)) (Repository, error) {
 	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		return nil, wrap(err)
 	}
 	return &repositoryGorm{
 		db:    db,
+		owner: owner,
 		user:  NewUserRepository(db),
 		price: NewPriceRepository(db),
 	}, nil
+}
+
+func (r *repositoryGorm) Owner(ctx context.Context) (bool, error) {
+	return r.owner(ctx)
 }
 
 func (r *repositoryGorm) InitDb(ctx context.Context) error {

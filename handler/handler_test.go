@@ -59,7 +59,7 @@ func init() {
 			}
 			MySQLTest struct {
 				Environment struct {
-					MySQLRootPassword string `yaml:"MYSQL_ROOT_PASSWORD"`
+					MySQLPassword string `yaml:"MYSQL_PASSWORD"`
 				}
 			} `yaml:"mysql-test"`
 		}
@@ -71,9 +71,20 @@ func init() {
 	pgimage = &conf.Services.Postgres.Image
 	mysqlimage = &conf.Services.MySQL.Image
 	pgpassword = &conf.Services.PostgresTest.Environment.PostgresPassword
-	mysqlpassword = &conf.Services.MySQLTest.Environment.MySQLRootPassword
+	mysqlpassword = &conf.Services.MySQLTest.Environment.MySQLPassword
 
-	if pgpool, err = pgxpool.New(context.Background(), formatDSN("postgres")); err != nil {
+	ctx := context.Background()
+	if pgpool, err = pgxpool.New(ctx, formatDSN("postgres")); err != nil {
+		log.Fatal(err)
+	}
+
+	conn, err := pgpool.Acquire(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Release()
+
+	if _, err = conn.Exec(ctx, "REVOKE ALL ON DATABASE postgres FROM PUBLIC"); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -92,16 +103,20 @@ func createTestDatabase(dbname string) (string, error) {
 	}
 	defer conn.Release()
 
-	if err := dropDatabaseIfExists(ctx, conn, dbname); err != nil {
+	if err = dropDatabaseIfExists(ctx, conn, dbname); err != nil {
 		return "", err
 	}
 
 	// dbnameと同一名のuser（LOGIN権限のあるROLE）を作成
-	if _, err := conn.Exec(ctx, "CREATE ROLE "+dbname+" LOGIN PASSWORD '"+*pgpassword+"'"); err != nil {
+	if _, err = conn.Exec(ctx, "CREATE ROLE "+dbname+" LOGIN PASSWORD '"+*pgpassword+"'"); err != nil {
 		return "", err
 	}
 
-	if _, err := conn.Exec(ctx, "CREATE DATABASE "+dbname+" OWNER "+dbname); err != nil {
+	if _, err = conn.Exec(ctx, "CREATE DATABASE "+dbname+" OWNER "+dbname); err != nil {
+		return "", err
+	}
+
+	if _, err = conn.Exec(ctx, "REVOKE ALL ON DATABASE "+dbname+" FROM PUBLIC"); err != nil {
 		return "", err
 	}
 
@@ -174,7 +189,10 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	if err != nil {
 		return nil, nil, testDB, nil, nil, err
 	}
-	if err := r.InitDb(ctx); err != nil {
+	if _, err = r.Owner(ctx); err != nil {
+		return nil, nil, testDB, nil, nil, err
+	}
+	if err = r.InitDb(ctx); err != nil {
 		return nil, nil, testDB, nil, nil, err
 	}
 
@@ -220,12 +238,16 @@ func setupMySQLTest(testname string) (*echo.Echo, error) {
 
 	// Repository
 	driverName := "mysql"
-	sqlDB, err := sql.Open(driverName, fmt.Sprintf("root:%s@tcp(localhost:13306)/testdb?parseTime=true", *mysqlpassword))
+	sqlDB, err := sql.Open(driverName, fmt.Sprintf("testdbuser:%s@tcp(localhost:13306)/testdb?parseTime=true", *mysqlpassword))
 	if err != nil {
 		return nil, err
 	}
 	r, err := repository.NewRepository(driverName, sqlDB)
 	if err != nil {
+		sqlDB.Close()
+		return nil, err
+	}
+	if _, err = r.Owner(ctx); err != nil {
 		sqlDB.Close()
 		return nil, err
 	}
