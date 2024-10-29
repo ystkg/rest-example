@@ -128,11 +128,10 @@ func TestPgOwnerError(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ok, checked, act := r.Owner(context.Background())
+	owner, act := r.Owner(context.Background())
 
 	// アサーション
-	assert.False(t, ok)
-	assert.True(t, checked)
+	assert.False(t, owner)
 	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 
@@ -158,11 +157,10 @@ func TestMySQLOwnerError(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ok, checked, act := r.Owner(context.Background())
+	owner, act := r.Owner(context.Background())
 
 	// アサーション
-	assert.False(t, ok)
-	assert.True(t, checked)
+	assert.False(t, owner)
 	assert.ErrorIs(t, act.(interface{ Unwrap() error }).Unwrap(), mockerr)
 }
 

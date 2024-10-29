@@ -189,7 +189,7 @@ func setupTestMain(testname string, newService func(repository.Repository) servi
 	if err != nil {
 		return nil, nil, testDB, nil, nil, err
 	}
-	if _, _, err = r.Owner(ctx); err != nil {
+	if _, err = r.Owner(ctx); err != nil {
 		return nil, nil, testDB, nil, nil, err
 	}
 	if err = r.InitDb(ctx); err != nil {
@@ -247,7 +247,7 @@ func setupMySQLTest(testname string) (*echo.Echo, error) {
 		sqlDB.Close()
 		return nil, err
 	}
-	if _, _, err = r.Owner(ctx); err != nil {
+	if _, err = r.Owner(ctx); err != nil {
 		sqlDB.Close()
 		return nil, err
 	}

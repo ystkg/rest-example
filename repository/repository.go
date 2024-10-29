@@ -19,7 +19,7 @@ const (
 
 type Repository interface {
 	InitDb(ctx context.Context) error
-	Owner(ctx context.Context) (ok, checked bool, err error)
+	Owner(ctx context.Context) (bool, error)
 
 	BeginTx(ctx context.Context) (context.Context, error)
 	Rollback(ctx context.Context) error
@@ -82,13 +82,8 @@ func newRepositoryByDialector(dialector gorm.Dialector, owner func(context.Conte
 	}, nil
 }
 
-func (r *repositoryGorm) Owner(ctx context.Context) (ok, checked bool, err error) {
-	if r.owner == nil {
-		return
-	}
-	ok, err = r.owner(ctx)
-	checked = true
-	return
+func (r *repositoryGorm) Owner(ctx context.Context) (bool, error) {
+	return r.owner(ctx)
 }
 
 func (r *repositoryGorm) InitDb(ctx context.Context) error {
