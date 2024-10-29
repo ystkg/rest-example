@@ -8,7 +8,7 @@ services:
     ports:
       - 127.0.0.1:5432:5432
     volumes:
-      - ./initdb/pg:/docker-entrypoint-initdb.d
+      - ./createuser.pg:/docker-entrypoint-initdb.d/createuser.sql
     environment:
       POSTGRES_PASSWORD: pwdev
       POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8 -A scram-sha-256"
@@ -43,7 +43,7 @@ services:
     ports:
       - 127.0.0.1:3306:3306
     volumes:
-      - ./initdb/mysql:/docker-entrypoint-initdb.d
+      - ./createuser.mysql:/docker-entrypoint-initdb.d/createuser.sql
     environment:
       MYSQL_ROOT_PASSWORD: pwdev
       MYSQL_DATABASE: devdb
