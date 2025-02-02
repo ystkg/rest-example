@@ -108,13 +108,15 @@ func TestCreatePriceValidation(t *testing.T) {
 
 	userId := uint(1)
 	jwt := genToken(conf, userId)
+	invalidToken := *jwt + "x"
 	cases := []struct {
 		jwt  *string
 		body string
 		code int
 		err  error
 	}{
-		{nil, "", 401, nil},
+		{nil, "", 400, nil},
+		{&invalidToken, "", 401, nil},
 		{jwt, "", 400, nil},
 		{jwt, "=", 400, nil},
 		{jwt, `{"DateTime":"2023-05-15 12:15:30", "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 201, nil},
@@ -237,11 +239,13 @@ func TestFindPricesValidation(t *testing.T) {
 	}
 
 	jwt := genToken(conf, userId)
+	invalidToken := *jwt + "x"
 	cases := []struct {
 		jwt  *string
 		code int
 	}{
-		{nil, 401},
+		{nil, 400},
+		{&invalidToken, 401},
 		{jwt, 200},
 	}
 
@@ -349,6 +353,7 @@ func TestFindPriceValidation(t *testing.T) {
 	}
 
 	jwt := genToken(conf, userId)
+	invalidToken := *jwt + "x"
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string
@@ -356,7 +361,8 @@ func TestFindPriceValidation(t *testing.T) {
 		code    int
 		err     error
 	}{
-		{nil, priceIdStr, 401, nil},
+		{nil, priceIdStr, 400, nil},
+		{&invalidToken, priceIdStr, 401, nil},
 		{jwt, priceIdStr, 200, nil},
 		{jwt, priceIdStr + "1", 404, handler.ErrNotFound},
 		{jwt, "a", 404, handler.ErrNotFound},
@@ -474,6 +480,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 	}
 
 	jwt := genToken(conf, userId)
+	invalidToken := *jwt + "x"
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string
@@ -482,7 +489,8 @@ func TestUpdatePriceValidation(t *testing.T) {
 		code    int
 		err     error
 	}{
-		{nil, priceIdStr, "", 401, nil},
+		{nil, priceIdStr, "", 400, nil},
+		{&invalidToken, priceIdStr, "", 401, nil},
 		{jwt, priceIdStr, "", 400, nil},
 		{jwt, priceIdStr, "=", 400, nil},
 		{jwt, priceIdStr, `{"DateTime":"2023-05-15 12:15:30", "Store":"pcshop", "Product":"ssd2T", "Price":1200}`, 200, nil},
@@ -600,6 +608,7 @@ func TestDeletePriceValidation(t *testing.T) {
 	}
 
 	jwt := genToken(conf, userId)
+	invalidToken := *jwt + "x"
 	priceIdStr := strconv.FormatUint(uint64(priceId), 10)
 	cases := []struct {
 		jwt     *string
@@ -607,7 +616,8 @@ func TestDeletePriceValidation(t *testing.T) {
 		code    int
 		err     error
 	}{
-		{nil, priceIdStr, 401, nil},
+		{nil, priceIdStr, 400, nil},
+		{&invalidToken, priceIdStr, 401, nil},
 		{jwt, priceIdStr + "1", 404, handler.ErrNotFound},
 		{jwt, "a", 404, handler.ErrNotFound},
 		{jwt, priceIdStr, 204, nil},
