@@ -66,7 +66,7 @@ erDiagram
 
 ### 推奨環境
 
-Go（version 1.24以降）がインストールされていること
+Go version 1.24以降
 
 例
 
