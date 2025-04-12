@@ -72,7 +72,7 @@ Go version 1.24以降
 
 ```ShellSession
 $ go version
-go version go1.24.1 linux/amd64
+go version go1.24.2 linux/amd64
 ```
 
 ### 起動方法
