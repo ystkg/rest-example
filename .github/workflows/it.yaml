@@ -11,7 +11,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: pwtest
           POSTGRES_INITDB_ARGS: "--no-locale -E UTF-8 -A scram-sha-256"

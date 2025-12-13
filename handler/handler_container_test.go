@@ -22,13 +22,13 @@ import (
 	"github.com/ystkg/rest-example/service"
 )
 
-func setupContainerTest(testname, driverName string, sqlDB *sql.DB) (*echo.Echo, error) {
+func setupContainerTest(ctx context.Context, testname, driverName string, sqlDB *sql.DB) (*echo.Echo, error) {
 	// Repository
 	r, err := repository.NewRepository(driverName, sqlDB)
 	if err != nil {
 		return nil, err
 	}
-	if err := r.InitDb(context.Background()); err != nil {
+	if err := r.InitDb(ctx); err != nil {
 		return nil, err
 	}
 
@@ -69,7 +69,7 @@ func TestContainerPg(t *testing.T) {
 	password := *pgpassword
 
 	// コンテナ起動
-	ctx := context.Background()
+	ctx := t.Context()
 	pgContainer, err := postgres.Run(ctx,
 		*pgimage,
 		postgres.WithPassword(password),
@@ -87,7 +87,7 @@ func TestContainerPg(t *testing.T) {
 	sqlDB, err := sql.Open(driverName, pgContainer.MustConnectionString(ctx, "sslmode=disable", "TimeZone=Asia/Tokyo"))
 	require.NoError(t, err)
 	defer sqlDB.Close()
-	e, err := setupContainerTest(testname, driverName, sqlDB)
+	e, err := setupContainerTest(t.Context(), testname, driverName, sqlDB)
 	require.NoError(t, err)
 
 	// テストシナリオの実行
@@ -105,7 +105,7 @@ func TestContainerMySQL(t *testing.T) {
 	password := *mysqlpassword
 
 	// コンテナ起動
-	ctx := context.Background()
+	ctx := t.Context()
 	driverName := "mysql"
 	mysqlContainer, err := mysql.Run(ctx,
 		*mysqlimage,
@@ -130,7 +130,7 @@ func TestContainerMySQL(t *testing.T) {
 	sqlDB, err := sql.Open(driverName, mysqlContainer.MustConnectionString(ctx, "parseTime=true"))
 	require.NoError(t, err)
 	defer sqlDB.Close()
-	e, err := setupContainerTest(testname, driverName, sqlDB)
+	e, err := setupContainerTest(t.Context(), testname, driverName, sqlDB)
 	require.NoError(t, err)
 
 	// テストシナリオの実行
@@ -181,7 +181,7 @@ func TestDockerPg(t *testing.T) {
 	require.NoError(t, err)
 
 	// セットアップ
-	e, err := setupContainerTest(testname, driverName, sqlDB)
+	e, err := setupContainerTest(t.Context(), testname, driverName, sqlDB)
 	require.NoError(t, err)
 
 	// テストシナリオの実行
@@ -233,7 +233,7 @@ func TestDockerMySQL(t *testing.T) {
 	require.NoError(t, err)
 
 	// セットアップ
-	e, err := setupContainerTest(testname, driverName, sqlDB)
+	e, err := setupContainerTest(t.Context(), testname, driverName, sqlDB)
 	require.NoError(t, err)
 
 	// テストシナリオの実行
