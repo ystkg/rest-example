@@ -1,7 +1,6 @@
 package handler_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -102,7 +101,7 @@ func TestCreatePriceValidation(t *testing.T) {
 	defer cleanIfSuccess(t, testDB)
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
-	if err := tx.Commit(context.Background()); err != nil {
+	if err := tx.Commit(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -115,7 +114,7 @@ func TestCreatePriceValidation(t *testing.T) {
 		code int
 		err  error
 	}{
-		{nil, "", 400, nil},
+		{nil, "", 401, nil},
 		{&invalidToken, "", 401, nil},
 		{jwt, "", 400, nil},
 		{jwt, "=", 400, nil},
@@ -234,7 +233,7 @@ func TestFindPricesValidation(t *testing.T) {
 	}
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
-	if err := tx.Commit(context.Background()); err != nil {
+	if err := tx.Commit(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -244,7 +243,7 @@ func TestFindPricesValidation(t *testing.T) {
 		jwt  *string
 		code int
 	}{
-		{nil, 400},
+		{nil, 401},
 		{&invalidToken, 401},
 		{jwt, 200},
 	}
@@ -348,7 +347,7 @@ func TestFindPriceValidation(t *testing.T) {
 	}
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
-	if err := tx.Commit(context.Background()); err != nil {
+	if err := tx.Commit(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -361,7 +360,7 @@ func TestFindPriceValidation(t *testing.T) {
 		code    int
 		err     error
 	}{
-		{nil, priceIdStr, 400, nil},
+		{nil, priceIdStr, 401, nil},
 		{&invalidToken, priceIdStr, 401, nil},
 		{jwt, priceIdStr, 200, nil},
 		{jwt, priceIdStr + "1", 404, handler.ErrNotFound},
@@ -475,7 +474,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 	}
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
-	if err := tx.Commit(context.Background()); err != nil {
+	if err := tx.Commit(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -489,7 +488,7 @@ func TestUpdatePriceValidation(t *testing.T) {
 		code    int
 		err     error
 	}{
-		{nil, priceIdStr, "", 400, nil},
+		{nil, priceIdStr, "", 401, nil},
 		{&invalidToken, priceIdStr, "", 401, nil},
 		{jwt, priceIdStr, "", 400, nil},
 		{jwt, priceIdStr, "=", 400, nil},
@@ -603,7 +602,7 @@ func TestDeletePriceValidation(t *testing.T) {
 	}
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
-	if err := tx.Commit(context.Background()); err != nil {
+	if err := tx.Commit(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -616,7 +615,7 @@ func TestDeletePriceValidation(t *testing.T) {
 		code    int
 		err     error
 	}{
-		{nil, priceIdStr, 400, nil},
+		{nil, priceIdStr, 401, nil},
 		{&invalidToken, priceIdStr, 401, nil},
 		{jwt, priceIdStr + "1", 404, handler.ErrNotFound},
 		{jwt, "a", 404, handler.ErrNotFound},

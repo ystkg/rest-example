@@ -16,7 +16,7 @@ func NewEcho(h *Handler) *echo.Echo {
 
 	e.Validator = h.validator
 
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit(h.requestBodyLimit))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(h.rateLimit))))

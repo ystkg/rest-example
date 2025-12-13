@@ -44,7 +44,7 @@ func scenario(t *testing.T, e *echo.Echo, testname string) {
 	assert.Equal(t, 201, rec.Code)
 
 	// ユーザの登録（重複）
-	rec, err = execHandler(e, req)
+	_, err = execHandler(e, req)
 	assert.NotNil(t, err)
 	httperr, ok := err.(*echo.HTTPError)
 	assert.True(t, ok)
@@ -175,7 +175,7 @@ func scenario(t *testing.T, e *echo.Echo, testname string) {
 		"",
 		&token,
 	)
-	rec, err = execHandler(e, req)
+	_, err = execHandler(e, req)
 	assert.NotNil(t, err)
 	httperr, ok = err.(*echo.HTTPError)
 	assert.True(t, ok)

@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17
+    image: postgres:18
     container_name: postgres-develop
     restart: always
     networks:
@@ -20,7 +20,7 @@ services:
       timeout: 5s
       retries: 10
   postgres-test:
-    image: postgres:17
+    image: postgres:18
     container_name: postgres-test
     ports:
       - 127.0.0.1:15432:5432

@@ -1,7 +1,6 @@
 package handler_test
 
 import (
-	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -97,7 +96,7 @@ func TestCreateUserValidation(t *testing.T) {
 	defer cleanIfSuccess(t, testDB)
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
-	if err := tx.Commit(context.Background()); err != nil {
+	if err := tx.Commit(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -219,7 +218,7 @@ func TestGenTokenValidation(t *testing.T) {
 	}
 
 	// バリデーションのテストは事前にコミットしてテーブル駆動
-	if err := tx.Commit(context.Background()); err != nil {
+	if err := tx.Commit(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 

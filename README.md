@@ -66,13 +66,13 @@ erDiagram
 
 ### 推奨環境
 
-Go version 1.24以降
+Go version 1.25以降
 
 例
 
 ```ShellSession
 $ go version
-go version go1.24.2 linux/amd64
+go version go1.25.5 linux/amd64
 ```
 
 ### 起動方法

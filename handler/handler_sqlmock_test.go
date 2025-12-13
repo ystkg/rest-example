@@ -1,7 +1,6 @@
 package handler_test
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -128,7 +127,7 @@ func TestPgOwnerError(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	owner, act := r.Owner(context.Background())
+	owner, act := r.Owner(t.Context())
 
 	// アサーション
 	assert.False(t, owner)
@@ -157,7 +156,7 @@ func TestMySQLOwnerError(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	owner, act := r.Owner(context.Background())
+	owner, act := r.Owner(t.Context())
 
 	// アサーション
 	assert.False(t, owner)
